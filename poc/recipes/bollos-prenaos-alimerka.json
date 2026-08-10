@@ -1,0 +1,65 @@
+{
+  "id": "bollos-prenaos-alimerka",
+  "name": "Bollos preñaos tiernos (estilo Alimerka)",
+  "servings": "~24 bollos de 40 g",
+  "ingredients": [
+    {
+      "item": "harina de fuerza",
+      "amount": 500,
+      "unit": "g en total (tangzhong + masa)"
+    },
+    {
+      "item": "leche",
+      "amount": 220,
+      "unit": "g en total (tangzhong + masa)"
+    },
+    {
+      "item": "huevos",
+      "amount": 3,
+      "unit": "unidad (2 para la masa + 1 para pintar)"
+    },
+    {
+      "item": "azúcar",
+      "amount": 35,
+      "unit": "g"
+    },
+    {
+      "item": "sal",
+      "amount": 10,
+      "unit": "g"
+    },
+    {
+      "item": "levadura seca",
+      "amount": 5.5,
+      "unit": "g"
+    },
+    {
+      "item": "mantequilla",
+      "amount": 80,
+      "unit": "g blanda (+ un poco extra para pincelar al salir del horno)"
+    },
+    {
+      "item": "chorizo semicurado",
+      "amount": null,
+      "unit": "en trocitos pequeños, al gusto"
+    }
+  ],
+  "steps": [
+    "Prepara el tangzhong: escalda la harina de fuerza (25 g) con la leche (125 g) a fuego suave sin dejar de remover hasta que espese y forme una papilla que deje surco con la varilla (unos 65°C). Deja enfriar.",
+    "Mezcla todos los ingredientes de la masa (tangzhong, harina, leche, huevos, azúcar y levadura) excepto la sal y la mantequilla.",
+    "Deja reposar la masa 20 minutos.",
+    "Añade la sal y amasa 5 minutos.",
+    "Incorpora la mantequilla poco a poco y amasa 10-15 minutos, hasta que la masa esté lisa y elástica.",
+    "Deja fermentar la masa 1½-2 horas.",
+    "Divide la masa en bolas de 40 g.",
+    "Rellena cada bola con un trocito de chorizo y ciérrala bien, dejando la costura hacia abajo.",
+    "Coloca los bollos en una bandeja, cúbrelos y déjalos toda la noche en la nevera.",
+    "Al día siguiente, saca los bollos de la nevera aproximadamente 1 hora antes de hornear.",
+    "Mientras se atemperan, precalienta el horno a 185°C.",
+    "Pinta los bollos con huevo batido.",
+    "Hornea 18-20 minutos hasta que estén dorados.",
+    "Al salir del horno, pincela con mantequilla derretida para que la corteza quede muy tierna."
+  ],
+  "summary": "Una masa enriquecida con tangzhong que retiene mucha humedad se amasa hasta quedar lisa y elástica, se rellena con trocitos de chorizo semicurado en bolas de 40 gramos y fermenta toda la noche en la nevera para ganar sabor. Al día siguiente se pintan con huevo batido y se hornean a 185°C hasta dorar, terminando con un pincelado de mantequilla derretida que deja la corteza muy tierna.",
+  "tip": "El tamaño de las bolas (40 g) es clave para que salgan como los bollos de bollería industrial. Añade la sal y la mantequilla al final del amasado para que el gluten se desarrolle primero, e incorpora la mantequilla en varias tandas sin añadir la siguiente hasta que la anterior esté totalmente integrada."
+}

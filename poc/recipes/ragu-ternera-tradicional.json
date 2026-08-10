@@ -1,0 +1,128 @@
+{
+  "id": "ragu-ternera-tradicional",
+  "name": "Ragú de ternera tradicional",
+  "servings": "3-4 personas",
+  "ingredients": [
+    {
+      "item": "ternera para guisar",
+      "amount": 600,
+      "unit": "g"
+    },
+    {
+      "item": "sal",
+      "amount": null,
+      "unit": "al gusto"
+    },
+    {
+      "item": "pimienta negra",
+      "amount": null,
+      "unit": "al gusto"
+    },
+    {
+      "item": "aceite de oliva virgen extra",
+      "amount": 1.5,
+      "unit": "cucharadas"
+    },
+    {
+      "item": "panceta ahumada",
+      "amount": 60,
+      "unit": "g, opcional pero recomendable"
+    },
+    {
+      "item": "cebolla",
+      "amount": 1,
+      "unit": "mediana, picada fina"
+    },
+    {
+      "item": "zanahoria",
+      "amount": 1,
+      "unit": "grande, picada fina"
+    },
+    {
+      "item": "apio",
+      "amount": 1,
+      "unit": "rama, picada fina"
+    },
+    {
+      "item": "ajo",
+      "amount": 2,
+      "unit": "dientes, picados"
+    },
+    {
+      "item": "concentrado de tomate",
+      "amount": 1.5,
+      "unit": "cucharadas"
+    },
+    {
+      "item": "tomate triturado",
+      "amount": 240,
+      "unit": "g"
+    },
+    {
+      "item": "vino tinto",
+      "amount": 120,
+      "unit": "ml"
+    },
+    {
+      "item": "caldo de carne",
+      "amount": 300,
+      "unit": "ml (+200 ml reservados por si hace falta)"
+    },
+    {
+      "item": "laurel",
+      "amount": 1,
+      "unit": "hoja"
+    },
+    {
+      "item": "romero",
+      "amount": 1,
+      "unit": "rama"
+    },
+    {
+      "item": "tomillo",
+      "amount": 2,
+      "unit": "ramas"
+    },
+    {
+      "item": "parmesano (corteza)",
+      "amount": 2,
+      "unit": "trozos pequeños"
+    },
+    {
+      "item": "salsa Worcestershire",
+      "amount": 1,
+      "unit": "cucharadita (5 ml)"
+    },
+    {
+      "item": "salsa de soja",
+      "amount": 1,
+      "unit": "cucharadita (5 ml)"
+    },
+    {
+      "item": "pasta fresca",
+      "amount": 350,
+      "unit": "g (300-400 g, o 220-250 g si es seca)"
+    },
+    {
+      "item": "parmesano rallado",
+      "amount": null,
+      "unit": "al gusto, para servir"
+    }
+  ],
+  "steps": [
+    "Saca la carne de la nevera 30 minutos antes, sécala bien con papel de cocina y salpimiéntala generosamente.",
+    "Calienta una olla de fondo grueso a fuego medio-alto, añade el aceite y dora la carne en 2 o 3 tandas sin llenar la olla. Resérvala.",
+    "Si usas panceta, cocínala primero unos 5 minutos; añade cebolla, zanahoria y apio y cocina 10-12 minutos; añade el ajo y cocina 1 minuto más.",
+    "Añade el concentrado de tomate y cocina 2 minutos removiendo.",
+    "Añade el vino tinto, rasca bien el fondo de la olla y deja reducir 5-8 minutos.",
+    "Incorpora la carne, el tomate triturado, el caldo, la Worcestershire, la soja, el laurel, el romero, el tomillo y el parmesano. El líquido debe casi cubrir la carne; añade más caldo si hace falta.",
+    "Cuando rompa a hervir, baja el fuego al mínimo hasta que haya un hervor muy suave -una burbuja cada 5-10 segundos- y deja la tapa medio puesta.",
+    "Cocina así 3-4 horas, removiendo cada 20-30 minutos y añadiendo caldo caliente si el líquido baja demasiado.",
+    "Cuando la carne se rompa con un tenedor sin hacer fuerza, retira el laurel, el romero y los restos de parmesano, y desmenúzala.",
+    "Cocina 15-20 minutos más, hasta que la salsa quede espesa y brillante.",
+    "Cuece la pasta al dente, guardando una taza del agua de cocción.",
+    "Añade la pasta directamente al ragú, con un poco del agua de cocción si hace falta, remueve un minuto y sirve con abundante parmesano rallado."
+  ],
+  "summary": "600 gramos de ternera se doran y se cuecen muy despacio, durante 3 o 4 horas a fuego mínimo, junto a un sofrito de cebolla, zanahoria y apio, tomate, vino tinto y hierbas aromáticas, hasta que el colágeno se convierte en gelatina y la carne se deshace sola; se desmenuza, se reduce la salsa y se mezcla con pasta fresca y parmesano justo antes de servir.",
+  "tip": "El punto correcto del fuego durante la cocción lenta es un hervor tan suave que solo sube una burbuja cada 5-10 segundos -si hierve a borbotones está demasiado fuerte, y si no hay ninguna burbuja está demasiado flojo. Prueba la sal solo al final, porque la soja, la Worcestershire y el parmesano ya aportan bastante, y el ragú está aún más bueno al día siguiente."
+}

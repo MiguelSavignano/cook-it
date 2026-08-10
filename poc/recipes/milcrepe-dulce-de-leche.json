@@ -1,0 +1,76 @@
+{
+  "id": "milcrepe-dulce-de-leche",
+  "name": "Milcrepe de dulce de leche",
+  "servings": "1 tarta (18-20 capas)",
+  "ingredients": [
+    {
+      "item": "huevos",
+      "amount": 4,
+      "unit": "unidad"
+    },
+    {
+      "item": "leche",
+      "amount": 500,
+      "unit": "ml"
+    },
+    {
+      "item": "harina de trigo",
+      "amount": 250,
+      "unit": "g"
+    },
+    {
+      "item": "mantequilla derretida",
+      "amount": 50,
+      "unit": "g"
+    },
+    {
+      "item": "azúcar",
+      "amount": 40,
+      "unit": "g (2 cucharadas)"
+    },
+    {
+      "item": "sal",
+      "amount": null,
+      "unit": "1 pizca"
+    },
+    {
+      "item": "vainilla",
+      "amount": 1,
+      "unit": "cucharadita, opcional"
+    },
+    {
+      "item": "nata para montar (mínimo 35% MG)",
+      "amount": 500,
+      "unit": "ml"
+    },
+    {
+      "item": "azúcar glas",
+      "amount": 80,
+      "unit": "g"
+    },
+    {
+      "item": "dulce de leche",
+      "amount": 450,
+      "unit": "g (400-500 g)"
+    }
+  ],
+  "steps": [
+    "Bate los huevos con el azúcar y la sal.",
+    "Añade la leche poco a poco, sin dejar de batir.",
+    "Incorpora la harina tamizada y mezcla hasta que no queden grumos.",
+    "Añade la mantequilla derretida y la vainilla.",
+    "Deja reposar la masa en la nevera al menos 30 minutos.",
+    "Calienta una sartén antiadherente a fuego medio y engrásala ligeramente.",
+    "Vierte un cucharón de masa, repartiéndola fina por toda la base.",
+    "Cocina 1-2 minutos por cada lado, hasta que esté dorada pero flexible.",
+    "Repite hasta terminar toda la masa (18-22 crepes) y déjalas enfriar por completo, separadas entre sí.",
+    "Monta la nata con el azúcar glas hasta que quede firme.",
+    "Incorpora el dulce de leche a la nata montada con cuidado (o alterna capas de nata y dulce de leche por separado).",
+    "Coloca la primera crepe como base y extiende una capa fina de relleno.",
+    "Coloca la siguiente crepe encima y repite el proceso con todas las capas.",
+    "Termina con una capa de crepe simple o decorada por encima y alisa los bordes con una espátula.",
+    "Refrigera la tarta al menos 3-4 horas, idealmente toda la noche, para que las capas se asienten."
+  ],
+  "summary": "Crepes finas cocinadas una a una en sartén y enfriadas por completo se apilan en capas alternas con nata montada mezclada con dulce de leche hasta formar una tarta de 18-20 pisos, que se deja reposar en frío varias horas para que asiente antes de cortarla.",
+  "tip": "Deja enfriar las crepes por completo y por separado antes de montar la tarta: si se apilan calientes o juntas se pegan y se rompen al separarlas. (Esta receta se guardó solo con la lista de ingredientes; los pasos son el método estándar de un milcrepe, ajústalos si tu técnica real es distinta.)"
+}

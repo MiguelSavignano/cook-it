@@ -1,0 +1,55 @@
+{
+  "id": "tarta-queso-pistacho",
+  "name": "Tarta de queso y pistacho",
+  "servings": "1 molde",
+  "ingredients": [
+    {
+      "item": "nata",
+      "amount": 200,
+      "unit": "ml"
+    },
+    {
+      "item": "vainilla",
+      "amount": null,
+      "unit": "chorrito de esencia"
+    },
+    {
+      "item": "pistacho (crema o pasta)",
+      "amount": null,
+      "unit": "1/3 de tarro"
+    },
+    {
+      "item": "queso crema",
+      "amount": 225,
+      "unit": "g (200-250 g)"
+    },
+    {
+      "item": "queso mascarpone",
+      "amount": 250,
+      "unit": "g"
+    },
+    {
+      "item": "azúcar",
+      "amount": 120,
+      "unit": "g"
+    },
+    {
+      "item": "huevos",
+      "amount": 3,
+      "unit": "unidad"
+    }
+  ],
+  "steps": [
+    "Precalienta el horno a 180°C (calor arriba y abajo) y prepara un molde forrado con papel de horno.",
+    "Bate el queso crema y el mascarpone hasta que estén lisos.",
+    "Añade el azúcar y mezcla bien.",
+    "Incorpora los huevos uno a uno.",
+    "Añade la nata y el chorrito de esencia de vainilla.",
+    "Incorpora el pistacho y mezcla hasta que quede homogéneo.",
+    "Vierte la mezcla en el molde y hornea 40 minutos a 180°C.",
+    "Apaga el horno y deja la tarta dentro 30 minutos con la puerta abierta, para que termine de cuajar sin bajones bruscos de temperatura.",
+    "Saca y enfría del todo a temperatura ambiente antes de refrigerar varias horas o toda la noche."
+  ],
+  "summary": "Una mezcla cremosa de queso crema, mascarpone y pasta de pistacho se hornea a 180°C hasta cuajar y se deja enfriar dentro del horno apagado con la puerta entreabierta, para que no se agriete y quede con esa textura suave típica de las tartas de queso al horno.",
+  "tip": "Deja la tarta enfriándose dentro del horno apagado con la puerta abierta -ese cambio de temperatura gradual es lo que evita que se raje la superficie. (Esta receta solo tenía ingredientes y horneado apuntados; el orden de mezclado es el método estándar de una tarta de queso, ajústalo si tu técnica real es distinta. Falta por confirmar el tiempo de refrigeración final antes de servir.)"
+}

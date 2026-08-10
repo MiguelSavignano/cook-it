@@ -1,0 +1,31 @@
+{
+  "id": "galletas-choco",
+  "name": "Galletas choco",
+  "servings": "una bandeja (según tamaño de las bolas)",
+  "ingredients": [
+    {"item": "huevos", "amount": 2, "unit": "unidad"},
+    {"item": "mantequilla", "amount": 150, "unit": "g, a temperatura ambiente"},
+    {"item": "azúcar blanco", "amount": 150, "unit": "g"},
+    {"item": "azúcar moreno", "amount": 150, "unit": "g (o más blanco si no tienes)"},
+    {"item": "vainilla", "amount": 1, "unit": "cucharadita de esencia"},
+    {"item": "harina de trigo", "amount": 350, "unit": "g"},
+    {"item": "polvo de hornear", "amount": 1, "unit": "cucharadita"},
+    {"item": "bicarbonato", "amount": 0.5, "unit": "cucharadita, opcional (mejora la textura)"},
+    {"item": "sal", "amount": 0.5, "unit": "cucharadita"},
+    {"item": "chispas de chocolate", "amount": 200, "unit": "g (o chocolate picado)"}
+  ],
+  "steps": [
+    "Bate la mantequilla con el azúcar blanco y el azúcar moreno hasta que quede una mezcla cremosa y esponjosa.",
+    "Añade los huevos uno a uno, batiendo bien entre cada uno, e incorpora la esencia de vainilla.",
+    "Tamiza juntos la harina, el polvo de hornear, el bicarbonato y la sal.",
+    "Incorpora los secos a la mezcla húmeda poco a poco, mezclando solo hasta integrar.",
+    "Añade las chispas de chocolate y mezcla suavemente para repartirlas por toda la masa.",
+    "Refrigera la masa al menos 30 minutos (o hasta 24-48 horas) para que las galletas queden más sabrosas y no se extiendan demasiado.",
+    "Precalienta el horno a 180°C.",
+    "Forma bolas de masa y colócalas separadas en una bandeja con papel de horno.",
+    "Hornea 10-12 minutos, hasta que los bordes estén dorados y el centro aún ligeramente blando.",
+    "Deja enfriar unos minutos en la bandeja antes de pasarlas a una rejilla."
+  ],
+  "summary": "La mantequilla se crema con los dos azúcares hasta quedar esponjosa, se incorporan huevos y harina sin sobrebatir, y una masa cargada de chispas de chocolate reposa en frío antes de hornearse a 180°C el tiempo justo para que los bordes doren y el centro quede tierno y ligeramente blando.",
+  "tip": "No te saltes el reposo en frío de la masa (mínimo 30 minutos, mejor si es de un día para otro): concentra los sabores y evita que las galletas se extiendan demasiado al hornear. Sácalas del horno cuando el centro aún esté blando -siguen cuajando fuera con el calor residual."
+}

@@ -1,0 +1,40 @@
+{
+  "id": "cheesecake-marmolado-dulce-leche-chocolate-blanco",
+  "name": "Cheesecake marmolado de dulce de leche y chocolate blanco",
+  "servings": "1 molde",
+  "ingredients": [
+    {"item": "galletas (base, opcional)", "amount": 200, "unit": "g aprox."},
+    {"item": "mantequilla (base)", "amount": 85, "unit": "g (80-90 g)"},
+    {"item": "queso crema", "amount": 500, "unit": "g"},
+    {"item": "azúcar", "amount": 120, "unit": "g"},
+    {"item": "vainilla", "amount": null, "unit": "al gusto"},
+    {"item": "huevos", "amount": null, "unit": "cantidad no especificada en la receta original, se añaden uno a uno"},
+    {"item": "maicena", "amount": null, "unit": "al gusto"},
+    {"item": "nata (mezcla)", "amount": 140, "unit": "ml"},
+    {"item": "chocolate blanco (parte A)", "amount": 150, "unit": "g"},
+    {"item": "dulce de leche (parte B)", "amount": 170, "unit": "g (160-180 g)"},
+    {"item": "chocolate blanco derretido (parte B)", "amount": 25, "unit": "g (20-30 g)"},
+    {"item": "nata (ganache)", "amount": 40, "unit": "ml"},
+    {"item": "dulce de leche (ganache)", "amount": 120, "unit": "g"},
+    {"item": "mantequilla (ganache)", "amount": 15, "unit": "g"},
+    {"item": "sal (ganache/decoración)", "amount": null, "unit": "pizca, opcional"}
+  ],
+  "steps": [
+    "Si quieres base, tritura las galletas, mézclalas con la mantequilla derretida, presiona en el molde y hornea 10 minutos a 180°C o enfría 20 minutos en la nevera.",
+    "Bate el queso crema hasta que esté liso, añade el azúcar y mezcla, incorpora la vainilla.",
+    "Añade los huevos uno a uno, mezclando suave sin sobrebatir.",
+    "Agrega la maicena y mezcla solo hasta integrar, luego añade la nata y mezcla hasta que quede homogéneo.",
+    "Separa la mezcla en dos partes: 2/3 (Parte A, blanca) y 1/3 (Parte B, dulce de leche).",
+    "Derrite el chocolate blanco y añádelo a la Parte A, mezclando hasta que quede uniforme.",
+    "Añade el dulce de leche a la Parte B junto con el chocolate blanco derretido extra, y mezcla hasta que quede homogéneo.",
+    "Vierte la mezcla blanca en el molde, añade cucharadas de la mezcla de dulce de leche encima en capas alternas.",
+    "Con un palillo o cuchillo, haz movimientos suaves en espiral para crear el efecto marmolado, sin mezclar en exceso.",
+    "Precalienta el horno a 160°C y hornea 50-60 minutos, hasta que el centro quede ligeramente tembloroso.",
+    "Apaga el horno y deja la tarta dentro 30 minutos con la puerta entreabierta, luego sácala y enfríala a temperatura ambiente.",
+    "Refrigera mínimo 6 horas, idealmente toda la noche.",
+    "Para el ganache: calienta la nata sin que hierva, añade el dulce de leche y la mantequilla, y mezcla hasta que quede brillante y suave (añade una pizca de sal si quieres contraste).",
+    "Decora con hilos de ganache, virutas de chocolate blanco, nueces tostadas y, si quieres, sal en escamas."
+  ],
+  "summary": "Una base cremosa de queso se divide en dos: una parte con chocolate blanco derretido y otra con dulce de leche, que se vierten en capas alternas y se marmolan con un palillo antes de hornear despacio a baja temperatura; se remata con un ganache brillante de dulce de leche y virutas de chocolate blanco.",
+  "tip": "Para mantener el efecto marmolado no mezcles en exceso al hacer las espirales con el palillo, y dale un enfriado gradual dentro del horno apagado con la puerta entreabierta antes de pasarla a la nevera, para que no se agriete la superficie."
+}

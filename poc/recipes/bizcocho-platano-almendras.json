@@ -1,0 +1,31 @@
+{
+  "id": "bizcocho-platano-almendras",
+  "name": "Bizcocho de plátano con almendras tostadas",
+  "servings": "1 molde (20-22 cm)",
+  "ingredients": [
+    {"item": "plátanos muy maduros", "amount": 2, "unit": "unidad"},
+    {"item": "harina de trigo", "amount": 200, "unit": "g"},
+    {"item": "azúcar moreno", "amount": 100, "unit": "g"},
+    {"item": "huevo grande", "amount": 1, "unit": "unidad"},
+    {"item": "aceite de girasol", "amount": 80, "unit": "ml (o 90 g de mantequilla derretida)"},
+    {"item": "extracto de vainilla", "amount": 1, "unit": "cucharadita, opcional"},
+    {"item": "levadura química", "amount": 8, "unit": "g (½ sobre aprox.)"},
+    {"item": "sal", "amount": null, "unit": "1 pizca"},
+    {"item": "canela", "amount": 0.5, "unit": "cucharadita, opcional"},
+    {"item": "almendras tostadas troceadas", "amount": 50, "unit": "g"},
+    {"item": "azúcar moreno (cobertura)", "amount": 18, "unit": "g (1 cucharada, 15-20 g)"}
+  ],
+  "steps": [
+    "Precalienta el horno a 180°C (calor arriba y abajo) y engrasa un molde de 20-22 cm o fórralo con papel de horno.",
+    "Machaca los plátanos hasta obtener un puré.",
+    "Bate el huevo con el azúcar moreno durante 2-3 minutos.",
+    "Añade el aceite, la vainilla y el puré de plátano, y mezcla bien.",
+    "Tamiza la harina, la levadura, la sal y la canela e incorpóralas, mezclando solo hasta integrar.",
+    "Añade las almendras tostadas troceadas y remueve suavemente.",
+    "Vierte la masa en el molde y espolvorea uniformemente una cucharada de azúcar moreno sobre toda la superficie justo antes de hornear.",
+    "Hornea 40-50 minutos, hasta que al introducir un palillo salga limpio.",
+    "Deja reposar 10 minutos antes de desmoldar y enfría sobre una rejilla."
+  ],
+  "summary": "Plátanos muy maduros machacados se mezclan con huevo, azúcar moreno y aceite, se incorporan a la harina con almendras tostadas troceadas, y justo antes de hornear se espolvorea azúcar moreno por encima para que se caramelice y forme una costra crujiente con sabor a toffee sobre un interior tierno y húmedo.",
+  "tip": "No te saltes el azúcar moreno espolvoreado por encima justo antes de hornear -es lo que da ese acabado caramelizado tipo toffee. Y usa plátanos con muchas manchas negras: cuanto más maduros, más jugoso y dulce queda el bizcocho."
+}

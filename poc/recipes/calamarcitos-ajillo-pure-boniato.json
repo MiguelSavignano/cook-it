@@ -1,0 +1,88 @@
+{
+  "id": "calamarcitos-ajillo-pure-boniato",
+  "name": "Calamarcitos al ajillo con puré de boniato",
+  "servings": "2-3 personas",
+  "ingredients": [
+    {
+      "item": "calamarcitos pequeños",
+      "amount": 500,
+      "unit": "g"
+    },
+    {
+      "item": "ajo",
+      "amount": 4,
+      "unit": "dientes, laminados"
+    },
+    {
+      "item": "aceite de oliva virgen extra",
+      "amount": 3,
+      "unit": "cucharadas"
+    },
+    {
+      "item": "perejil fresco picado",
+      "amount": 2,
+      "unit": "cucharadas"
+    },
+    {
+      "item": "sal",
+      "amount": null,
+      "unit": "al gusto"
+    },
+    {
+      "item": "pimienta negra",
+      "amount": null,
+      "unit": "al gusto, opcional"
+    },
+    {
+      "item": "limón",
+      "amount": 0.5,
+      "unit": "unidad"
+    },
+    {
+      "item": "boniato",
+      "amount": 2,
+      "unit": "medianos (500-600 g)"
+    },
+    {
+      "item": "mantequilla",
+      "amount": 30,
+      "unit": "g"
+    },
+    {
+      "item": "leche caliente o nata",
+      "amount": 75,
+      "unit": "ml (50-100 ml), opcional"
+    },
+    {
+      "item": "nuez moscada",
+      "amount": null,
+      "unit": "pizca, opcional"
+    },
+    {
+      "item": "miel",
+      "amount": 1,
+      "unit": "cucharadita, opcional (toque especial)"
+    },
+    {
+      "item": "pimentón ahumado",
+      "amount": null,
+      "unit": "pizca, opcional (toque especial)"
+    }
+  ],
+  "steps": [
+    "Pela los boniatos y córtalos en dados.",
+    "Cuécelos en agua con una pizca de sal 15-20 minutos, hasta que estén muy tiernos.",
+    "Escúrrelos bien y tritúralos o aplástalos con un pasapurés.",
+    "Incorpora la mantequilla y mezcla.",
+    "Añade poco a poco la leche caliente (o nata) hasta obtener una textura cremosa.",
+    "Ajusta de sal, pimienta y, si te gusta, una pizca de nuez moscada. Reserva caliente.",
+    "Seca muy bien los calamarcitos con papel de cocina.",
+    "Calienta una sartén grande a fuego fuerte y añade el aceite de oliva.",
+    "Incorpora los ajos laminados y dóralos 30-60 segundos, sin que se quemen.",
+    "Añade los calamarcitos en una sola capa (si no caben, cocina en dos tandas) y cocina 2-3 minutos, removiendo continuamente.",
+    "Apaga el fuego, añade el perejil picado, unas gotas de limón y rectifica de sal.",
+    "Sirve una base de puré de boniato con los calamarcitos encima, rociados con el aceite de ajo de la sartén y un poco más de perejil y limón."
+  ],
+  "summary": "Un puré de boniato cremoso con mantequilla y un toque de nuez moscada sirve de base a unos calamarcitos salteados muy rápido en aceite de ajo dorado, terminados con perejil fresco y unas gotas de limón para un plato ligero y resuelto en menos de 40 minutos.",
+  "tip": "Seca muy bien los calamarcitos antes de cocinarlos para que se doren en vez de cocerse, y no prolongues la cocción -entre 5 y 15 minutos quedan gomosos. Para un toque especial, añade al puré una cucharadita de miel o una pizca de pimentón ahumado."
+}

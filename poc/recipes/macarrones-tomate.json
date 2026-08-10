@@ -1,0 +1,45 @@
+{
+  "id": "macarrones-tomate",
+  "name": "Macarrones con tomate",
+  "servings": 2,
+  "ingredients": [
+    {
+      "item": "macarrones",
+      "amount": 200,
+      "unit": "g"
+    },
+    {
+      "item": "tomate frito",
+      "amount": 300,
+      "unit": "g"
+    },
+    {
+      "item": "cebolla",
+      "amount": 0.5,
+      "unit": "unidad"
+    },
+    {
+      "item": "aceite de oliva",
+      "amount": 2,
+      "unit": "cucharadas"
+    },
+    {
+      "item": "sal",
+      "amount": null,
+      "unit": "al gusto"
+    },
+    {
+      "item": "queso rallado",
+      "amount": 50,
+      "unit": "g"
+    }
+  ],
+  "steps": [
+    "Pon a hervir agua con sal y cuece los macarrones el tiempo indicado en el paquete.",
+    "Mientras tanto, sofríe la cebolla picada en aceite de oliva hasta que esté transparente.",
+    "Añade el tomate frito al sofrito y cocina 5 minutos a fuego bajo.",
+    "Escurre los macarrones, mézclalos con la salsa y sirve con queso rallado por encima."
+  ],
+  "summary": "Para preparar un plato de macarrones con tomate reconfortante, comienza sofríe finas hojuelas de cebolla en aceite de oliva hasta que estén translúcidas, creando una base aromática. Luego, incorpora el tomate frito, permitiendo que se integre suavemente a fuego bajo, desarrollando su sabor a lo largo de unos cinco minutos. Finalmente, añade los macarrones recién cocidos, mezclando cuidadosamente hasta que estén completamente cubiertos por la salsa, y termina con una generosa lluvia de queso rallado para un toque final cremoso y sabroso.",
+  "tip": "Para un sabor aún más intenso, añade una pizca de azúcar a la salsa de tomate para contrarrestar su acidez. También puedes incorporar una hoja de laurel durante los últimos minutos de cocción para intensificar el aroma."
+}

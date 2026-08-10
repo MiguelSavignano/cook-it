@@ -1,0 +1,21 @@
+# Python
+poc/.venv/
+**/__pycache__/
+*.pyc
+
+# Local secrets/config
+.env
+
+# TLS cert -- self-signed, regenerated automatically by run_web.sh
+poc/certs/
+
+# Runtime state / generated at runtime, not source
+poc/session_state.json
+poc/cache_llm/
+poc/*.wav
+
+# Downloaded model (63MB, third-party asset -- see docs/voz.md for what/why)
+poc/voices/
+
+# OS/editor cruft
+.DS_Store
