@@ -7,7 +7,7 @@ externas ni coste de tokens. Inspirado en [BMO local AI agent](https://www.youtu
 - [`docs/feasibility.md`](docs/feasibility.md) — análisis de viabilidad y benchmarks reales de latencia.
 - [`docs/voz.md`](docs/voz.md) — detalle del subsistema de voz (STT/TTS).
 
-Este repo es el **proof of concept**: vive en [`poc/`](poc/) — API web (FastAPI) + interfaz por
+Este repo es el **proof of concept**: vive en [`src/`](src/) — API web (FastAPI) + interfaz por
 voz en el navegador, más un par de scripts de CLI para probar el pipeline sin navegador.
 
 ## Requisitos
@@ -35,13 +35,14 @@ lista completa con sus valores por defecto:
 |---|---|---|
 | `OLLAMA_BASE_URL` | Dónde está Ollama — solo hace falta si no corre en `localhost` | `http://localhost:11434` |
 | `OLLAMA_MODEL` | Qué modelo pedirle a Ollama | `gemma3` |
+| `COOKIT_VOICE` | Qué voz de Piper usar (nombre de [rhasspy/piper-voices](https://huggingface.co/rhasspy/piper-voices)) | `es_ES-davefx-medium` |
 | `COOKIT_MIC_DEVICE` | Dispositivo ALSA del micro (solo scripts de CLI, no la web) | `plughw:1,0` |
 | `COOKIT_RECORD_SECONDS` | Segundos de grabación por turno (solo CLI) | `7` |
 
 ## Estructura
 
 ```
-poc/
+src/
   api.py            API web (FastAPI) -- backend de la interfaz por voz del navegador
   recipe_engine.py  Lógica compartida: pedir receta (LLM+RAG), navegación de pasos, router
   common.py         Estado de sesión + síntesis/reproducción de voz

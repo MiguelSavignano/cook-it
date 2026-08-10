@@ -19,9 +19,9 @@ import requests
 
 from common import load_state, save_state, clear_state
 
-POC_DIR = Path(__file__).parent
-RECIPES_DIR = POC_DIR / "recipes"
-CACHE_DIR = POC_DIR / "cache_llm"
+BASE_DIR = Path(__file__).parent
+RECIPES_DIR = BASE_DIR / "recipes"
+CACHE_DIR = BASE_DIR / "cache_llm"
 CACHE_DIR.mkdir(exist_ok=True)
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma3")

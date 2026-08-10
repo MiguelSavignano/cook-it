@@ -139,7 +139,7 @@ Esto confirma lo que reportan terceros: Gemma 3 usa "pythonic function calling" 
 
 ## 8. Prueba real de TTS + STT (2026-08-10)
 
-Entorno: venv en `poc/.venv`, paquetes `piper-tts`, `faster-whisper` (en vez de whisper.cpp — ver nota). Voz descargada: [`es_ES-davefx-medium`](https://huggingface.co/rhasspy/piper-voices/tree/main/es/es_ES/davefx/medium) (63 MB).
+Entorno: venv en `src/.venv`, paquetes `piper-tts`, `faster-whisper` (en vez de whisper.cpp — ver nota). Voz descargada: [`es_ES-davefx-medium`](https://huggingface.co/rhasspy/piper-voices/tree/main/es/es_ES/davefx/medium) (63 MB).
 
 **Nota sobre STT:** se usó `faster-whisper` (CTranslate2) en vez de whisper.cpp porque no había `cmake` instalado y evita compilar C++. Es funcionalmente equivalente (mismos modelos Whisper de OpenAI, backend distinto, también CPU-only e int8). Si más adelante se prefiere whisper.cpp real, solo hace falta `sudo apt install cmake` y compilar.
 
@@ -167,7 +167,7 @@ STT + TTS combinados añaden solo ~3.5 s de latencia (1.2 s TTS + 2.3 s STT) sob
 
 ### 8.4 Prueba con voz real (micro TONOR, en vivo)
 
-Primer intento fallido: grabación disparada directamente por el agente salió en silencio (amplitud máxima 0.024/1.0) — no era problema de hardware/mixer (el TONOR estaba al 100% y activo), sino de sincronización: el `arecord` se ejecutaba antes de que el usuario tuviera tiempo de reaccionar al mensaje. Se resolvió con un script (`poc/mic_test_record.sh`) lanzado por el propio usuario vía `!` en su terminal, para que la grabación esté sincronizada con el momento real de hablar.
+Primer intento fallido: grabación disparada directamente por el agente salió en silencio (amplitud máxima 0.024/1.0) — no era problema de hardware/mixer (el TONOR estaba al 100% y activo), sino de sincronización: el `arecord` se ejecutaba antes de que el usuario tuviera tiempo de reaccionar al mensaje. Se resolvió con un script (`src/mic_test_record.sh`) lanzado por el propio usuario vía `!` en su terminal, para que la grabación esté sincronizada con el momento real de hablar.
 
 Resultado con voz real, condiciones normales de habitación (sin aislar ruido):
 
@@ -182,7 +182,7 @@ Transcripción **perfecta**, sin errores, idioma detectado correctamente (es, 10
 
 ## 9. Prueba end-to-end del pipeline completo (2026-08-10)
 
-Prototipo: [`poc/assistant_poc.py`](../poc/assistant_poc.py) (lanzado vía `poc/run_assistant.sh`). Flujo real: grabar (micro TONOR) → `faster-whisper` (STT) → `gemma3` vía Ollama, con la receta de tortilla de patatas (`poc/recipes/tortilla-patatas.json`) inyectada como contexto y marcando "paso actual" → `piper` (TTS) → `aplay`.
+Prototipo: [`src/assistant_poc.py`](../src/assistant_poc.py) (lanzado vía `src/run_assistant.sh`). Flujo real: grabar (micro TONOR) → `faster-whisper` (STT) → `gemma3` vía Ollama, con la receta de tortilla de patatas (`src/recipes/tortilla-patatas.json`) inyectada como contexto y marcando "paso actual" → `piper` (TTS) → `aplay`.
 
 **Interacción real probada:**
 

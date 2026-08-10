@@ -12,8 +12,8 @@
 Ambos corren como proceso/librería local — no hay llamada de red a ningún servicio externo en ningún punto del pipeline de voz.
 
 **Dónde vive en el código:**
-- STT: se carga una vez el modelo Whisper (`WhisperModel("small", device="cpu", compute_type="int8")`) y se transcribe en [`assistant_poc.py`](../poc/assistant_poc.py) (CLI) y [`api.py`](../poc/api.py) (web, endpoint `/api/question`).
-- TTS: funciones [`synthesize()`/`speak()`](../poc/common.py) — lanzan `python3 -m piper` como subproceso. `speak()` además reproduce con `aplay` (solo lo usan los scripts de CLI, donde la máquina que ejecuta el proceso es la misma junto a la que está el usuario); `api.py` usa `synthesize()` y devuelve el audio en base64 para que lo reproduzca el propio dispositivo que hizo la petición (el navegador, no el servidor — importante desde que se puede pedir desde el móvil).
+- STT: se carga una vez el modelo Whisper (`WhisperModel("small", device="cpu", compute_type="int8")`) y se transcribe en [`assistant_poc.py`](../src/assistant_poc.py) (CLI) y [`api.py`](../src/api.py) (web, endpoint `/api/question`).
+- TTS: funciones [`synthesize()`/`speak()`](../src/common.py) — lanzan `python3 -m piper` como subproceso. `speak()` además reproduce con `aplay` (solo lo usan los scripts de CLI, donde la máquina que ejecuta el proceso es la misma junto a la que está el usuario); `api.py` usa `synthesize()` y devuelve el audio en base64 para que lo reproduzca el propio dispositivo que hizo la petición (el navegador, no el servidor — importante desde que se puede pedir desde el móvil).
 - En la web, el navegador (`app.js`) **solo graba** el audio con `MediaRecorder` y lo sube — nunca transcribe ni sintetiza nada en el cliente, para no romper el "100% local".
 
 ## ¿Gastamos tokens por la voz?
@@ -21,7 +21,7 @@ Ambos corren como proceso/librería local — no hay llamada de red a ningún se
 **No, cero tokens y cero coste de API, ni para transcribir ni para generar la voz.**
 
 - **Procesar la voz (STT):** `faster-whisper` es un modelo Whisper de OpenAI corriendo localmente vía CTranslate2, no la API de OpenAI. No hay llamada HTTP a ningún proveedor — es inferencia en tu CPU con un modelo descargado una vez (~464 MB, cacheado en `~/.cache/huggingface`).
-- **Generar la voz (TTS):** Piper sintetiza con un modelo ONNX descargado a disco (`poc/voices/es_ES-davefx-medium.onnx`, 63 MB). Tampoco hay servicio cloud de por medio (nada de ElevenLabs, Amazon Polly, Google TTS, etc.).
+- **Generar la voz (TTS):** Piper sintetiza con un modelo ONNX descargado a disco (`src/voices/es_ES-davefx-medium.onnx`, 63 MB). Tampoco hay servicio cloud de por medio (nada de ElevenLabs, Amazon Polly, Google TTS, etc.).
 
 Y de propina: tampoco el LLM que genera las recetas/respuestas gasta tokens de pago — usa Ollama + `gemma3` corriendo local (`OLLAMA_BASE_URL`, por defecto `localhost:11434`), no la API de Anthropic/OpenAI. Ver `recipe_engine.py` y el `README.md` raíz para las variables de entorno.
 

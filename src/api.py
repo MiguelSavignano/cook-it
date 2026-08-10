@@ -34,8 +34,8 @@ from pydantic import BaseModel
 from common import load_state, clear_state, synthesize
 from recipe_engine import load_recipes, next_step, previous_step, process_question, request_recipe
 
-POC_DIR = Path(__file__).parent
-STATIC_DIR = POC_DIR / "static"
+BASE_DIR = Path(__file__).parent
+STATIC_DIR = BASE_DIR / "static"
 
 # NOTE: no auth on this app by design (removed per user request) -- it's
 # being sent to a real person to test over the public internet and a

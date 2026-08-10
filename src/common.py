@@ -1,14 +1,22 @@
 """Shared helpers for Cook-It: session state (memory while cooking) and
 text-to-speech. Used by both the CLI scripts and the web API."""
 import json
+import os
 import subprocess
 import time
 from pathlib import Path
 
-POC_DIR = Path(__file__).parent
-VOICE_PATH = POC_DIR / "voices" / "es_ES-davefx-medium.onnx"
-OUT_WAV = POC_DIR / "assistant_out.wav"
-STATE_PATH = POC_DIR / "session_state.json"
+BASE_DIR = Path(__file__).parent
+
+# Which Piper voice to speak with -- a Piper voice name (not a path), e.g.
+# "es_ES-davefx-medium" or "es_MX-claude-high". Must already be downloaded to
+# voices/<name>.onnx (+ .onnx.json) -- see setup.sh, which fetches whichever
+# voice this is set to. Full list: https://huggingface.co/rhasspy/piper-voices
+COOKIT_VOICE = os.environ.get("COOKIT_VOICE", "es_ES-davefx-medium")
+VOICE_PATH = BASE_DIR / "voices" / f"{COOKIT_VOICE}.onnx"
+
+OUT_WAV = BASE_DIR / "assistant_out.wav"
+STATE_PATH = BASE_DIR / "session_state.json"
 
 
 def load_state():
@@ -31,6 +39,11 @@ def synthesize(text):
     """Synthesizes `text` with Piper. Returns (wav_bytes, synth_time). Does NOT
     play anything -- for the web API, where the caller (browser) is the one
     that should play it, not this machine (see speak() for that case)."""
+    if not VOICE_PATH.exists():
+        raise FileNotFoundError(
+            f"Voice model not found: {VOICE_PATH}. Set COOKIT_VOICE to a voice "
+            f"you've downloaded to voices/, or run setup.sh to fetch the default."
+        )
     t0 = time.time()
     subprocess.run(
         ["python3", "-m", "piper", "-m", str(VOICE_PATH), "-f", str(OUT_WAV)],

@@ -19,12 +19,12 @@ from faster_whisper import WhisperModel
 from common import speak
 from recipe_engine import process_command
 
-POC_DIR = Path(__file__).parent
+BASE_DIR = Path(__file__).parent
 RECORD_SECONDS = int(os.environ.get("COOKIT_RECORD_SECONDS", "7"))
 # `arecord -l` lists your devices, e.g. "plughw:1,0" -- machine-specific, so
 # this is NOT meant to work out of the box, override it via env var.
 MIC_DEVICE = os.environ.get("COOKIT_MIC_DEVICE", "plughw:1,0")
-REC_WAV = POC_DIR / "assistant_in.wav"
+REC_WAV = BASE_DIR / "assistant_in.wav"
 
 
 def step(msg):
