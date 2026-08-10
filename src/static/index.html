@@ -116,6 +116,11 @@
     text-align: center;
     color: var(--brown-soft);
   }
+  .placeholder-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--brown);
+  }
   .card.placeholder .examples {
     margin-top: 12px;
     display: flex; flex-direction: column; gap: 6px;
@@ -302,11 +307,6 @@
     background: linear-gradient(145deg, #f0d8b8, #d8b98a);
     color: var(--brown);
   }
-  .step-nav button.question {
-    flex: 0.85;
-    background: var(--orange-dark);
-    font-size: 0.92rem;
-  }
   .step-nav button:disabled {
     opacity: 0.4;
     cursor: default;
@@ -330,7 +330,7 @@
   </div>
 
   <div id="card" class="card placeholder">
-    <div>👋 Aún no hay ninguna receta activa.</div>
+    <div class="placeholder-title">👨‍🍳 ¿Qué cocinamos hoy?</div>
     <div class="examples">
       <span>"Dame la receta de tortilla de patatas"</span>
       <span>"Cómo se hacen macarrones con tomate"</span>

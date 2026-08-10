@@ -8,10 +8,41 @@ let mediaRecorder = null;
 let chunks = [];
 let recording = false;
 
-function setStatus(text, btnClass) {
-  statusText.textContent = text;
+// Whether a recipe is currently active -- changes what the mic invites you
+// to do (ask for a recipe vs. ask a question about the one you're cooking),
+// see idleHintHTML()/resetToIdle() below. Kept in sync by renderState().
+let recipeActive = false;
+
+// Small chef's-toque-with-a-question-mark icon: the mic already handles both
+// "ask for a recipe" and "ask a question about the current step" (same
+// recording flow either way), so instead of a second button we just make
+// that second purpose visible with this icon + a hint, once a recipe is
+// active. Plain inline SVG, no external asset.
+const CHEF_QUESTION_ICON = `
+  <svg viewBox="0 0 40 40" width="22" height="22" style="vertical-align:-6px;margin-right:4px" aria-hidden="true">
+    <circle cx="13" cy="15" r="8" style="fill:var(--orange-dark)"/>
+    <circle cx="21" cy="10" r="9" style="fill:var(--orange-dark)"/>
+    <circle cx="29" cy="15" r="7" style="fill:var(--orange-dark)"/>
+    <rect x="9" y="16" width="22" height="8" rx="2" style="fill:var(--orange-dark)"/>
+    <rect x="9" y="24" width="22" height="5" rx="1.5" style="fill:var(--brown)"/>
+    <circle cx="30" cy="27" r="8" style="fill:var(--cream);stroke:var(--orange-dark);stroke-width:2"/>
+    <text x="30" y="31" font-size="12" font-weight="700" text-anchor="middle" style="fill:var(--orange-dark)">?</text>
+  </svg>`;
+
+function idleHintHTML() {
+  return recipeActive
+    ? `${CHEF_QUESTION_ICON}¿Tienes alguna duda? Toca el micrófono y pregunta`
+    : 'Toca el micrófono y pide una receta';
+}
+
+function setStatus(html, btnClass) {
+  statusText.innerHTML = html;
   micBtn.classList.remove('listening', 'thinking');
   if (btnClass) micBtn.classList.add(btnClass);
+}
+
+function resetToIdle() {
+  setStatus(idleHintHTML(), null);
 }
 
 // Plays audio on THIS device (the one the user is holding/looking at), not
@@ -74,7 +105,7 @@ async function sendAudio(blob) {
     }
 
     userText.textContent = data.user_text ? `"${data.user_text}"` : '';
-    setStatus('✅ Listo — toca para hablar de nuevo', null);
+    resetToIdle();
     renderResponse(data);
   } catch (err) {
     micBtn.disabled = false;
@@ -97,6 +128,8 @@ function renderResponse(data) {
     return;
   }
   if (d.finished) {
+    recipeActive = false;
+    resetToIdle();
     card.className = 'card';
     card.innerHTML = `
       <div class="finished">
@@ -118,7 +151,7 @@ async function buttonAction(endpoint, button) {
     const res = await fetch(endpoint, { method: 'POST' });
     const data = await res.json();
     if (data.audio_base64) playAudioB64(data.audio_base64, data.audio_mime);
-    setStatus('✅ Listo — toca para hablar de nuevo', null);
+    resetToIdle();
     userText.textContent = '';
     renderResponse(data);
   } catch (err) {
@@ -127,32 +160,6 @@ async function buttonAction(endpoint, button) {
   } finally {
     button.disabled = false;
   }
-}
-
-// "❓ Pregunta" button in the bottom step-nav bar: same recording flow as the
-// top mic button (reuses startRecording()/sendAudio(), which already POSTs
-// to api/question and plays back audio_base64), just reachable down where
-// your hands already are while cooking. The top #micBtn/#statusText already
-// reflect listening/thinking globally; this button additionally shows a
-// lightweight local label so feedback is visible without scrolling up.
-async function askQuestion(btn) {
-  if (recording) return;
-  btn.disabled = true;
-  const originalLabel = btn.innerHTML;
-  await startRecording();
-  if (!recording) {
-    // startRecording() failed synchronously (e.g. mic permission denied) --
-    // the global status text already explains why, just restore the button.
-    btn.disabled = false;
-    btn.innerHTML = originalLabel;
-    return;
-  }
-  btn.innerHTML = '🎙️ Escuchando…';
-  setTimeout(() => {
-    // The button is normally replaced by the next renderState() call once
-    // the answer comes back, but guard in case it's still attached.
-    if (btn.isConnected) btn.innerHTML = '🤔 Pensando…';
-  }, RECORD_MS);
 }
 
 // Local recipes list, for the "tap to pick one" home screen. Fetched once
@@ -177,7 +184,7 @@ async function selectRecipe(name) {
     });
     const data = await res.json();
     if (data.audio_base64) playAudioB64(data.audio_base64, data.audio_mime);
-    setStatus('✅ Listo — toca para hablar de nuevo', null);
+    resetToIdle();
     userText.textContent = '';
     renderResponse(data);
   } catch (err) {
@@ -193,13 +200,15 @@ function escapeHtml(text) {
 }
 
 function renderPlaceholder() {
+  recipeActive = false;
   card.className = 'card placeholder';
   card.innerHTML = `
-    <div>👋 Elige una receta para empezar:</div>
+    <div class="placeholder-title">👨‍🍳 ¿Qué cocinamos hoy?</div>
     <div class="recipe-list" id="recipeList"><div class="loading-hint">Cargando recetas…</div></div>
     <div class="examples">
       <span>O pide cualquier otra por voz: "Cómo se hace una paella"</span>
     </div>`;
+  resetToIdle();
   getAvailableRecipes().then((recipes) => {
     const listEl = document.getElementById('recipeList');
     if (!listEl) return; // the user already navigated away from this screen
@@ -226,6 +235,8 @@ function renderState(state, questionAnswer) {
     renderPlaceholder();
     return;
   }
+  recipeActive = true;
+  resetToIdle();
 
   const total = state.steps.length;
   const current = state.current_step;
@@ -257,7 +268,6 @@ function renderState(state, questionAnswer) {
     <div class="step-nav">
       <button class="previous" ${current === 0 ? 'disabled' : ''} onclick="buttonAction('api/previous', this)">◀ Anterior</button>
       <button onclick="buttonAction('api/next', this)">Siguiente ▶</button>
-      <button class="question" onclick="askQuestion(this)">❓ Pregunta</button>
     </div>
     <div class="secondary-actions">
       <button onclick="resetSession()">🗑️ Empezar otra receta</button>
