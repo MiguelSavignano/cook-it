@@ -206,3 +206,41 @@ Prototype: [`src/assistant_poc.py`](../src/assistant_poc.py) (launched via `src/
 This result **meets the latency goal defined in `spec.md` §9** (<20 s for open questions to the LLM) and confirms that, as predicted in §5-§8, the LLM (12.3 s of the 15.7 s total, ~78%) remains by far the component that dominates latency — STT and TTS combined are <25% of the total time.
 
 **Suggested next step:** implement the deterministic intent router (Phase 2 of `spec.md`) so simple control commands ("next step", "repeat", "set a timer") don't go through the LLM at all and respond almost instantly, reserving the LLM's ~15 s only for genuinely open questions.
+
+## 11. Smaller models for Raspberry Pi 5 (2026-08-11)
+
+Phase 5 of `spec.md`'s roadmap is dedicated hardware, e.g. a Pi 5. No physical Pi 5 was available for this test, so this is a **proxy test**: candidate models pulled and run through Cook-It's real system prompt (the exact `format: "json"` request `recipe_engine.py` sends, against the `tortilla-patatas` local recipe) on this desktop, to compare model *size/RAM/output quality* — not raw speed, since desktop CPU is far faster than a Pi 5's. For the speed axis, published third-party Pi 5 (8GB, active cooling) benchmarks are used instead: [TinyWeights](https://tinyweights.dev/posts/run-llms-raspberry-pi-5/), [Stratosphere Lab](https://www.stratosphereips.org/blog/2025/6/5/how-well-do-llms-perform-on-a-raspberry-pi-5), [Local AI Master](https://localaimaster.com/blog/llm-raspberry-pi-5). All agree CPU-only Pi 5 inference tops out around **2-22 tok/s depending on model size**, with the "1B-3.8B tier" cited as the practical sweet spot for conversational latency.
+
+### 11.1 Candidates tested
+
+| Model | Disk | RAM resident (`ollama ps`) | Published Pi 5 speed | Valid JSON + correct keys |
+|---|---|---|---|---|
+| `gemma3:1b` | 815 MB | 1.2 GB | ~18-22 tok/s | ✅ |
+| `qwen2.5:1.5b` | 986 MB | 1.1 GB | ~13.8 tok/s | ✅ |
+| `qwen2.5:3b` | 1.9 GB | 2.1 GB | ~8.2 tok/s | ✅ |
+| `llama3.2:3b` | 2.0 GB | 2.5 GB | ~8.8 tok/s | ✅ (but see 11.2) |
+| `phi3.5` (3.8B) | 2.2 GB | 3.7 GB | ~7.4 tok/s | ✅ |
+
+All five correctly returned valid JSON with the required `summary`/`ingredients`/`steps`/`tip` keys — Ollama's `format: "json"` grammar constraint works regardless of model size, that part isn't a differentiator.
+
+### 11.2 Output quality — the real differentiator
+
+Since ingredients/steps for local recipes are always overridden deterministically in code (never trusted from the LLM, per §8's design), a small model's job is narrow: write a coherent `summary` + `tip` in Spanish. Quality varied a lot for that narrow job:
+
+- **`gemma3:1b`** — fastest by far, but the `summary` was generic filler ("a classic, nutritious, delicious dish...") that didn't actually describe the technique. Technically correct, low value spoken aloud.
+- **`qwen2.5:1.5b`** — reasonable content, minor Spanish typo ("frídas"), reads more like a step list than the requested flowing narrative.
+- **`qwen2.5:3b`** — best quality of the batch: accurate, grounded in the actual technique, correct flowing-narrative style, coherent Spanish.
+- **`llama3.2:3b`** — ⚠️ **reproducible bug, now fixed at the prompt level (see 11.3)**: for the tortilla-patatas prompt specifically, it echoed the system prompt's own few-shot *style example* almost verbatim instead of writing a real summary — one run even kept the example's literal wrong ingredient ("Cuece **las castañas**..." — chestnuts, not potatoes — glazed with rum, honey and vanilla, for a *potato tortilla*). Confirmed on 2 of 3 runs; a different recipe (macarrones con tomate) came out correct, so it was prompt/recipe-dependent, not constant, but the failure mode (verbatim-copying the few-shot example instead of following the pattern) is exactly the kind of thing that reads as broken/embarrassing spoken aloud.
+- **`phi3.5`** — good coherent Spanish, but heaviest RAM of the batch (3.7 GB) — combined with STT (~1 GB) + TTS (~300 MB) + app overhead, that's tight even on an 8GB Pi and won't fit a 4GB one at all (see §4's budget table, same math applies).
+
+### 11.3 Recommendation
+
+- **Pi 5 8GB: `qwen2.5:3b`.** Best content quality, ~2.1 GB RAM leaves headroom for STT/TTS/app, and ~8.2 tok/s published speed keeps total latency in a similar ballpark to what §9 measured on the desktop with gemma3:4b (that one doesn't fit an 8GB Pi at all once STT/TTS/OS overhead is added).
+- **Pi 5 4GB: `qwen2.5:1.5b`.** Only candidate here that comfortably fits a 4GB board once the rest of the pipeline is accounted for; accept the narrower/listier summary style as a tradeoff, or fall back to always serving local recipes' summary from a code-side template instead of the LLM (feasible since it's currently freeform prose, not templated).
+- **Fixed the root cause**: `recipe_engine.py`'s `SYSTEM_PROMPT` now explicitly labels the few-shot example as "tone and structure only, do NOT copy these words or ingredients, write about the actual dish you were asked for" instead of presenting it as a bare example. Re-tested `llama3.2:3b` 3/3 times after the fix, tortilla-patatas summaries now correctly describe frying potatoes and eggs, no more chestnuts/rum. Worth having done regardless of target model — a model copying instructions verbatim is a prompt-design smell, not just a small-model quirk.
+
+With the prompt fix, `llama3.2:3b` is a viable alternative too (2.5 GB RAM, ~8.8 tok/s) if `qwen2.5:3b`'s Spanish reads worse on a wider sample than this single-recipe test — `qwen2.5:3b` is the pick from what was tested here, not a fixed conclusion.
+
+Switching models is just `OLLAMA_MODEL=qwen2.5:3b` (see root `README.md`) plus `ollama pull qwen2.5:3b` on the target device — no code changes needed.
+
+**Still needed before this is a real Pi 5 recommendation, not a proxy:** actually running this on a physical Pi 5 (thermal throttling alone can halve tok/s after ~90s per the TinyWeights benchmark, which no desktop test can reveal), and re-running the full end-to-end latency test from §9 there.

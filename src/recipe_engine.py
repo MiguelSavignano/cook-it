@@ -37,10 +37,13 @@ válido (nada de texto antes ni después, nada de markdown), con exactamente est
 
 {
   "summary": "un único párrafo breve y fluido, al estilo de un buen libro de cocina, que \
-resuma el plato entero combinando técnica e ingredientes clave -- NO una lista, una narración \
-corta. Ejemplo de estilo: 'Cuece las castañas en agua hasta que estén tiernas, escúrrelas y \
-glaséalas a fuego lento con el azúcar moreno, la miel, el ron y la vainilla hasta obtener una \
-salsa espesa, incorporando la canela al final si se desea.'",
+resuma EL PLATO QUE TE HAN PEDIDO A TI combinando su técnica e ingredientes clave -- NO una \
+lista, una narración corta. A continuación tienes un ejemplo de TONO Y ESTRUCTURA para un plato \
+cualquiera (una receta de castañas glaseadas) -- es solo para que veas cómo de largo y cómo de \
+fluido debe sonar, NO copies estas palabras ni estos ingredientes, escribe sobre el plato real \
+que se te pide: 'Cuece las castañas en agua hasta que estén tiernas, escúrrelas y glaséalas a \
+fuego lento con el azúcar moreno, la miel, el ron y la vainilla hasta obtener una salsa espesa, \
+incorporando la canela al final si se desea.'",
   "ingredients": [{"item": "...", "amount": "...", "unit": "..."}],
   "steps": ["paso 1, imperativo y claro, uno por elemento de la lista", "paso 2", "..."],
   "tip": "un truco o consejo especial de cocina relacionado con esta receta, algo útil y no obvio"
