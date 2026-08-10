@@ -12,7 +12,7 @@ cd "$(dirname "$0")"
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -q --upgrade pip
-pip install -q piper-tts faster-whisper requests fastapi "uvicorn[standard]" python-multipart
+pip install -q piper-tts faster-whisper requests fastapi "uvicorn[standard]" python-multipart "qrcode[pil]"
 
 VOICE="${COOKIT_VOICE:-es_ES-davefx-medium}"
 # Piper voice names are "<locale>-<name>-<quality>", e.g. "es_ES-davefx-medium"

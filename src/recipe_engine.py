@@ -60,6 +60,30 @@ que tiene activa ahora mismo (te paso su nombre y en qué paso va). Responde en 
 frases breves y naturales, sin markdown, listas para ser leídas en voz alta. Ve directo al \
 grano, no repitas la receta entera ni la lista de pasos, solo contesta la pregunta."""
 
+# Used by "cargar receta" (dictate your own recipe by voice instead of typing
+# it): the transcript can be messy (filler words, repeats, out-of-order
+# steps, someone talking while they cook) -- the LLM's only job here is to
+# turn that into the same schema local recipe files already use, WITHOUT
+# inventing anything the user didn't say. No summary/tip is asked for: those
+# are generated lazily and cached the first time the recipe is actually
+# requested (see request_recipe()'s docstring), so dictating a recipe never
+# spends a second, redundant LLM call it might not need yet.
+SYSTEM_PROMPT_DICTATE = """Eres Cook-It. El usuario te ha dictado una receta suya de viva voz -- \
+puede tener muletillas, repeticiones o pasos fuera de orden. Interpreta lo que dijo y devuelve \
+ÚNICAMENTE un objeto JSON válido (nada de texto antes ni después, nada de markdown) con \
+exactamente estas claves:
+
+{
+  "name": "nombre corto y claro del plato, como aparecería en un libro de cocina",
+  "servings": número de raciones si el usuario lo menciona, o null si no lo dijo,
+  "ingredients": [{"item": "...", "amount": número o null, "unit": "..."}],
+  "steps": ["paso 1, imperativo y claro, uno por elemento de la lista", "paso 2", "..."]
+}
+
+Limítate a lo que el usuario dijo: no inventes ingredientes ni pasos que no mencionó, no \
+rellenes cantidades que no dio (usa null), y ordena los pasos en el orden lógico de cocinado \
+aunque el usuario los haya dictado desordenados o repetidos."""
+
 
 def load_recipes():
     recipes = {}
@@ -249,6 +273,67 @@ def request_recipe(user_text):
         "step_text": steps[0],
         "llm_time": llm_time,
     }
+
+
+def structure_dictated_recipe(transcript):
+    """Turns a raw dictated transcript into the recipe schema local files use
+    (name/servings/ingredients/steps), via the LLM -- see SYSTEM_PROMPT_DICTATE.
+    Doesn't save anything; that's save_dictated_recipe(), called separately
+    once the user has reviewed/edited the result (see api.py's
+    /api/recipes/upload + /api/recipes/save)."""
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT_DICTATE},
+        {"role": "user", "content": transcript},
+    ]
+    return ask_llm_json(messages)
+
+
+def _unique_slug(base_slug):
+    """Appends -2, -3, ... if base_slug is already taken, so dictating a
+    recipe never silently overwrites an existing one (curated or previously
+    dictated) that happens to slugify to the same name."""
+    slug = base_slug or "receta"
+    i = 2
+    while (RECIPES_DIR / f"{slug}.json").exists():
+        slug = f"{base_slug or 'receta'}-{i}"
+        i += 1
+    return slug
+
+
+def save_dictated_recipe(data):
+    """Persists a recipe (LLM-structured from a dictated transcript, possibly
+    edited by the user afterwards) as a new local recipe file -- same schema
+    load_recipes()/request_recipe() already read, so it's immediately usable
+    by voice or by tapping it on the home screen, same as the curated ones.
+    Raises ValueError if it's missing what makes it a recipe (name, steps)."""
+    name = (data.get("name") or "").strip()
+    steps = [s.strip() for s in (data.get("steps") or []) if s and s.strip()]
+    if not name or not steps:
+        raise ValueError("La receta necesita al menos un nombre y un paso.")
+
+    ingredients = []
+    for ing in data.get("ingredients") or []:
+        item = (ing.get("item") or "").strip()
+        if not item:
+            continue
+        ingredients.append({
+            "item": item,
+            "amount": ing.get("amount"),
+            "unit": (ing.get("unit") or "").strip() or None,
+        })
+
+    slug = _unique_slug(_slugify(name))
+    recipe = {
+        "id": slug,
+        "name": name,
+        "servings": data.get("servings"),
+        "ingredients": ingredients,
+        "steps": steps,
+    }
+    (RECIPES_DIR / f"{slug}.json").write_text(
+        json.dumps(recipe, ensure_ascii=False, indent=2)
+    )
+    return recipe
 
 
 def next_step():

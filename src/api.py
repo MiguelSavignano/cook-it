@@ -21,18 +21,29 @@ user is standing next to, so they use common.speak() to play locally instead.)
 Usage: poc/run_web.sh   (starts uvicorn on https://0.0.0.0:3000)
 """
 import base64
+import io
 import tempfile
 import time
 from pathlib import Path
+from typing import Dict, List, Optional
 
-from fastapi import FastAPI, UploadFile
-from fastapi.responses import FileResponse, JSONResponse
+import qrcode
+from fastapi import FastAPI, Request, UploadFile
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from faster_whisper import WhisperModel
 from pydantic import BaseModel
 
 from common import load_state, clear_state, synthesize
-from recipe_engine import load_recipes, next_step, previous_step, process_question, request_recipe
+from recipe_engine import (
+    load_recipes,
+    next_step,
+    previous_step,
+    process_question,
+    request_recipe,
+    save_dictated_recipe,
+    structure_dictated_recipe,
+)
 
 BASE_DIR = Path(__file__).parent
 STATIC_DIR = BASE_DIR / "static"
@@ -61,6 +72,14 @@ def load_whisper_model():
 @app.get("/")
 def index():
     return FileResponse(STATIC_DIR / "index.html")
+
+
+@app.get("/cargar-receta")
+def cargar_receta_page():
+    """Short, easy-to-type/scan URL for the "dictate your own recipe" page --
+    what the QR code from /api/qr points to, meant to be opened on a phone
+    while the main screen (this same server, / ) stays on whatever's cooking."""
+    return FileResponse(STATIC_DIR / "cargar-receta.html")
 
 
 @app.get("/api/state")
@@ -107,6 +126,90 @@ def select_recipe(body: SelectRecipeRequest):
         )
     spoken_text = f"{data['summary']} Empecemos. Paso 1 de {data['total_steps']}: {data['step_text']}"
     return _respond_with_audio({"type": "new_recipe", "data": data, "spoken_text": spoken_text})
+
+
+@app.post("/api/recipes/upload")
+async def upload_recipe(audio: UploadFile):
+    """Mic button on cargar-receta.html: the user dictates a recipe they
+    already know (ingredients + steps, in whatever order they remember it).
+    Transcribes it locally (same whisper model as /api/question) and asks the
+    local LLM to structure it into the schema local recipe files use.
+
+    Returns a PREVIEW only -- nothing is written to disk here, so the user
+    can review/fix what the LLM understood before it becomes a real local
+    recipe. Saving happens in a separate call, /api/recipes/save."""
+    t0 = time.time()
+    content = await audio.read()
+    suffix = Path(audio.filename or "clip.webm").suffix or ".webm"
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=True) as tmp:
+        tmp.write(content)
+        tmp.flush()
+        segments, _info = _whisper_model.transcribe(tmp.name, language="es")
+        transcript = " ".join(s.text.strip() for s in segments).strip()
+    stt_time = time.time() - t0
+
+    if not transcript:
+        return JSONResponse(
+            {"ok": False, "reason": "no_speech_detected",
+             "error": "No te he escuchado bien, inténtalo otra vez."},
+            status_code=400,
+        )
+
+    try:
+        recipe, llm_time = structure_dictated_recipe(transcript)
+    except Exception as e:
+        return JSONResponse(
+            {"ok": False, "reason": "llm_error", "error": str(e)},
+            status_code=500,
+        )
+
+    return {
+        "ok": True,
+        "transcript": transcript,
+        "recipe": recipe,
+        "latency": {"stt": round(stt_time, 2), "llm": round(llm_time, 2)},
+    }
+
+
+class SaveRecipeRequest(BaseModel):
+    name: str
+    servings: Optional[int] = None
+    ingredients: List[Dict] = []
+    steps: List[str]
+
+
+@app.post("/api/recipes/save")
+def save_recipe(body: SaveRecipeRequest):
+    """"Guardar receta" button on cargar-receta.html: persists the (possibly
+    user-edited) structured recipe as a new local recipe file. From that
+    point on it's usable exactly like the curated ones -- by voice, or by
+    tapping it on the home screen -- and never invents quantities, same
+    guarantee as the rest of the local recipe base (see docs/spec.md)."""
+    try:
+        recipe = save_dictated_recipe({
+            "name": body.name,
+            "servings": body.servings,
+            "ingredients": body.ingredients,
+            "steps": body.steps,
+        })
+    except ValueError as e:
+        return JSONResponse({"ok": False, "error": str(e)}, status_code=400)
+    return {"ok": True, "recipe": recipe}
+
+
+@app.get("/api/qr")
+def recipe_upload_qr(request: Request, url: Optional[str] = None):
+    """PNG QR code pointing at /cargar-receta -- meant to be shown on
+    whatever screen sits by the Pi so a phone on the same network can scan it
+    and dictate a recipe from wherever the user is standing, no IP typing.
+    Defaults to THIS request's own origin (whatever LAN address/hostname the
+    caller used to reach the API -- works whether that's an IP or a
+    hostname), overridable via ?url= for a fixed known LAN address."""
+    target = url or f"{str(request.base_url).rstrip('/')}/cargar-receta"
+    img = qrcode.make(target)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return Response(content=buf.getvalue(), media_type="image/png")
 
 
 def _synthesize_b64(text):

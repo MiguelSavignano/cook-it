@@ -281,5 +281,17 @@ micBtn.addEventListener('click', () => {
   else startRecording();
 });
 
+// "📱 Ver código QR" -- shows the QR pointing at cargar-receta.html only on
+// demand (loading api/qr eagerly on every page view would mean generating an
+// image nobody asked for most of the time).
+const qrToggle = document.getElementById('qrToggle');
+const qrBox = document.getElementById('qrBox');
+if (qrToggle && qrBox) {
+  qrToggle.addEventListener('click', () => {
+    qrBox.hidden = !qrBox.hidden;
+    qrToggle.textContent = qrBox.hidden ? '📱 Ver código QR' : '🙈 Ocultar código QR';
+  });
+}
+
 // On page load, restore the active recipe if there was one (session memory).
 fetchAndRenderState();

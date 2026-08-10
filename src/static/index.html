@@ -312,6 +312,26 @@
     cursor: default;
   }
   .step-nav button:active:not(:disabled) { transform: scale(0.97); }
+
+  /* --- "Cargar mi receta" bar + QR (dictate your own recipe from a phone) --- */
+  .load-recipe-bar {
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+    margin-top: 6px;
+  }
+  .load-recipe-bar a, .load-recipe-bar button {
+    font: inherit; font-size: 0.8rem; font-weight: 600; color: var(--orange-dark);
+    background: none; border: 1px solid var(--orange-light); border-radius: 999px;
+    padding: 6px 14px; cursor: pointer; text-decoration: none;
+  }
+  .load-recipe-bar a:hover, .load-recipe-bar button:hover { background: var(--cream-2); }
+  .qr-box {
+    margin-top: 10px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    text-align: center; font-size: 0.8rem; color: var(--brown-soft);
+  }
+  .qr-box img {
+    width: 160px; height: 160px; border-radius: 12px; background: white;
+    padding: 8px; box-shadow: var(--shadow);
+  }
 </style>
 </head>
 <body>
@@ -319,6 +339,14 @@
 <header>
   <h1>🍳 Cook-It</h1>
   <p>Tu ayudante de cocina, 100% local y por voz</p>
+  <div class="load-recipe-bar">
+    <a href="cargar-receta.html">📋 Cargar mi receta</a>
+    <button id="qrToggle" type="button">📱 Ver código QR</button>
+  </div>
+  <div id="qrBox" class="qr-box" hidden>
+    <img src="api/qr" alt="Código QR para abrir 'Cargar mi receta' desde el móvil" />
+    <span>Escanéalo con la cámara del móvil para dictar tu receta desde ahí</span>
+  </div>
 </header>
 
 <div class="stage">

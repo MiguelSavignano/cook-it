@@ -44,10 +44,25 @@ lista completa con sus valores por defecto:
 ```
 src/
   api.py            API web (FastAPI) -- backend de la interfaz por voz del navegador
-  recipe_engine.py  Lógica compartida: pedir receta (LLM+RAG), navegación de pasos, router
+  recipe_engine.py  Lógica compartida: pedir receta (LLM+RAG), navegación de pasos, router,
+                     dictado de recetas propias (structure_dictated_recipe/save_dictated_recipe)
   common.py         Estado de sesión + síntesis/reproducción de voz
   assistant_poc.py  CLI push-to-talk (sin navegador)
   next_step.py      CLI "botón" de siguiente paso, sin voz ni LLM
   static/           Frontend (HTML/CSS/JS, sin frameworks)
-  recipes/          Base de recetas locales (JSON), fuente de verdad para RAG
+    index.html/js      Pantalla principal (voz + recetas)
+    cargar-receta.*     "Cargar mi receta": dicta una receta propia por voz desde cualquier
+                        dispositivo (móvil incluido, vía el QR de la pantalla principal) y el
+                        LLM local la estructura para guardarla como receta local
+  recipes/          Base de recetas locales (JSON), fuente de verdad para RAG -- incluye tanto
+                     las curadas a mano como las que los usuarios dictan por voz
 ```
+
+### Cargar tu propia receta por voz
+
+Además de las recetas curadas en `src/recipes/`, cualquiera puede dictar una receta propia:
+en la pantalla principal, "📋 Cargar mi receta" (o el código QR, para hacerlo desde el móvil sin
+teclear nada) abre una página donde se graba la receta de viva voz sin límite de tiempo. El
+mismo pipeline local (whisper + LLM vía Ollama) la transcribe y estructura en el mismo esquema
+que las recetas curadas -- el usuario revisa/corrige el resultado antes de guardarla, y desde ese
+momento se puede pedir por voz o elegir en la pantalla principal igual que cualquier otra.

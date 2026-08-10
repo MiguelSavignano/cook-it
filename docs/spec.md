@@ -88,6 +88,7 @@ Si se quiere tool-calling nativo real (agente más flexible, más "inteligente" 
 | `convertir_unidad(cantidad, de, a)` | "¿cuánto es una taza en gramos?" | Tabla de conversión local, sin LLM salvo para parsear frases ambiguas |
 | `sustituir_ingrediente(ingrediente)` | "no tengo mantequilla, ¿qué uso?" | Tabla de sustituciones curada + fallback a LLM con nota "no verificado" |
 | `pregunta_abierta(texto)` | "¿por qué se me corta la mahonesa?" | Va al LLM con contexto de la receta actual (RAG), no acción crítica |
+| `cargar_receta_por_voz()` | Dictar una receta propia entera (nombre, ingredientes, pasos) desde "Cargar mi receta" | No es un comando dentro de una receta activa, es su propia pantalla (`cargar-receta.html`, accesible por QR desde el móvil); el LLM estructura el dictado en el mismo esquema que las recetas curadas, el usuario revisa antes de guardar (`/api/recipes/save`), y a partir de ahí se comporta como cualquier receta local |
 
 ## 7. Datos: base de recetas local
 
