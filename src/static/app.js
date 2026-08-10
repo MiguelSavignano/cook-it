@@ -89,8 +89,20 @@ function stopRecording() {
   mediaRecorder.stop();
 }
 
+const COOKING_LOADER_HTML = `
+  <span class="cooking-loader">
+    <span class="pot">🍲</span>
+    <span class="steam"><span></span><span></span><span></span></span>
+    Creando tu receta…
+  </span>`;
+
 async function sendAudio(blob) {
-  setStatus('🤔 Pensando…', 'thinking');
+  // recipeActive still holds its PRE-request value here (only renderState()/
+  // renderPlaceholder() update it, once the response comes back) -- so if we
+  // were on the home screen when recording started, this request is almost
+  // certainly a brand-new recipe (gemma3, can take a while), not a quick
+  // follow-up question (qwen2.5:3b) about one already on screen.
+  setStatus(recipeActive ? '🤔 Pensando…' : COOKING_LOADER_HTML, 'thinking');
   const form = new FormData();
   form.append('audio', blob, 'clip.webm');
   try {

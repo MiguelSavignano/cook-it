@@ -24,8 +24,19 @@ RECIPES_DIR = BASE_DIR / "recipes"
 CACHE_DIR = BASE_DIR / "cache_llm"
 CACHE_DIR.mkdir(exist_ok=True)
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma3")
 OLLAMA_CHAT_URL = f"{OLLAMA_BASE_URL}/api/chat"
+
+# Two models, picked for what each call actually needs -- see docs/feasibility.md
+# §11 for the comparison behind these defaults:
+#   - Recipe generation (request_recipe/ask_llm_json): gemma3 -- fastest of the
+#     models tested, and this is the "please wait, creating your recipe" path
+#     where speed matters most (also the only path with a long/structured JSON
+#     response: ingredients+steps for recipes without a local match).
+#   - Follow-up questions (process_question): qwen2.5:3b -- best output quality
+#     of the small models tested, and answers here are short (1-3 sentences),
+#     so its lower raw tok/s matters less than getting the answer right.
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma3")
+OLLAMA_QUESTION_MODEL = os.environ.get("OLLAMA_QUESTION_MODEL", "qwen2.5:3b")
 
 # NOTE: the instructions below are written in Spanish on purpose -- they tell
 # the LLM how to write Spanish output for a Spanish-speaking user, and models
@@ -407,7 +418,7 @@ def process_question(user_text):
     t0 = time.time()
     r = requests.post(
         OLLAMA_CHAT_URL,
-        json={"model": OLLAMA_MODEL, "messages": messages, "stream": False},
+        json={"model": OLLAMA_QUESTION_MODEL, "messages": messages, "stream": False},
         timeout=120,
     )
     r.raise_for_status()

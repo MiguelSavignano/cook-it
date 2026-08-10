@@ -24,9 +24,10 @@ adapt it to another language.
 
 For this to work, the machine it runs on needs:
 
-1. **[Ollama](https://ollama.com)**, running, with the `gemma3` model already pulled
-   (`ollama pull gemma3`). It's the LLM that narrates recipes and answers follow-up questions —
-   see `docs/feasibility.md` for why this specific model, and how much RAM it needs.
+1. **[Ollama](https://ollama.com)**, running, with two models pulled: `gemma3`
+   (`ollama pull gemma3`, generates new recipes) and `qwen2.5:3b`
+   (`ollama pull qwen2.5:3b`, answers follow-up questions) — see
+   `docs/feasibility.md` for why these two specifically, and how much RAM they need.
 2. **[Piper](https://github.com/rhasspy/piper)** (TTS) — synthesizes the spoken responses. The app
    uses the `piper-tts` Python package and needs the `es_ES-davefx-medium` voice model downloaded.
 3. **[faster-whisper](https://github.com/SYSTRAN/faster-whisper)** (STT) — transcribes what the
@@ -44,7 +45,8 @@ the full list with defaults:
 | Variable | What it's for | Default |
 |---|---|---|
 | `OLLAMA_BASE_URL` | Where Ollama is — only needed if it's not on `localhost` | `http://localhost:11434` |
-| `OLLAMA_MODEL` | Which model to ask Ollama for | `gemma3` |
+| `OLLAMA_MODEL` | Model used to generate new recipes (picked for speed) | `gemma3` |
+| `OLLAMA_QUESTION_MODEL` | Model used to answer follow-up questions (picked for quality) | `qwen2.5:3b` |
 | `COOKIT_VOICE` | Which Piper voice to use (a name from [rhasspy/piper-voices](https://huggingface.co/rhasspy/piper-voices)) | `es_ES-davefx-medium` |
 | `COOKIT_MIC_DEVICE` | ALSA mic device (CLI scripts only, not the web app) | `plughw:1,0` |
 | `COOKIT_RECORD_SECONDS` | Seconds recorded per turn (CLI only) | `7` |
