@@ -244,3 +244,59 @@ With the prompt fix, `llama3.2:3b` is a viable alternative too (2.5 GB RAM, ~8.8
 Switching models is just `OLLAMA_MODEL=qwen2.5:3b` (see root `README.md`) plus `ollama pull qwen2.5:3b` on the target device — no code changes needed.
 
 **Still needed before this is a real Pi 5 recommendation, not a proxy:** actually running this on a physical Pi 5 (thermal throttling alone can halve tok/s after ~90s per the TinyWeights benchmark, which no desktop test can reveal), and re-running the full end-to-end latency test from §9 there.
+
+## 12. Split architecture: LLM on a remote machine (older/weaker Pi as thin client) (2026-08-11)
+
+§11 assumed a Pi 5 running the *entire* pipeline (STT + LLM + TTS) locally. Not everyone has a
+Pi 5 -- an older board (Pi 3, Pi Zero 2 W, etc.) has nowhere near enough RAM/CPU to load even the
+smallest Ollama model from §11. That doesn't rule out using it: **`OLLAMA_BASE_URL` already lets
+the LLM run on a different machine on the network** (see root `README.md` / `.env.example`), so
+the old Pi only needs to run `src/api.py` (FastAPI) + serve the static frontend + do STT/TTS,
+while an always-on machine at home (desktop, NAS, another Pi 5) runs Ollama and answers over the
+LAN. No code changes are needed for this -- it's just configuration:
+
+```
+# On the old Pi, in .env (or exported before running run_web.sh):
+OLLAMA_BASE_URL=http://192.168.1.50:11434   # the home machine's LAN IP
+```
+
+### 12.1 What this does and doesn't solve
+
+| Component | Where it runs in this split | Why |
+|---|---|---|
+| LLM (Ollama, `gemma3`/`qwen2.5:3b`) | Remote machine (the one with real RAM/CPU) | This is the heavy part §4/§11 measured -- moving it off the Pi is the whole point. |
+| Web server + frontend (`src/api.py`, `static/`) | Old Pi | Just FastAPI + static files, negligible RAM/CPU (a few tens of MB). |
+| STT (`faster-whisper`, `small`) | **Still the old Pi** | `api.py` loads Whisper itself and transcribes the uploaded audio before ever talking to Ollama -- it isn't offloaded by `OLLAMA_BASE_URL`. §4/§8 measured this as lightweight (~500 MB RAM, ~2.3s for 5.4s of audio) **on a desktop-class CPU**. An old Pi's CPU (especially single/dual-core boards like a Pi Zero/Pi 3) is much slower and has no `int8` matrix acceleration to speak of -- transcription could take significantly longer there. **Not validated on real old-Pi hardware; test with `src/mic_test_record.sh` before relying on it.** |
+| TTS (Piper) | **Still the old Pi** | Same caveat as STT, but lighter (§8: ~1.2s on desktop) -- less likely to be a real bottleneck, still untested on old-Pi-class CPUs. |
+
+So this split solves the RAM problem (no multi-GB model has to fit on the old Pi) but does **not**
+make the Pi's own CPU irrelevant -- it still has to run Whisper + Piper for every turn. If that
+alone is too slow on a given board, the next lever (not yet implemented) would be a smaller
+Whisper model (`tiny`/`base` instead of `small`) traded for accuracy, since `WhisperModel(...)` in
+`src/api.py` is a one-line change.
+
+### 12.2 Network + security notes
+
+- **Ollama must be reachable from the Pi**, which usually means setting `OLLAMA_HOST=0.0.0.0` (or
+  the LAN interface's IP) on the *home* machine before starting the `ollama serve` service --
+  Ollama's own default only binds `localhost`, which is invisible to anything but itself. Confirm
+  with `curl http://<home-ip>:11434/api/tags` from the Pi.
+- Added network latency per LLM call is small next to generation time itself (§9: 12+ seconds of
+  generation vs. sub-100ms typical LAN round-trip) -- this is not expected to be the bottleneck,
+  unlike STT/TTS above.
+- **Keep this LAN-only** (or behind a VPN/Tailscale if remote access is wanted) -- Ollama has no
+  built-in auth, so exposing `11434` directly to the internet lets anyone who finds it run
+  inference (and read/pull/delete models) on the home machine. Same "no auth" caveat already
+  documented in `src/api.py` for the web app itself applies doubly here: don't port-forward either
+  service to the public internet without adding auth first.
+- If the Pi and the home machine aren't always on the same LAN (e.g. testing from a phone
+  hotspot), a private mesh network (Tailscale/WireGuard) is simpler and safer than opening router
+  ports, and keeps `OLLAMA_BASE_URL` pointing at a stable address either way.
+
+### 12.3 Still needed before this is a validated recommendation
+
+- Real latency/CPU numbers for STT/TTS on actual old-Pi hardware (not desktop-proxied like §11) --
+  this is the one part of the pipeline this split doesn't move off the Pi.
+- Confirm which specific "old Raspberry Pi" model is targeted (Pi 3B/3B+/Zero 2 W all have very
+  different single-core performance) -- worth updating this section with the exact board once
+  known.

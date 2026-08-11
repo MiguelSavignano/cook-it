@@ -36,6 +36,27 @@ For this to work, the machine it runs on needs:
 All three are 100% local — none of this calls a cloud service. See `docs/voice.md` for the
 STT/TTS details and `docs/feasibility.md` for the real measured latency/RAM numbers.
 
+## Running on weaker hardware (e.g. an old Raspberry Pi) with a remote LLM
+
+An old Pi (Pi 3, Zero 2 W...) doesn't have the RAM/CPU to load an Ollama model itself (see
+`docs/feasibility.md` §11), but it can still run the web server + frontend and call an Ollama
+instance running on another, more capable machine on your network (a desktop, a Pi 5, a NAS).
+That's what `OLLAMA_BASE_URL` is for — no code changes needed:
+
+1. On the beefier machine, make sure Ollama listens on the LAN, not just `localhost`: set
+   `OLLAMA_HOST=0.0.0.0` before starting `ollama serve` (or in its systemd unit), and pull the
+   models (`ollama pull gemma3`, `ollama pull qwen2.5:3b`).
+2. On the Pi, point Cook-It at it — in `.env` (or exported before `run_web.sh`):
+   ```
+   OLLAMA_BASE_URL=http://192.168.1.50:11434
+   ```
+3. Verify it's reachable from the Pi: `curl http://192.168.1.50:11434/api/tags`.
+
+Note this only offloads the LLM — STT (Whisper) and TTS (Piper) still run on the Pi itself (see
+`docs/feasibility.md` §12 for why, and the RAM/latency numbers). Keep this setup LAN-only or
+behind a VPN (e.g. Tailscale): Ollama has no built-in auth, and neither does this app (see the
+note at the top of `src/api.py`).
+
 ## Environment variables
 
 None are required if everything runs on the same machine with the default setup — they only
