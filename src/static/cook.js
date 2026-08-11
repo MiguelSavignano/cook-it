@@ -7,6 +7,7 @@
 const RECORD_MS = 6000;
 
 const face = document.getElementById('face');
+const mouthImg = document.getElementById('mouth');
 const pupilLeft = document.getElementById('pupilLeft');
 const pupilRight = document.getElementById('pupilRight');
 const faceWrap = document.getElementById('faceWrap');
@@ -51,6 +52,14 @@ let eyeTimer = null;
 let blinkTimer = null;
 let currentFaceState = 'idle';
 
+// Mouth artwork is a swappable file, not CSS -- see assets/README.md.
+// Every state except "happy" reuses the idle drawing (CSS rotates/scales it
+// for confused/speaking); "happy" is the one state with its own image.
+const MOUTH_SRC = {
+  idle: 'static/assets/mouth-idle.svg',
+  happy: 'static/assets/mouth-happy.svg',
+};
+
 function lookAt(x, y) {
   const t = `translate(${x}px, ${y}px)`;
   pupilLeft.style.transform = t;
@@ -81,6 +90,7 @@ function setFaceState(state, hint) {
   currentFaceState = state;
   face.className = `face state-${state}`;
   faceHint.textContent = hint !== undefined ? hint : (DEFAULT_HINTS[state] || '');
+  mouthImg.src = MOUTH_SRC[state] || MOUTH_SRC.idle;
   clearInterval(eyeTimer);
   eyeTimer = null;
   if (state === 'idle') {
