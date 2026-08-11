@@ -176,7 +176,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3vh;
+    gap: clamp(6px, 2.5vh, 20px);
   }
 
   /* Listening: the whole screen breathes with a soft blue glow instead of
@@ -198,11 +198,20 @@
   }
 
   /* No eyebrows -- thinking/confused/listening are read off the eyes
-     (darting pupils, JS-driven) and the mouth alone. */
-  .eyes { display: flex; align-items: center; gap: 8vw; }
+     (darting pupils, JS-driven) and the mouth alone.
+
+     Sized off vh, not vw: this route is meant for a wide-but-short
+     landscape phone screen (browser chrome eats into the height), and on
+     a viewport like that vw stays generous while vh is the scarce
+     dimension. Driving the eyes/mouth from vw let them balloon to a size
+     that pushed the mouth completely out of the (height-limited)
+     face-wrap. Setting the *height* directly from vh and letting the
+     width follow via aspect-ratio keeps the whole face inside whatever
+     vertical room is actually left after the topbar/step strip. */
+  .eyes { display: flex; align-items: center; gap: clamp(16px, 8vh, 90px); }
   .eye {
     position: relative;
-    width: clamp(42px, 11vw, 130px);
+    height: clamp(44px, 22vh, 170px);
     aspect-ratio: 4 / 9;
     background: transparent;
     border-radius: 50%;
@@ -219,7 +228,7 @@
     height: 78%;
     border-radius: 50%;
     background: var(--screen-blue);
-    box-shadow: 0 0 3vw var(--screen-glow);
+    box-shadow: 0 0 clamp(6px, 2.5vh, 18px) var(--screen-glow);
     transition: transform 0.35s ease;
   }
   /* Happy: eyes become closed "^ ^" curves instead of open ovals. */
@@ -238,27 +247,28 @@
     left: 0; right: 0;
     display: flex;
     justify-content: center;
-    gap: 30vw;
+    gap: clamp(60px, 26vh, 260px);
     opacity: 0;
     transition: opacity 0.3s ease;
   }
-  .cheek { width: clamp(16px, 4vw, 40px); aspect-ratio: 1 / 1; border-radius: 50%; background: rgba(232, 112, 58, 0.5); filter: blur(2px); }
+  .cheek { width: clamp(14px, 6vh, 40px); aspect-ratio: 1 / 1; border-radius: 50%; background: rgba(232, 112, 58, 0.5); filter: blur(2px); }
   .face.state-happy .cheeks { opacity: 1; }
 
   /* Default/idle mouth is already a warm smile, not a neutral line -- the
      resting face should read as content, not blank. Tall enough relative
      to its width that the curve actually reads as a grin. state-happy
-     widens it further for the "recipe finished" celebration. */
+     widens it further for the "recipe finished" celebration. Same
+     vh-first sizing logic as the eyes above. */
   .mouth {
-    width: clamp(56px, 14vw, 160px);
-    height: clamp(22px, 4vh, 46px);
+    width: clamp(48px, 21vh, 160px);
+    height: clamp(16px, 7vh, 46px);
     background: var(--screen-blue);
-    box-shadow: 0 0 2.5vw var(--screen-glow);
+    box-shadow: 0 0 clamp(5px, 2vh, 16px) var(--screen-glow);
     border-radius: 0 0 50% 50%;
     transform-origin: center top;
     transition: all 0.2s ease;
   }
-  .face.state-happy .mouth { width: clamp(76px, 19vw, 210px); height: clamp(30px, 5.4vh, 60px); border-radius: 0 0 42% 42%; }
+  .face.state-happy .mouth { width: clamp(64px, 28vh, 210px); height: clamp(22px, 9vh, 60px); border-radius: 0 0 42% 42%; }
   .face.state-confused .mouth { transform: rotate(9deg); }
   .face.state-speaking .mouth { animation: talk 0.32s ease-in-out infinite; }
   @keyframes talk {
@@ -325,14 +335,11 @@
   }
 
   /* Extra-short landscape viewports (phone lying flat, browser chrome
-     eating into the height): shrink the eyes/mouth and the gap between
-     them a bit further, so the step strip never gets squeezed out. */
+     eating into the height): the eyes/mouth already shrink on their own
+     (sized off vh above) -- this just reclaims a bit more room for the
+     step strip and tightens its own padding. */
   @media (orientation: landscape) and (max-height: 380px) {
-    .face { gap: 1.5vh; }
-    .eyes { gap: 6vw; }
-    .eye { width: clamp(32px, 9vw, 90px); }
-    .mouth { width: clamp(38px, 9vw, 100px); height: clamp(12px, 2.2vh, 24px); }
-    .step-area { max-height: 40vh; }
+    .step-area { max-height: 42vh; }
     .cook-center { gap: 2px; padding-top: 4px; }
     .current-step { font-size: 0.82rem; padding: 6px 10px; }
   }
