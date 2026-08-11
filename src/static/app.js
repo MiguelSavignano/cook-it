@@ -126,9 +126,88 @@ async function sendAudio(blob) {
   }
 }
 
+// --- Step timer (see timer.js for the countdown/parsing logic itself) -----
+// Only one step timer can be running at a time -- tracked here so any
+// navigation (next/previous/reset/new recipe) can cancel a stale one instead
+// of letting it keep ticking (and eventually beeping) for a step you've
+// already left.
+let activeStepTimer = null;
+
+function stopActiveStepTimer() {
+  if (activeStepTimer) {
+    activeStepTimer.cancel();
+    activeStepTimer = null;
+  }
+}
+
+function playTimerBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.value = 880;
+    o.connect(g);
+    g.connect(ctx.destination);
+    // Three short beeps instead of one flat tone.
+    [0, 0.3, 0.6].forEach((t) => {
+      g.gain.setValueAtTime(0.0001, ctx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + t + 0.25);
+    });
+    o.start();
+    o.stop(ctx.currentTime + 1);
+  } catch (err) {
+    // No AudioContext available (or blocked) -- the on-screen message still
+    // shows, so this is safe to just skip.
+    console.error('No se pudo reproducir el aviso del temporizador:', err);
+  }
+}
+
+// Renders the "poner temporizador" button for the current step, or clears
+// the slot if this step doesn't need one. Always stops any timer left
+// running from a previous step first.
+function renderStepTimerControls(seconds) {
+  stopActiveStepTimer();
+  const container = document.getElementById('stepTimer');
+  if (!container) return;
+  if (!seconds) {
+    container.innerHTML = '';
+    return;
+  }
+  container.innerHTML = `<button class="timer-start" id="timerStartBtn">⏱️ Poner temporizador (${formatTimer(seconds)})</button>`;
+  document.getElementById('timerStartBtn').addEventListener('click', () => startStepTimer(seconds, container));
+}
+
+function startStepTimer(seconds, container) {
+  container.innerHTML = `
+    <div class="timer-running">
+      <span class="timer-countdown" id="timerCountdown">${formatTimer(seconds)}</span>
+      <button class="timer-cancel" id="timerCancelBtn" title="Cancelar temporizador">✕</button>
+    </div>`;
+  document.getElementById('timerCancelBtn').addEventListener('click', () => {
+    stopActiveStepTimer();
+    renderStepTimerControls(seconds);
+  });
+
+  activeStepTimer = createStepTimer(seconds, {
+    onTick: (remaining) => {
+      const el = document.getElementById('timerCountdown');
+      if (el) el.textContent = formatTimer(remaining);
+    },
+    onFinish: (message) => {
+      activeStepTimer = null;
+      playTimerBeep();
+      container.innerHTML = `<div class="timer-finished">${message}</div>`;
+    },
+  });
+  activeStepTimer.start();
+}
+
 function renderResponse(data) {
   const d = data.data || {};
   if (data.type === 'error') {
+    stopActiveStepTimer();
     card.className = 'card placeholder';
     card.innerHTML = `<div>😕 ${data.spoken_text}</div>`;
     return;
@@ -140,6 +219,7 @@ function renderResponse(data) {
     return;
   }
   if (d.finished) {
+    stopActiveStepTimer();
     recipeActive = false;
     resetToIdle();
     card.className = 'card';
@@ -212,6 +292,7 @@ function escapeHtml(text) {
 }
 
 function renderPlaceholder() {
+  stopActiveStepTimer();
   recipeActive = false;
   card.className = 'card placeholder';
   card.innerHTML = `
@@ -276,6 +357,7 @@ function renderState(state, questionAnswer) {
       <div class="label">Paso ${current + 1} de ${total}</div>
     </div>
     <div class="current-step">${state.steps[current]}</div>
+    <div class="step-timer" id="stepTimer"></div>
     ${state.tip ? `<div class="tip-box"><b>💡 Tip:</b> ${state.tip}</div>` : ''}
     <div class="step-nav">
       <button class="previous" ${current === 0 ? 'disabled' : ''} onclick="buttonAction('api/previous', this)">◀ Anterior</button>
@@ -285,6 +367,7 @@ function renderState(state, questionAnswer) {
       <button onclick="resetSession()">🗑️ Empezar otra receta</button>
     </div>
   `;
+  renderStepTimerControls(parseStepTimerSeconds(state.steps[current]));
 }
 
 async function fetchAndRenderState(questionAnswer) {
