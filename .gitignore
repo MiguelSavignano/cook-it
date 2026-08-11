@@ -19,3 +19,5 @@ src/voices/
 
 # OS/editor cruft
 .DS_Store
+
+images/test/
