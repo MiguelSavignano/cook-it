@@ -9,6 +9,7 @@ recipe_engine.py / common.py, shared with the web API (api.py).
 Usage: run via poc/run_assistant.sh (which activates the venv).
 """
 import os
+import re
 import subprocess
 import sys
 import time
@@ -21,10 +22,50 @@ from recipe_engine import process_command
 
 BASE_DIR = Path(__file__).parent
 RECORD_SECONDS = int(os.environ.get("COOKIT_RECORD_SECONDS", "7"))
-# `arecord -l` lists your devices, e.g. "plughw:1,0" -- machine-specific, so
-# this is NOT meant to work out of the box, override it via env var.
-MIC_DEVICE = os.environ.get("COOKIT_MIC_DEVICE", "plughw:1,0")
+# Fallback used only if COOKIT_MIC_DEVICE isn't set AND auto-detection below
+# (via `arecord -l`) can't find any capture device -- machine-specific, so
+# this is NOT meant to work out of the box.
+DEFAULT_MIC_DEVICE = "plughw:1,0"
 REC_WAV = BASE_DIR / "assistant_in.wav"
+
+# `arecord -l` prints capture devices like:
+#   card 1: Device [USB PnP Sound Device], device 0: USB Audio [USB Audio]
+_ARECORD_DEVICE_RE = re.compile(
+    r"^card (\d+): .*?\[(.*?)\], device (\d+):", re.MULTILINE
+)
+
+
+def detect_mic_device():
+    """Auto-detect a capture (mic) device via `arecord -l`, preferring a USB one.
+
+    Lets the assistant find a plugged-in USB mic without the user having to
+    run `arecord -l` and hand-copy a "plughw:X,Y" string. Returns None if
+    `arecord` isn't installed or no capture device is found, so the caller
+    can fall back to DEFAULT_MIC_DEVICE.
+    """
+    try:
+        out = subprocess.run(
+            ["arecord", "-l"], capture_output=True, text=True, timeout=5
+        ).stdout
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return None
+
+    devices = [
+        (card, device, desc) for card, desc, device in _ARECORD_DEVICE_RE.findall(out)
+    ]
+    if not devices:
+        return None
+
+    # Prefer a device whose description names it as USB (e.g. most USB mics/
+    # headsets), otherwise just take the first capture device found.
+    card, device, desc = next(
+        (d for d in devices if "usb" in d[2].lower()), devices[0]
+    )
+    print(f"  Micrófono detectado: card {card} ({desc}), device {device}")
+    return f"plughw:{card},{device}"
+
+
+MIC_DEVICE = os.environ.get("COOKIT_MIC_DEVICE") or detect_mic_device() or DEFAULT_MIC_DEVICE
 
 
 def step(msg):

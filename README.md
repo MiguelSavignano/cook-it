@@ -48,7 +48,7 @@ the full list with defaults:
 | `OLLAMA_MODEL` | Model used to generate new recipes (picked for speed) | `gemma3` |
 | `OLLAMA_QUESTION_MODEL` | Model used to answer follow-up questions (picked for quality) | `qwen2.5:3b` |
 | `COOKIT_VOICE` | Which Piper voice to use (a name from [rhasspy/piper-voices](https://huggingface.co/rhasspy/piper-voices)) | `es_ES-davefx-medium` |
-| `COOKIT_MIC_DEVICE` | ALSA mic device (CLI scripts only, not the web app) | `plughw:1,0` |
+| `COOKIT_MIC_DEVICE` | ALSA mic device (CLI scripts only, not the web app). Optional — auto-detected via `arecord -l` (preferring a USB mic) if unset; only set this to override | auto-detected, else `plughw:1,0` |
 | `COOKIT_RECORD_SECONDS` | Seconds recorded per turn (CLI only) | `7` |
 
 ## Structure
