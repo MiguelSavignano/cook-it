@@ -22,6 +22,13 @@ function randomLook(spreadX: number, spreadY: number): Look {
   return { x: Number(x.toFixed(1)), y: Number(y.toFixed(1)) };
 }
 
+// See Face.css's mouth.talk-1..4 -- picked fresh each time speech starts so
+// the mouth doesn't move the exact same way on every turn.
+const TALK_VARIANTS = 4;
+function randomTalkVariant() {
+  return 1 + Math.floor(Math.random() * TALK_VARIANTS);
+}
+
 /**
  * The animated face: idle "thinking" look with wandering eyes/blinks, plus
  * listening/thinking/speaking/happy/confused expressions -- everything
@@ -32,6 +39,8 @@ function randomLook(spreadX: number, spreadY: number): Look {
 export default function Face({ state }: FaceProps) {
   const [look, setLook] = useState<Look>({ x: 0, y: 0 });
   const [blinking, setBlinking] = useState(false);
+  const [quirking, setQuirking] = useState(false);
+  const [talkVariant, setTalkVariant] = useState(1);
 
   // Wandering gaze: a fresh look every few seconds while idle ("de vez en
   // cuando"), faster darting while actively thinking something out, a fixed
@@ -71,14 +80,46 @@ export default function Face({ state }: FaceProps) {
     };
   }, []);
 
+  // Occasional idle personality beat: a quick curious head-tilt + eyes
+  // widening (see Face.css's .quirk), independent of blink -- only while
+  // idle, so it never fights with listening/thinking's own eye transforms.
+  useEffect(() => {
+    if (state !== 'idle') return;
+    let openTimer: ReturnType<typeof setTimeout>;
+    let closeTimer: ReturnType<typeof setTimeout>;
+    const scheduleQuirk = () => {
+      openTimer = setTimeout(() => {
+        setQuirking(true);
+        closeTimer = setTimeout(() => setQuirking(false), 900);
+        scheduleQuirk();
+      }, 7000 + Math.random() * 8000);
+    };
+    scheduleQuirk();
+    return () => {
+      clearTimeout(openTimer);
+      clearTimeout(closeTimer);
+      setQuirking(false);
+    };
+  }, [state]);
+
+  // A fresh mouth-movement pattern each time speech starts (see
+  // Mouth.tsx/Face.css) -- picked once per turn, not on every render.
+  useEffect(() => {
+    if (state === 'speaking') setTalkVariant(randomTalkVariant());
+  }, [state]);
+
+  const className = ['face', `state-${state}`, blinking && 'blink', quirking && 'quirk']
+    .filter(Boolean)
+    .join(' ');
+
   return (
-    <div className={`face state-${state}${blinking ? ' blink' : ''}`}>
+    <div className={className}>
       <div className="ring" />
       <div className="eyes">
         <Eye look={look} />
         <Eye look={look} />
       </div>
-      <Mouth state={state} />
+      <Mouth state={state} talkVariant={talkVariant} />
       <div className="cheeks">
         <span className="cheek left" />
         <span className="cheek right" />
