@@ -276,6 +276,60 @@
     50% { transform: scaleY(1.7); }
   }
 
+  /* Step timer: takes over the exact spot the face occupies (same
+     face-wrap slot) whenever the current step needs one and there's no
+     voice interaction in progress -- see cook.js's updateFaceTimerVisibility().
+     .face/.timer-view [hidden] need an explicit override because both
+     already declare their own `display`, which would otherwise beat the
+     UA's `[hidden] { display: none }`. */
+  .face[hidden], .timer-view[hidden] { display: none; }
+  .timer-view {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(10px, 3vh, 26px);
+  }
+  .timer-display {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    font-size: clamp(48px, 22vh, 180px);
+    color: var(--screen-blue);
+    text-shadow: 0 0 clamp(10px, 4vh, 40px) var(--screen-glow);
+    line-height: 1;
+  }
+  .timer-message {
+    font-size: clamp(0.9rem, 2.6vh, 1.3rem);
+    color: var(--ink);
+    text-align: center;
+    font-weight: 700;
+    padding: 0 16px;
+  }
+  .timer-btn {
+    border: none;
+    border-radius: 999px;
+    padding: clamp(10px, 2.2vh, 16px) clamp(20px, 4vw, 34px);
+    font-size: clamp(0.85rem, 2.2vh, 1.05rem);
+    font-weight: 700;
+    cursor: pointer;
+    touch-action: manipulation;
+    max-width: min(92%, 480px);
+    white-space: normal;
+    text-align: center;
+  }
+  .timer-start-btn {
+    background: linear-gradient(145deg, var(--orange-light), var(--orange));
+    color: #2a1608;
+  }
+  .timer-cancel-btn {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--ink-soft);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
   /* Pinned thin strip under the face -- the face keeps most of the
      screen, this is a caption/status strip, not a competing panel. */
   .step-area {
@@ -374,6 +428,16 @@
         <div class="cheeks"><span class="cheek left"></span><span class="cheek right"></span></div>
       </div>
       <div class="face-hint" id="faceHint">Toca la cara para preguntar</div>
+
+      <!-- Same slot as .face -- shown instead of it while the current step
+           has a timer and nothing voice-related is happening (see
+           updateFaceTimerVisibility() in cook.js). -->
+      <div class="timer-view" id="timerView" hidden>
+        <div class="timer-display" id="timerDisplay">0:00</div>
+        <div class="timer-message" id="timerMessage" hidden></div>
+        <button class="timer-btn timer-start-btn" id="timerStartBtn">▶ Iniciar temporizador</button>
+        <button class="timer-btn timer-cancel-btn" id="timerCancelBtn" hidden>✕ Cancelar</button>
+      </div>
     </div>
 
     <div class="step-area">
@@ -393,6 +457,7 @@
 
 <!-- Relative path (no leading slash): works both mounted at the domain root
      (dev, :3000) and reverse-proxied under a subpath, e.g. Caddy /cookit/*. -->
+<script src="static/timer.js"></script>
 <script src="static/cook.js"></script>
 
 </body>

@@ -22,6 +22,11 @@ const userTextEl = document.getElementById('userText');
 const answerBox = document.getElementById('answerBox');
 const tipBox = document.getElementById('tipBox');
 const homeBtn = document.getElementById('homeBtn');
+const timerView = document.getElementById('timerView');
+const timerDisplay = document.getElementById('timerDisplay');
+const timerMessage = document.getElementById('timerMessage');
+const timerStartBtn = document.getElementById('timerStartBtn');
+const timerCancelBtn = document.getElementById('timerCancelBtn');
 
 let mediaRecorder = null;
 let chunks = [];
@@ -44,6 +49,7 @@ const DEFAULT_HINTS = {
 };
 let eyeTimer = null;
 let blinkTimer = null;
+let currentFaceState = 'idle';
 
 function lookAt(x, y) {
   const t = `translate(${x}px, ${y}px)`;
@@ -72,6 +78,7 @@ function scheduleBlink() {
 // `hint` overrides the state's default caption (e.g. a specific error
 // message); omit it to fall back to DEFAULT_HINTS[state].
 function setFaceState(state, hint) {
+  currentFaceState = state;
   face.className = `face state-${state}`;
   faceHint.textContent = hint !== undefined ? hint : (DEFAULT_HINTS[state] || '');
   clearInterval(eyeTimer);
@@ -89,6 +96,102 @@ function setFaceState(state, hint) {
   } else {
     lookAt(0, 0);
   }
+  updateFaceTimerVisibility();
+}
+
+// ---------- Step timer (takes over the face's spot) ----------
+// Parsing/countdown logic lives in timer.js (shared with the old picker-page
+// card, before that view moved to this route -- see api.py/docs). Here we
+// just wire it into the face-wrap: while the current step has a timer *and*
+// nothing voice-related is going on (state idle), show the countdown where
+// the face would be; any listening/thinking/speaking/confused moment still
+// shows the face as usual, timer counting on unseen in the background.
+
+let activeStepTimer = null;
+let currentStepTimerSeconds = null;
+
+function stopActiveStepTimer() {
+  if (activeStepTimer) {
+    activeStepTimer.cancel();
+    activeStepTimer = null;
+  }
+}
+
+function playTimerBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.value = 880;
+    o.connect(g);
+    g.connect(ctx.destination);
+    // Three short beeps instead of one flat tone.
+    [0, 0.3, 0.6].forEach((t) => {
+      g.gain.setValueAtTime(0.0001, ctx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + t + 0.25);
+    });
+    o.start();
+    o.stop(ctx.currentTime + 1);
+  } catch (err) {
+    // No AudioContext available (or blocked) -- the on-screen message still
+    // shows, so this is safe to just skip.
+    console.error('No se pudo reproducir el aviso del temporizador:', err);
+  }
+}
+
+function renderTimerReady(seconds) {
+  timerDisplay.textContent = formatTimer(seconds);
+  timerMessage.hidden = true;
+  timerStartBtn.hidden = false;
+  timerStartBtn.textContent = `▶ Iniciar temporizador (${formatTimer(seconds)})`;
+  timerCancelBtn.hidden = true;
+}
+
+function startCurrentStepTimer() {
+  if (!currentStepTimerSeconds) return;
+  timerStartBtn.hidden = true;
+  timerCancelBtn.hidden = false;
+  timerMessage.hidden = true;
+  activeStepTimer = createStepTimer(currentStepTimerSeconds, {
+    onTick: (remaining) => { timerDisplay.textContent = formatTimer(remaining); },
+    onFinish: (message) => {
+      activeStepTimer = null;
+      playTimerBeep();
+      timerDisplay.textContent = '⏰';
+      timerCancelBtn.hidden = true;
+      timerMessage.hidden = false;
+      timerMessage.textContent = message;
+    },
+  });
+  activeStepTimer.start();
+}
+
+// Buttons stopPropagation so tapping them doesn't also bubble up to
+// faceWrap's click handler and toggle voice recording.
+timerStartBtn.addEventListener('click', (e) => { e.stopPropagation(); startCurrentStepTimer(); });
+timerCancelBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  stopActiveStepTimer();
+  renderTimerReady(currentStepTimerSeconds);
+});
+
+// Called whenever the current step changes (renderState/renderFinished).
+// Cancels whatever timer the *previous* step left running so it never keeps
+// ticking (and eventually beeping) for a step you've already left.
+function setupStepTimer(seconds) {
+  stopActiveStepTimer();
+  currentStepTimerSeconds = seconds;
+  if (seconds) renderTimerReady(seconds);
+  updateFaceTimerVisibility();
+}
+
+function updateFaceTimerVisibility() {
+  const showTimer = currentFaceState === 'idle' && !!currentStepTimerSeconds;
+  face.hidden = showTimer;
+  faceHint.hidden = showTimer;
+  timerView.hidden = !showTimer;
 }
 
 // ---------- Recording (tap the face to ask a question) ----------
@@ -239,6 +342,7 @@ homeBtn.addEventListener('click', () => { window.location.href = './'; });
 // ---------- State rendering ----------
 
 function renderFinished(d) {
+  setupStepTimer(null);
   setFaceState('happy');
   prevBtn.hidden = true;
   nextBtn.hidden = true;
@@ -278,6 +382,8 @@ function renderState(state) {
   } else {
     tipBox.hidden = true;
   }
+
+  setupStepTimer(parseStepTimerSeconds(state.steps[current]));
 }
 
 async function fetchAndRenderState() {
