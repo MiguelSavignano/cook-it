@@ -196,16 +196,44 @@ function updateFaceTimerVisibility() {
 
 // ---------- Recording (tap the face to ask a question) ----------
 
+// Only one clip should ever be audible at once -- tracked here so a second
+// call (e.g. tapping "siguiente" twice fast, or a pending greeting racing a
+// button press) stops/discards whatever's still playing instead of the two
+// overlapping.
+let currentAudioPlayer = null;
+
+function stopCurrentAudio() {
+  if (!currentAudioPlayer) return;
+  const { player, url } = currentAudioPlayer;
+  player.pause();
+  player.onended = null;
+  player.onerror = null;
+  URL.revokeObjectURL(url);
+  currentAudioPlayer = null;
+}
+
 function playAudioB64(base64, mime) {
+  stopCurrentAudio();
   const bytes = atob(base64);
   const buf = new Uint8Array(bytes.length);
   for (let i = 0; i < bytes.length; i++) buf[i] = bytes.charCodeAt(i);
   const blob = new Blob([buf], { type: mime || 'audio/wav' });
   const url = URL.createObjectURL(blob);
   const player = new Audio(url);
+  currentAudioPlayer = { player, url };
   setFaceState('speaking');
-  const backToIdle = () => setFaceState('idle');
-  player.addEventListener('ended', () => { URL.revokeObjectURL(url); backToIdle(); });
+  const backToIdle = () => {
+    // Guard: only clean up/reset if this player is still the current one --
+    // stopCurrentAudio() may have already superseded it by the time this
+    // fires (shouldn't happen for 'ended' after pause(), but 'error' could
+    // still land late).
+    if (currentAudioPlayer && currentAudioPlayer.player === player) {
+      URL.revokeObjectURL(url);
+      currentAudioPlayer = null;
+    }
+    setFaceState('idle');
+  };
+  player.addEventListener('ended', backToIdle);
   player.addEventListener('error', backToIdle);
   player.play().catch((err) => {
     console.error('No se pudo reproducir el audio:', err);

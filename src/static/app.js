@@ -22,14 +22,37 @@ function resetToIdle() {
 // on the server -- the API sends back base64 WAV instead of playing it
 // itself, precisely so a phone gets the answer in its own hand, not through
 // whatever PC happens to be running the backend.
+//
+// Only one clip should ever be audible at once -- tracked here so tapping
+// the mic again before the previous response finished playing (the button
+// re-enables as soon as the response arrives, same tick this fires) stops
+// the old clip instead of the two overlapping.
+let currentAudioPlayer = null;
+
+function stopCurrentAudio() {
+  if (!currentAudioPlayer) return;
+  const { player, url } = currentAudioPlayer;
+  player.pause();
+  player.onended = null;
+  URL.revokeObjectURL(url);
+  currentAudioPlayer = null;
+}
+
 function playAudioB64(base64, mime) {
+  stopCurrentAudio();
   const bytes = atob(base64);
   const buf = new Uint8Array(bytes.length);
   for (let i = 0; i < bytes.length; i++) buf[i] = bytes.charCodeAt(i);
   const blob = new Blob([buf], { type: mime || 'audio/wav' });
   const url = URL.createObjectURL(blob);
   const player = new Audio(url);
-  player.addEventListener('ended', () => URL.revokeObjectURL(url));
+  currentAudioPlayer = { player, url };
+  player.addEventListener('ended', () => {
+    if (currentAudioPlayer && currentAudioPlayer.player === player) {
+      URL.revokeObjectURL(url);
+      currentAudioPlayer = null;
+    }
+  });
   player.play().catch((err) => console.error('No se pudo reproducir el audio:', err));
 }
 

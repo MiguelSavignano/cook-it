@@ -231,10 +231,17 @@
     box-shadow: 0 0 clamp(6px, 2.5vh, 18px) var(--screen-glow);
     transition: transform 0.35s ease;
   }
-  /* Happy: eyes become closed "^ ^" curves instead of open ovals. */
+  /* Happy: eyes become closed "^ ^" curves instead of open ovals. Width
+     matches the open eye's own rendered width (same clamp/aspect-ratio
+     math as the base .eye rule above, just spelled out since a percentage
+     height doesn't resolve inside .eyes -- a flex row with no definite
+     height of its own -- which is what made this collapse to a sliver
+     before). */
   .face.state-happy .eye {
+    aspect-ratio: auto;
+    width: clamp(20px, 10vh, 76px);
+    height: clamp(14px, 6vh, 46px);
     background: transparent;
-    height: 34%;
     border-radius: 0 0 60px 60px;
     border-bottom: clamp(4px, 0.8vh, 8px) solid var(--screen-blue);
     box-shadow: 0 4px 10px var(--screen-glow);
@@ -255,20 +262,28 @@
   .face.state-happy .cheeks { opacity: 1; }
 
   /* Default/idle mouth is already a warm smile, not a neutral line -- the
-     resting face should read as content, not blank. Tall enough relative
-     to its width that the curve actually reads as a grin. state-happy
-     widens it further for the "recipe finished" celebration. Same
-     vh-first sizing logic as the eyes above. */
+     resting face should read as content, not blank. Same open-curve
+     technique as the happy eyes below (border-bottom arc, no fill) rather
+     than a filled bar, because a curved *line* reads as an actual smile at
+     a glance -- a rounded-bottom bar just read as a flat mouth with soft
+     corners. state-happy widens/thickens it further for the "recipe
+     finished" celebration. Same vh-first sizing logic as the eyes above. */
   .mouth {
-    width: clamp(48px, 21vh, 160px);
-    height: clamp(16px, 7vh, 46px);
-    background: var(--screen-blue);
-    box-shadow: 0 0 clamp(5px, 2vh, 16px) var(--screen-glow);
-    border-radius: 0 0 50% 50%;
+    width: clamp(56px, 23vh, 180px);
+    height: clamp(20px, 8vh, 54px);
+    background: transparent;
+    border-bottom: clamp(6px, 1.6vh, 12px) solid var(--screen-blue);
+    border-radius: 0 0 60% 60%;
+    box-shadow: 0 clamp(3px, 1vh, 10px) clamp(8px, 2.5vh, 22px) var(--screen-glow);
     transform-origin: center top;
     transition: all 0.2s ease;
   }
-  .face.state-happy .mouth { width: clamp(64px, 28vh, 210px); height: clamp(22px, 9vh, 60px); border-radius: 0 0 42% 42%; }
+  .face.state-happy .mouth {
+    width: clamp(78px, 30vh, 230px);
+    height: clamp(30px, 11vh, 74px);
+    border-bottom-width: clamp(8px, 2vh, 15px);
+    border-radius: 0 0 55% 55%;
+  }
   .face.state-confused .mouth { transform: rotate(9deg); }
   .face.state-speaking .mouth { animation: talk 0.32s ease-in-out infinite; }
   @keyframes talk {
