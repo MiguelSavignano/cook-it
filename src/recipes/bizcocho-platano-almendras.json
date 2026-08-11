@@ -18,13 +18,22 @@
   "steps": [
     "Precalienta el horno a 180°C (calor arriba y abajo) y engrasa un molde de 20-22 cm o fórralo con papel de horno.",
     "Machaca los plátanos hasta obtener un puré.",
-    "Bate el huevo con el azúcar moreno durante 2-3 minutos.",
+    {
+      "text": "Bate el huevo con el azúcar moreno durante 2-3 minutos.",
+      "timer_seconds": 180
+    },
     "Añade el aceite, la vainilla y el puré de plátano, y mezcla bien.",
     "Tamiza la harina, la levadura, la sal y la canela e incorpóralas, mezclando solo hasta integrar.",
     "Añade las almendras tostadas troceadas y remueve suavemente.",
     "Vierte la masa en el molde y espolvorea uniformemente una cucharada de azúcar moreno sobre toda la superficie justo antes de hornear.",
-    "Hornea 40-50 minutos, hasta que al introducir un palillo salga limpio.",
-    "Deja reposar 10 minutos antes de desmoldar y enfría sobre una rejilla."
+    {
+      "text": "Hornea 40-50 minutos, hasta que al introducir un palillo salga limpio.",
+      "timer_seconds": 3000
+    },
+    {
+      "text": "Deja reposar 10 minutos antes de desmoldar y enfría sobre una rejilla.",
+      "timer_seconds": 600
+    }
   ],
   "summary": "Plátanos muy maduros machacados se mezclan con huevo, azúcar moreno y aceite, se incorporan a la harina con almendras tostadas troceadas, y justo antes de hornear se espolvorea azúcar moreno por encima para que se caramelice y forme una costra crujiente con sabor a toffee sobre un interior tierno y húmedo.",
   "tip": "No te saltes el azúcar moreno espolvoreado por encima justo antes de hornear -es lo que da ese acabado caramelizado tipo toffee. Y usa plátanos con muchas manchas negras: cuanto más maduros, más jugoso y dulce queda el bizcocho."

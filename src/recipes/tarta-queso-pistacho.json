@@ -46,8 +46,14 @@
     "Incorpora los huevos uno a uno.",
     "Añade la nata y el chorrito de esencia de vainilla.",
     "Incorpora el pistacho y mezcla hasta que quede homogéneo.",
-    "Vierte la mezcla en el molde y hornea 40 minutos a 180°C.",
-    "Apaga el horno y deja la tarta dentro 30 minutos con la puerta abierta, para que termine de cuajar sin bajones bruscos de temperatura.",
+    {
+      "text": "Vierte la mezcla en el molde y hornea 40 minutos a 180°C.",
+      "timer_seconds": 2400
+    },
+    {
+      "text": "Apaga el horno y deja la tarta dentro 30 minutos con la puerta abierta, para que termine de cuajar sin bajones bruscos de temperatura.",
+      "timer_seconds": 1800
+    },
     "Saca y enfría del todo a temperatura ambiente antes de refrigerar varias horas o toda la noche."
   ],
   "summary": "Una mezcla cremosa de queso crema, mascarpone y pasta de pistacho se hornea a 180°C hasta cuajar y se deja enfriar dentro del horno apagado con la puerta entreabierta, para que no se agriete y quede con esa textura suave típica de las tartas de queso al horno.",

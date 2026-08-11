@@ -75,6 +75,17 @@ frases breves y naturales, sin markdown, listas para ser leídas en voz alta. Ve
 grano, no repitas la receta entera ni la lista de pasos, solo contesta la pregunta."""
 
 
+def step_text(step):
+    """A recipe step is usually a plain string, but a local recipe's JSON may
+    give a step that needs a timer as {"text": "...", "timer_seconds": N}
+    instead (see src/recipes/*.json and static/timer.js's matching
+    stepText()) -- this is the one place that needs to know about both
+    shapes before a step goes into spoken text or an LLM prompt. The
+    frontend gets the raw step (string or object) as-is via /api/state and
+    reads .timer_seconds itself; the LLM/TTS side only ever wants the text."""
+    return step["text"] if isinstance(step, dict) else step
+
+
 def load_recipes():
     recipes = {}
     for f in sorted(RECIPES_DIR.glob("*.json")):
@@ -122,7 +133,7 @@ def format_local_recipe(recipe):
         f"- {ing['item']}: {ing.get('amount') or ''} {ing.get('unit') or ''}".strip()
         for ing in recipe["ingredients"]
     )
-    steps_txt = "\n".join(f"{i+1}. {s}" for i, s in enumerate(recipe["steps"]))
+    steps_txt = "\n".join(f"{i+1}. {step_text(s)}" for i, s in enumerate(recipe["steps"]))
     return f"""RECETA LOCAL: {recipe['name']} ({recipe.get('servings', '')})
 
 Ingredientes:
@@ -260,7 +271,7 @@ def request_recipe(user_text):
     return {
         **state,
         "total_steps": len(steps),
-        "step_text": steps[0],
+        "step_text": step_text(steps[0]),
         "llm_time": llm_time,
     }
 
@@ -293,7 +304,7 @@ def next_step():
         "finished": False,
         "current_step": state["current_step"],
         "total_steps": len(steps),
-        "step_text": steps[state["current_step"]],
+        "step_text": step_text(steps[state["current_step"]]),
         "name": state["name"],
     }
 
@@ -309,7 +320,7 @@ def previous_step():
         "finished": False,
         "current_step": state["current_step"],
         "total_steps": len(state["steps"]),
-        "step_text": state["steps"][state["current_step"]],
+        "step_text": step_text(state["steps"][state["current_step"]]),
         "name": state["name"],
     }
 
@@ -323,7 +334,7 @@ def repeat_step():
         "finished": False,
         "current_step": state["current_step"],
         "total_steps": len(state["steps"]),
-        "step_text": state["steps"][state["current_step"]],
+        "step_text": step_text(state["steps"][state["current_step"]]),
         "name": state["name"],
     }
 
@@ -410,7 +421,7 @@ def process_question(user_text):
             "content": (
                 f"Receta activa: {state['name']}. Va por el paso "
                 f"{state['current_step'] + 1} de {len(state['steps'])}: "
-                f"\"{state['steps'][state['current_step']]}\".\n\n"
+                f"\"{step_text(state['steps'][state['current_step']])}\".\n\n"
                 f"Pregunta del usuario: \"{user_text}\""
             ),
         },

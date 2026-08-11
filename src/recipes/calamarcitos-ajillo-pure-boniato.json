@@ -71,7 +71,10 @@
   ],
   "steps": [
     "Pela los boniatos y córtalos en dados.",
-    "Cuécelos en agua con una pizca de sal 15-20 minutos, hasta que estén muy tiernos.",
+    {
+      "text": "Cuécelos en agua con una pizca de sal 15-20 minutos, hasta que estén muy tiernos.",
+      "timer_seconds": 1200
+    },
     "Escúrrelos bien y tritúralos o aplástalos con un pasapurés.",
     "Incorpora la mantequilla y mezcla.",
     "Añade poco a poco la leche caliente (o nata) hasta obtener una textura cremosa.",
@@ -79,7 +82,10 @@
     "Seca muy bien los calamarcitos con papel de cocina.",
     "Calienta una sartén grande a fuego fuerte y añade el aceite de oliva.",
     "Incorpora los ajos laminados y dóralos 30-60 segundos, sin que se quemen.",
-    "Añade los calamarcitos en una sola capa (si no caben, cocina en dos tandas) y cocina 2-3 minutos, removiendo continuamente.",
+    {
+      "text": "Añade los calamarcitos en una sola capa (si no caben, cocina en dos tandas) y cocina 2-3 minutos, removiendo continuamente.",
+      "timer_seconds": 180
+    },
     "Apaga el fuego, añade el perejil picado, unas gotas de limón y rectifica de sal.",
     "Sirve una base de puré de boniato con los calamarcitos encima, rociados con el aceite de ajo de la sartén y un poco más de perejil y limón."
   ],

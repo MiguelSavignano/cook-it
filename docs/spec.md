@@ -115,6 +115,8 @@ MVP: hand-curated recipes in JSON, example schema:
 
 (Note: this is the schema's original design sketch, in English for readability here — the actual recipe files in `src/recipes/` keep their content in Spanish, since that's what gets spoken to the user. See `src/recipe_engine.py` for the real field names.)
 
+A step is normally just a string, as above. A step that needs a countdown (a bake, a rest, a simmer...) instead gives an object: `{"text": "Bake 40-50 minutes...", "timer_seconds": 3000}` — `timer_seconds` is explicit in the recipe file rather than guessed from the text, so it's exact even where the wording is fuzzy ("40-50 minutes", "1½-2 hours"). `src/static/timer.js`'s `parseStepTimerSeconds()` reads that field directly on the frontend for the `/cook` route's timer view; `recipe_engine.py`'s `step_text()` is the one place on the Python side that unwraps either shape back down to plain text (spoken text, LLM prompts). Steps the LLM generates for a recipe with no local match stay plain strings — the model isn't asked for `timer_seconds` — so `parseStepTimerSeconds()` still falls back to guessing a duration from the step's own Spanish text for those.
+
 The LLM always receives the current step + the full recipe as context (RAG via direct injection, since recipes are short — no need for a vector DB in the MVP).
 
 ## 8. Phases / roadmap

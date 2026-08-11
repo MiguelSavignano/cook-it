@@ -59,17 +59,26 @@
     "Añade la leche poco a poco, sin dejar de batir.",
     "Incorpora la harina tamizada y mezcla hasta que no queden grumos.",
     "Añade la mantequilla derretida y la vainilla.",
-    "Deja reposar la masa en la nevera al menos 30 minutos.",
+    {
+      "text": "Deja reposar la masa en la nevera al menos 30 minutos.",
+      "timer_seconds": 1800
+    },
     "Calienta una sartén antiadherente a fuego medio y engrásala ligeramente.",
     "Vierte un cucharón de masa, repartiéndola fina por toda la base.",
-    "Cocina 1-2 minutos por cada lado, hasta que esté dorada pero flexible.",
+    {
+      "text": "Cocina 1-2 minutos por cada lado, hasta que esté dorada pero flexible.",
+      "timer_seconds": 120
+    },
     "Repite hasta terminar toda la masa (18-22 crepes) y déjalas enfriar por completo, separadas entre sí.",
     "Monta la nata con el azúcar glas hasta que quede firme.",
     "Incorpora el dulce de leche a la nata montada con cuidado (o alterna capas de nata y dulce de leche por separado).",
     "Coloca la primera crepe como base y extiende una capa fina de relleno.",
     "Coloca la siguiente crepe encima y repite el proceso con todas las capas.",
     "Termina con una capa de crepe simple o decorada por encima y alisa los bordes con una espátula.",
-    "Refrigera la tarta al menos 3-4 horas, idealmente toda la noche, para que las capas se asienten."
+    {
+      "text": "Refrigera la tarta al menos 3-4 horas, idealmente toda la noche, para que las capas se asienten.",
+      "timer_seconds": 14400
+    }
   ],
   "summary": "Crepes finas cocinadas una a una en sartén y enfriadas por completo se apilan en capas alternas con nata montada mezclada con dulce de leche hasta formar una tarta de 18-20 pisos, que se deja reposar en frío varias horas para que asiente antes de cortarla.",
   "tip": "Deja enfriar las crepes por completo y por separado antes de montar la tarta: si se apilan calientes o juntas se pegan y se rompen al separarlas. (Esta receta se guardó solo con la lista de ingredientes; los pasos son el método estándar de un milcrepe, ajústalos si tu técnica real es distinta.)"

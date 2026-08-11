@@ -122,21 +122,45 @@
   "steps": [
     "Corta el pollo en trozos de unos 4-5 cm.",
     "Mezcla el pollo con el ajo, el jengibre, la sal, la pimienta, la salsa de soja ligera y el mirin del marinado.",
-    "Deja marinar entre 30 minutos y 2 horas.",
+    {
+      "text": "Deja marinar entre 30 minutos y 2 horas.",
+      "timer_seconds": 1800
+    },
     "Escurre bien el pollo marinado.",
     "Mezcla la fécula de patata con la levadura química para el rebozado.",
     "Reboza cada trozo de pollo presionando ligeramente para que se adhiera una capa fina.",
-    "Deja reposar el pollo rebozado 10 minutos.",
-    "Calienta el aceite a 165°C y fríe el pollo 5-6 minutos, sin dejar que se dore demasiado.",
-    "Saca el pollo y déjalo reposar 10 minutos.",
-    "Sube el aceite a 185-190°C y fríe el pollo 2-3 minutos más, hasta que quede muy dorado y crujiente.",
-    "Pon todos los ingredientes de la salsa Yangnyeom en un cazo, excepto el aceite de sésamo y las semillas de sésamo, y cocina 3-5 minutos a fuego medio hasta que espese ligeramente.",
+    {
+      "text": "Deja reposar el pollo rebozado 10 minutos.",
+      "timer_seconds": 600
+    },
+    {
+      "text": "Calienta el aceite a 165°C y fríe el pollo 5-6 minutos, sin dejar que se dore demasiado.",
+      "timer_seconds": 360
+    },
+    {
+      "text": "Saca el pollo y déjalo reposar 10 minutos.",
+      "timer_seconds": 600
+    },
+    {
+      "text": "Sube el aceite a 185-190°C y fríe el pollo 2-3 minutos más, hasta que quede muy dorado y crujiente.",
+      "timer_seconds": 180
+    },
+    {
+      "text": "Pon todos los ingredientes de la salsa Yangnyeom en un cazo, excepto el aceite de sésamo y las semillas de sésamo, y cocina 3-5 minutos a fuego medio hasta que espese ligeramente.",
+      "timer_seconds": 300
+    },
     "Retira la salsa del fuego y añade el aceite de sésamo.",
     "Introduce el pollo caliente en un bol, añade la salsa y mezcla 15-20 segundos, solo hasta cubrir cada pieza.",
     "Espolvorea semillas de sésamo tostadas y, si quieres, cebolleta picada.",
-    "Lava el arroz 3-5 veces y déjalo reposar 20-30 minutos en el agua.",
+    {
+      "text": "Lava el arroz 3-5 veces y déjalo reposar 20-30 minutos en el agua.",
+      "timer_seconds": 1800
+    },
     "Cocina el arroz con una proporción de 1 parte de arroz por 1,1-1,2 partes de agua.",
-    "Cuando termine, deja reposar el arroz 10 minutos con la tapa puesta, y sirve el pollo con él."
+    {
+      "text": "Cuando termine, deja reposar el arroz 10 minutos con la tapa puesta, y sirve el pollo con él.",
+      "timer_seconds": 600
+    }
   ],
   "summary": "Los trozos de contramuslo se marinan con ajo, jengibre y soja, se rebozan en fécula de patata y se fríen dos veces -a temperatura moderada primero, muy caliente después- para lograr una corteza fina y extremadamente crujiente. Se bañan en caliente con una salsa Yangnyeom picante de gochujang, miel y ajo, y se sirven con arroz japonés recién hecho.",
   "tip": "La doble fritura es la clave: la primera cocina el pollo por dentro y con el reposo sale la humedad, la segunda a más temperatura crea la corteza crujiente -no te saltes el reposo entre ambas. Mezcla el pollo con la salsa justo antes de servir, porque si se deja reposar ya salseado el rebozado pierde el punto crujiente enseguida. Si prefieres una versión no picante, hay una alternativa: la salsa Ganjang, de soja, ajo y mantequilla."

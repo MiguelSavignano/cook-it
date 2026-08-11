@@ -26,9 +26,15 @@
   ],
   "steps": [
     "Pela y corta las patatas en láminas finas.",
-    "Fríe las patatas a fuego medio hasta que estén tiernas, unos 15-20 minutos.",
+    {
+      "text": "Fríe las patatas a fuego medio hasta que estén tiernas, unos 15-20 minutos.",
+      "timer_seconds": 1200
+    },
     "Bate los huevos en un bol grande y mezcla con las patatas ya escurridas de aceite.",
-    "Cuaja la mezcla en la sartén por ambos lados, unos 2-3 minutos por cada lado."
+    {
+      "text": "Cuaja la mezcla en la sartén por ambos lados, unos 2-3 minutos por cada lado.",
+      "timer_seconds": 180
+    }
   ],
   "summary": "Para elaborar una auténtica tortilla española, comienza por confitar las patatas en abundante aceite de oliva a fuego medio, hasta que estén tiernas y ligeramente doradas, creando así una base de sabor intensa. Mientras tanto, bate los huevos en un bol, incorporando cuidadosamente las patatas escurridas. Una vez que la tortilla esté cuajada por ambos lados, disfruta de su textura suave y su sabor tradicional.",
   "tip": "Para evitar que la tortilla se pegue a la sartén, asegúrate de que esté bien caliente antes de echar la mezcla y, si es necesario, añade un poco más de aceite al principio."

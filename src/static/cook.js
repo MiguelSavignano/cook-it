@@ -373,7 +373,10 @@ function renderState(state) {
     return `<div class="dot ${cls}"></div>`;
   }).join('');
   progressLabel.textContent = `Paso ${current + 1} de ${total}`;
-  currentStepEl.textContent = state.steps[current];
+  // A step is usually a plain string, but one that needs a timer is
+  // {text, timer_seconds} instead (see static/timer.js/src/recipes/*.json)
+  // -- stepText() (from timer.js, loaded before this file) reads either.
+  currentStepEl.textContent = stepText(state.steps[current]);
   prevBtn.disabled = current === 0;
 
   if (state.tip) {
