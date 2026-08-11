@@ -8,33 +8,6 @@ let mediaRecorder = null;
 let chunks = [];
 let recording = false;
 
-// Whether a recipe is currently active -- changes what the mic invites you
-// to do (ask for a recipe vs. ask a question about the one you're cooking),
-// see idleHintHTML()/resetToIdle() below. Kept in sync by renderState().
-let recipeActive = false;
-
-// Small chef's-toque-with-a-question-mark icon: the mic already handles both
-// "ask for a recipe" and "ask a question about the current step" (same
-// recording flow either way), so instead of a second button we just make
-// that second purpose visible with this icon + a hint, once a recipe is
-// active. Plain inline SVG, no external asset.
-const CHEF_QUESTION_ICON = `
-  <svg viewBox="0 0 40 40" width="22" height="22" style="vertical-align:-6px;margin-right:4px" aria-hidden="true">
-    <circle cx="13" cy="15" r="8" style="fill:var(--orange-dark)"/>
-    <circle cx="21" cy="10" r="9" style="fill:var(--orange-dark)"/>
-    <circle cx="29" cy="15" r="7" style="fill:var(--orange-dark)"/>
-    <rect x="9" y="16" width="22" height="8" rx="2" style="fill:var(--orange-dark)"/>
-    <rect x="9" y="24" width="22" height="5" rx="1.5" style="fill:var(--brown)"/>
-    <circle cx="30" cy="27" r="8" style="fill:var(--cream);stroke:var(--orange-dark);stroke-width:2"/>
-    <text x="30" y="31" font-size="12" font-weight="700" text-anchor="middle" style="fill:var(--orange-dark)">?</text>
-  </svg>`;
-
-function idleHintHTML() {
-  return recipeActive
-    ? `${CHEF_QUESTION_ICON}¿Tienes alguna duda? Toca el micrófono y pregunta`
-    : 'Toca el micrófono y pide una receta';
-}
-
 function setStatus(html, btnClass) {
   statusText.innerHTML = html;
   micBtn.classList.remove('listening', 'thinking');
@@ -42,7 +15,7 @@ function setStatus(html, btnClass) {
 }
 
 function resetToIdle() {
-  setStatus(idleHintHTML(), null);
+  setStatus('Toca el micrófono y pide una receta', null);
 }
 
 // Plays audio on THIS device (the one the user is holding/looking at), not
@@ -96,161 +69,48 @@ const COOKING_LOADER_HTML = `
     Creando tu receta…
   </span>`;
 
+// Hands off to the dedicated cooking route (cook.html/cook.js) once a
+// recipe is active -- this page only ever picks/creates a recipe, never
+// steps through one. The response's spoken greeting (summary + step 1) is
+// stashed in sessionStorage instead of played here, because playing it now
+// and then navigating away would kill it mid-sentence; cook.js picks it up
+// and plays it once the cooking view has loaded, one beat later.
+function goToCook(data) {
+  if (data.audio_base64) {
+    sessionStorage.setItem(
+      'cookit_pending_audio',
+      JSON.stringify({ audio_base64: data.audio_base64, audio_mime: data.audio_mime }),
+    );
+  }
+  window.location.href = 'cook';
+}
+
 async function sendAudio(blob) {
-  // recipeActive still holds its PRE-request value here (only renderState()/
-  // renderPlaceholder() update it, once the response comes back) -- so if we
-  // were on the home screen when recording started, this request is almost
-  // certainly a brand-new recipe (gemma3, can take a while), not a quick
-  // follow-up question (qwen2.5:3b) about one already on screen.
-  setStatus(recipeActive ? '🤔 Pensando…' : COOKING_LOADER_HTML, 'thinking');
+  // On THIS page a recipe is never already active (see fetchAndRenderState()
+  // below -- an active one redirects away immediately), so the mic here
+  // always means "create/find a recipe", never a follow-up question about
+  // one already on screen. That's a slower, gemma3-backed call, hence the
+  // "creando tu receta" loader instead of a plain "pensando".
+  setStatus(COOKING_LOADER_HTML, 'thinking');
   const form = new FormData();
   form.append('audio', blob, 'clip.webm');
   try {
     const res = await fetch('api/question', { method: 'POST', body: form });
     const data = await res.json();
     micBtn.disabled = false;
-    if (data.audio_base64) playAudioB64(data.audio_base64, data.audio_mime);
 
     if (!data.ok) {
+      if (data.audio_base64) playAudioB64(data.audio_base64, data.audio_mime);
       setStatus(data.spoken_text || 'No te he entendido, prueba otra vez', null);
       return;
     }
 
     userText.textContent = data.user_text ? `"${data.user_text}"` : '';
-    resetToIdle();
-    renderResponse(data);
+    goToCook(data);
   } catch (err) {
     micBtn.disabled = false;
     setStatus('Error hablando con el servidor 😕', null);
     console.error(err);
-  }
-}
-
-// --- Step timer (see timer.js for the countdown/parsing logic itself) -----
-// Only one step timer can be running at a time -- tracked here so any
-// navigation (next/previous/reset/new recipe) can cancel a stale one instead
-// of letting it keep ticking (and eventually beeping) for a step you've
-// already left.
-let activeStepTimer = null;
-
-function stopActiveStepTimer() {
-  if (activeStepTimer) {
-    activeStepTimer.cancel();
-    activeStepTimer = null;
-  }
-}
-
-function playTimerBeep() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = 'sine';
-    o.frequency.value = 880;
-    o.connect(g);
-    g.connect(ctx.destination);
-    // Three short beeps instead of one flat tone.
-    [0, 0.3, 0.6].forEach((t) => {
-      g.gain.setValueAtTime(0.0001, ctx.currentTime + t);
-      g.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + t + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + t + 0.25);
-    });
-    o.start();
-    o.stop(ctx.currentTime + 1);
-  } catch (err) {
-    // No AudioContext available (or blocked) -- the on-screen message still
-    // shows, so this is safe to just skip.
-    console.error('No se pudo reproducir el aviso del temporizador:', err);
-  }
-}
-
-// Renders the "poner temporizador" button for the current step, or clears
-// the slot if this step doesn't need one. Always stops any timer left
-// running from a previous step first.
-function renderStepTimerControls(seconds) {
-  stopActiveStepTimer();
-  const container = document.getElementById('stepTimer');
-  if (!container) return;
-  if (!seconds) {
-    container.innerHTML = '';
-    return;
-  }
-  container.innerHTML = `<button class="timer-start" id="timerStartBtn">⏱️ Poner temporizador (${formatTimer(seconds)})</button>`;
-  document.getElementById('timerStartBtn').addEventListener('click', () => startStepTimer(seconds, container));
-}
-
-function startStepTimer(seconds, container) {
-  container.innerHTML = `
-    <div class="timer-running">
-      <span class="timer-countdown" id="timerCountdown">${formatTimer(seconds)}</span>
-      <button class="timer-cancel" id="timerCancelBtn" title="Cancelar temporizador">✕</button>
-    </div>`;
-  document.getElementById('timerCancelBtn').addEventListener('click', () => {
-    stopActiveStepTimer();
-    renderStepTimerControls(seconds);
-  });
-
-  activeStepTimer = createStepTimer(seconds, {
-    onTick: (remaining) => {
-      const el = document.getElementById('timerCountdown');
-      if (el) el.textContent = formatTimer(remaining);
-    },
-    onFinish: (message) => {
-      activeStepTimer = null;
-      playTimerBeep();
-      container.innerHTML = `<div class="timer-finished">${message}</div>`;
-    },
-  });
-  activeStepTimer.start();
-}
-
-function renderResponse(data) {
-  const d = data.data || {};
-  if (data.type === 'error') {
-    stopActiveStepTimer();
-    card.className = 'card placeholder';
-    card.innerHTML = `<div>😕 ${data.spoken_text}</div>`;
-    return;
-  }
-  if (data.type === 'question') {
-    // Follow-up question: doesn't touch the current step, just shows the
-    // answer above the recipe that was already on screen.
-    fetchAndRenderState(data.spoken_text);
-    return;
-  }
-  if (d.finished) {
-    stopActiveStepTimer();
-    recipeActive = false;
-    resetToIdle();
-    card.className = 'card';
-    card.innerHTML = `
-      <div class="finished">
-        <div class="emoji">🎉</div>
-        <div class="recipe-title">${d.name || ''}</div>
-        <div class="summary">¡Receta terminada! Buen provecho.</div>
-        ${d.tip ? `<div class="tip-box"><b>💡 Tip:</b> ${d.tip}</div>` : ''}
-      </div>`;
-    return;
-  }
-  // new_recipe carries more fields (summary, ingredients, verified_source).
-  fetchAndRenderState();
-}
-
-async function buttonAction(endpoint, button) {
-  button.disabled = true;
-  setStatus('🤔 Pensando…', 'thinking');
-  try {
-    const res = await fetch(endpoint, { method: 'POST' });
-    const data = await res.json();
-    if (data.audio_base64) playAudioB64(data.audio_base64, data.audio_mime);
-    resetToIdle();
-    userText.textContent = '';
-    renderResponse(data);
-  } catch (err) {
-    setStatus('Error hablando con el servidor 😕', null);
-    console.error(err);
-  } finally {
-    button.disabled = false;
   }
 }
 
@@ -275,10 +135,14 @@ async function selectRecipe(name) {
       body: JSON.stringify({ name }),
     });
     const data = await res.json();
-    if (data.audio_base64) playAudioB64(data.audio_base64, data.audio_mime);
-    resetToIdle();
-    userText.textContent = '';
-    renderResponse(data);
+
+    if (!data.ok) {
+      if (data.audio_base64) playAudioB64(data.audio_base64, data.audio_mime);
+      setStatus(data.spoken_text || 'No he encontrado esa receta, prueba con otra.', null);
+      return;
+    }
+
+    goToCook(data);
   } catch (err) {
     setStatus('Error hablando con el servidor 😕', null);
     console.error(err);
@@ -292,8 +156,6 @@ function escapeHtml(text) {
 }
 
 function renderPlaceholder() {
-  stopActiveStepTimer();
-  recipeActive = false;
   card.className = 'card placeholder';
   card.innerHTML = `
     <div class="placeholder-title">👨‍🍳 ¿Qué cocinamos hoy?</div>
@@ -323,62 +185,16 @@ function renderPlaceholder() {
   });
 }
 
-function renderState(state, questionAnswer) {
-  if (!state || state.active === false) {
-    renderPlaceholder();
-    return;
-  }
-  recipeActive = true;
-  resetToIdle();
-
-  const total = state.steps.length;
-  const current = state.current_step;
-  const dots = state.steps.map((_, i) => {
-    const cls = i < current ? 'done' : (i === current ? 'current' : '');
-    return `<div class="dot ${cls}"></div>`;
-  }).join('');
-
-  const chips = (state.ingredients || []).map((ing) => {
-    const amount = [ing.amount, ing.unit].filter(Boolean).join(' ');
-    return `<div class="chip">${ing.item}${amount ? ' · ' + amount : ''}</div>`;
-  }).join('');
-
-  card.className = 'card';
-  card.innerHTML = `
-    <div class="recipe-title">${state.name}</div>
-    <span class="source-badge ${state.verified_source ? 'local' : 'general'}">
-      ${state.verified_source ? '✓ receta verificada' : '⚠ receta general del LLM'}
-    </span>
-    ${state.summary ? `<div class="summary">${state.summary}</div>` : ''}
-    ${chips ? `<div class="ingredients">${chips}</div>` : ''}
-    ${questionAnswer ? `<div class="question-answer">🗣️ ${questionAnswer}</div>` : ''}
-    <div class="progress">
-      <div class="dots">${dots}</div>
-      <div class="label">Paso ${current + 1} de ${total}</div>
-    </div>
-    <div class="current-step">${state.steps[current]}</div>
-    <div class="step-timer" id="stepTimer"></div>
-    ${state.tip ? `<div class="tip-box"><b>💡 Tip:</b> ${state.tip}</div>` : ''}
-    <div class="step-nav">
-      <button class="previous" ${current === 0 ? 'disabled' : ''} onclick="buttonAction('api/previous', this)">◀ Anterior</button>
-      <button onclick="buttonAction('api/next', this)">Siguiente ▶</button>
-    </div>
-    <div class="secondary-actions">
-      <button onclick="resetSession()">🗑️ Empezar otra receta</button>
-    </div>
-  `;
-  renderStepTimerControls(parseStepTimerSeconds(state.steps[current]));
-}
-
-async function fetchAndRenderState(questionAnswer) {
+// On load: if a recipe is already active (session memory from a previous
+// visit), skip straight to the cooking route instead of showing the picker.
+async function fetchAndRenderState() {
   const res = await fetch('api/state');
   const state = await res.json();
-  renderState(state, questionAnswer);
-}
-
-async function resetSession() {
-  await fetch('api/reset', { method: 'POST' });
-  fetchAndRenderState();
+  if (state && state.active !== false) {
+    window.location.href = 'cook';
+    return;
+  }
+  renderPlaceholder();
 }
 
 micBtn.addEventListener('click', () => {
@@ -386,5 +202,4 @@ micBtn.addEventListener('click', () => {
   else startRecording();
 });
 
-// On page load, restore the active recipe if there was one (session memory).
 fetchAndRenderState();

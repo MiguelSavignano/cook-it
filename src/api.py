@@ -63,6 +63,15 @@ def index():
     return FileResponse(STATIC_DIR / "index.html")
 
 
+@app.get("/cook")
+def cook_page():
+    """The active-cooking route: animated face + step navigation, separate
+    from "/" (recipe picker/creator) so it can be laid out for hands-free,
+    phone-propped-up-in-landscape use without fighting the picker's layout.
+    See static/cook.html/cook.js."""
+    return FileResponse(STATIC_DIR / "cook.html")
+
+
 @app.get("/api/state")
 def get_state():
     return load_state() or {"active": False}
