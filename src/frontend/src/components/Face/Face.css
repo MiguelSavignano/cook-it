@@ -1,0 +1,127 @@
+/* The face: idle "thinking" look with wandering eyes/blinks (Face.tsx-driven
+   state via inline transforms/classes), plus listening/thinking/speaking/
+   happy/confused expressions swapped by the state-X class.
+
+   Unlike a normal on-page widget, this face IS the screen: the real
+   enclosure (docs/hardware.md) puts a small OLED behind a face window in a
+   3D-printed cream/white "Gorro" body wearing a chef hat -- but that body
+   and hat are printed plastic, not pixels. What the panel itself shows is
+   just this: black background, glowing blue eyes and mouth, filling the
+   whole display. Cook.css's .face-wrap fills essentially the entire
+   viewport, and the eyes/mouth here are sized directly off viewport units
+   instead of a small fixed-size avatar box. */
+.face {
+  position: relative;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(6px, 2.5vh, 20px);
+}
+
+/* Listening: the whole screen breathes with a soft blue glow instead of a
+   ring around an avatar -- there's no avatar edge to ring anymore. */
+.face .ring {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle, var(--screen-glow) 0%, transparent 65%);
+  opacity: 0;
+}
+.face.state-listening .ring {
+  opacity: 0.35;
+  animation: pulse-glow 1.1s infinite;
+}
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.45; }
+}
+
+/* No eyebrows -- thinking/confused/listening are read off the eyes (darting
+   pupils, Face.tsx-driven) and the mouth alone.
+
+   Sized off vh, not vw: this route is meant for a wide-but-short landscape
+   phone screen (browser chrome eats into the height), and on a viewport
+   like that vw stays generous while vh is the scarce dimension. Driving the
+   eyes/mouth from vw let them balloon to a size that pushed the mouth
+   completely out of the (height-limited) face-wrap. Setting the *height*
+   directly from vh and letting the width follow via aspect-ratio keeps the
+   whole face inside whatever vertical room is actually left after the
+   topbar/step strip. */
+.eyes { display: flex; align-items: center; gap: clamp(16px, 8vh, 90px); }
+.eye {
+  position: relative;
+  height: clamp(44px, 22vh, 170px);
+  aspect-ratio: 4 / 9;
+  background: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: transform 0.15s ease;
+}
+.face.blink .eye { transform: scaleY(0.12); }
+.face.state-listening .eye { transform: scale(1.1); }
+.pupil {
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 clamp(6px, 2.5vh, 18px) var(--screen-glow));
+  transition: transform 0.35s ease;
+}
+/* Happy: eyes become closed "^ ^" curves instead of open ovals. Width
+   matches the open eye's own rendered width (same clamp/aspect-ratio math
+   as the base .eye rule above, just spelled out since a percentage height
+   doesn't resolve inside .eyes -- a flex row with no definite height of its
+   own). This is a fundamentally different closed shape from the open
+   eye.svg, so it stays plain CSS rather than a variant image. */
+.face.state-happy .eye {
+  aspect-ratio: auto;
+  width: clamp(20px, 10vh, 76px);
+  height: clamp(14px, 6vh, 46px);
+  background: transparent;
+  border-radius: 0 0 60px 60px;
+  border-bottom: clamp(4px, 0.8vh, 8px) solid var(--screen-blue);
+  box-shadow: 0 4px 10px var(--screen-glow);
+}
+.face.state-happy .pupil { display: none; }
+
+.cheeks {
+  position: absolute;
+  bottom: 22%;
+  left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  gap: clamp(60px, 26vh, 260px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.cheek { width: clamp(14px, 6vh, 40px); aspect-ratio: 1 / 1; border-radius: 50%; background: rgba(232, 112, 58, 0.5); filter: blur(2px); }
+.face.state-happy .cheeks { opacity: 1; }
+
+/* Mouth artwork lives in public/assets/ (mouth-idle.svg / mouth-happy.svg --
+   see public/assets/README.md) so it's a drop-in file to redraw, not CSS to
+   tweak. Mouth.tsx swaps the <img> src for state-happy; every other state
+   (confused/speaking/...) just transforms this same idle image below. */
+.mouth {
+  width: clamp(56px, 23vh, 180px);
+  height: clamp(20px, 8vh, 54px);
+  object-fit: contain;
+  filter: drop-shadow(0 clamp(3px, 1vh, 10px) clamp(8px, 2.5vh, 22px) var(--screen-glow));
+  transform-origin: center top;
+  transition: all 0.2s ease;
+}
+.face.state-happy .mouth {
+  width: clamp(78px, 30vh, 230px);
+  height: clamp(30px, 11vh, 74px);
+}
+.face.state-confused .mouth { transform: rotate(9deg); }
+.face.state-speaking .mouth { animation: talk 0.32s ease-in-out infinite; }
+@keyframes talk {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.7); }
+}

@@ -78,7 +78,7 @@ grano, no repitas la receta entera ni la lista de pasos, solo contesta la pregun
 def step_text(step):
     """A recipe step is usually a plain string, but a local recipe's JSON may
     give a step that needs a timer as {"text": "...", "timer_seconds": N}
-    instead (see src/recipes/*.json and static/timer.js's matching
+    instead (see src/recipes/*.json and frontend/src/lib/timer.ts's matching
     stepText()) -- this is the one place that needs to know about both
     shapes before a step goes into spoken text or an LLM prompt. The
     frontend gets the raw step (string or object) as-is via /api/state and
