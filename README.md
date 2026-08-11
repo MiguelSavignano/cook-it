@@ -55,11 +55,16 @@ the full list with defaults:
 
 ```
 src/
-  api.py            Web API (FastAPI) -- backend for the browser voice interface
+  api.py            Web API (FastAPI) -- backend for the browser voice interface,
+                     serves the built frontend (see below) + /api/*
   recipe_engine.py  Shared logic: request a recipe (LLM+RAG), step navigation, router
   common.py         Session state + voice synthesis/playback
   assistant_poc.py  Push-to-talk CLI (no browser)
   next_step.py      CLI "next step" button, no voice or LLM
-  static/           Frontend (HTML/CSS/JS, no frameworks)
+  frontend/         Browser UI (React + TypeScript, Vite) -- Picker "/" (pick/create a
+                     recipe) + Cook "/cook" (hands-free step-through), one SPA. `npm run
+                     build` writes to src/static_dist/, which api.py serves; run_web.sh
+                     does this for you. `npm run dev` for a fast dev loop instead
+                     (proxies /api/* to api.py -- see frontend/vite.config.ts).
   recipes/          Local recipe database (JSON), source of truth for RAG
 ```

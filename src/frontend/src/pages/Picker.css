@@ -1,0 +1,179 @@
+:root {
+  --cream: #FFF6EC;
+  --cream-2: #FDEBD3;
+  --orange: #E8703A;
+  --orange-dark: #C9541F;
+  --orange-light: #FFB37B;
+  --brown: #4A2E1E;
+  --brown-soft: #8A6A55;
+  --green-ok: #6B8E4E;
+  --shadow: 0 10px 30px rgba(74, 46, 30, 0.15);
+}
+
+/* Page root (see Picker.tsx) -- in the old multi-page static site this
+   sizing/background lived on <body> since every page got a fresh
+   document; in the SPA both routes share one <body>, so it lives on the
+   root wrapper each page actually mounts instead (Cook.tsx does the same
+   with .cook-stage). */
+.picker-page {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 48px;
+  background: radial-gradient(circle at top, var(--cream) 0%, var(--cream-2) 100%);
+  color: var(--brown);
+  font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 8px;
+}
+header h1 {
+  font-size: 2.2rem;
+  margin: 0;
+  color: var(--orange-dark);
+  letter-spacing: -0.5px;
+}
+header p {
+  margin: 4px 0 0;
+  color: var(--brown-soft);
+  font-size: 0.95rem;
+}
+
+.stage {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+/* --- Microphone button --- */
+.mic-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+#micBtn {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(145deg, var(--orange-light), var(--orange));
+  box-shadow: var(--shadow);
+  font-size: 3rem;
+  cursor: pointer;
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+#micBtn:active { transform: scale(0.96); }
+#micBtn.listening {
+  background: linear-gradient(145deg, #ff7a5c, #d8391f);
+  animation: pulse 1.1s infinite;
+}
+#micBtn.thinking {
+  background: linear-gradient(145deg, #e0a95c, #b97a1f);
+  animation: spin-glow 1.4s infinite;
+}
+#micBtn:disabled { cursor: default; }
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(216, 57, 31, 0.45), var(--shadow); }
+  70% { box-shadow: 0 0 0 22px rgba(216, 57, 31, 0), var(--shadow); }
+  100% { box-shadow: 0 0 0 0 rgba(216, 57, 31, 0), var(--shadow); }
+}
+@keyframes spin-glow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.25); }
+}
+
+#statusText {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--orange-dark);
+  min-height: 1.4em;
+}
+#userText {
+  font-size: 0.88rem;
+  color: var(--brown-soft);
+  font-style: italic;
+  text-align: center;
+  min-height: 1.2em;
+}
+
+/* --- Recipe card --- */
+.card {
+  width: 100%;
+  background: white;
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  padding: 22px 24px;
+  border: 1px solid rgba(232, 112, 58, 0.15);
+}
+.card.placeholder {
+  text-align: center;
+  color: var(--brown-soft);
+}
+.placeholder-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--brown);
+}
+.card.placeholder .examples {
+  margin-top: 12px;
+  display: flex; flex-direction: column; gap: 6px;
+  font-size: 0.9rem;
+}
+.card.placeholder .examples span {
+  background: var(--cream-2);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+/* --- Tap-to-pick recipe list (home screen, no recipe active) --- */
+.recipe-list {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+.loading-hint {
+  grid-column: 1 / -1;
+  color: var(--brown-soft);
+  font-size: 0.85rem;
+  padding: 8px 0;
+}
+.recipe-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  text-align: left;
+  background: var(--cream-2);
+  border: 1px solid rgba(232, 112, 58, 0.18);
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+.recipe-card:hover { background: var(--cream); }
+.recipe-card:active { transform: scale(0.97); }
+.recipe-card-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--brown);
+  text-transform: capitalize;
+}
+.recipe-card-servings {
+  font-size: 0.75rem;
+  color: var(--brown-soft);
+}
+
+footer {
+  margin-top: 28px;
+  font-size: 0.75rem;
+  color: var(--brown-soft);
+  text-align: center;
+  opacity: 0.7;
+}

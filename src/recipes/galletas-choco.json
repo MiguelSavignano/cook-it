@@ -20,10 +20,16 @@
     "Tamiza juntos la harina, el polvo de hornear, el bicarbonato y la sal.",
     "Incorpora los secos a la mezcla húmeda poco a poco, mezclando solo hasta integrar.",
     "Añade las chispas de chocolate y mezcla suavemente para repartirlas por toda la masa.",
-    "Refrigera la masa al menos 30 minutos (o hasta 24-48 horas) para que las galletas queden más sabrosas y no se extiendan demasiado.",
+    {
+      "text": "Refrigera la masa al menos 30 minutos (o hasta 24-48 horas) para que las galletas queden más sabrosas y no se extiendan demasiado.",
+      "timer_seconds": 172800
+    },
     "Precalienta el horno a 180°C.",
     "Forma bolas de masa y colócalas separadas en una bandeja con papel de horno.",
-    "Hornea 10-12 minutos, hasta que los bordes estén dorados y el centro aún ligeramente blando.",
+    {
+      "text": "Hornea 10-12 minutos, hasta que los bordes estén dorados y el centro aún ligeramente blando.",
+      "timer_seconds": 720
+    },
     "Deja enfriar unos minutos en la bandeja antes de pasarlas a una rejilla."
   ],
   "summary": "La mantequilla se crema con los dos azúcares hasta quedar esponjosa, se incorporan huevos y harina sin sobrebatir, y una masa cargada de chispas de chocolate reposa en frío antes de hornearse a 180°C el tiempo justo para que los bordes doren y el centro quede tierno y ligeramente blando.",

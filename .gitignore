@@ -17,6 +17,12 @@ src/*.wav
 # Downloaded model (63MB, third-party asset -- see docs/voz.md for what/why)
 src/voices/
 
+# Frontend (src/frontend/, Vite+React) -- built fresh by run_web.sh/`npm
+# run build`, not source. node_modules is frontend/.gitignore's job (it's
+# inside that directory); static_dist lives one level up (see
+# frontend/vite.config.ts's outDir), so it needs its own entry here.
+src/static_dist/
+
 # OS/editor cruft
 .DS_Store
 

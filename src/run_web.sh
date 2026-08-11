@@ -17,6 +17,17 @@ source .venv/bin/activate
 
 [ -f ../.env ] && set -a && source ../.env && set +a
 
+# Frontend (src/frontend/ -- Vite+React, see its README/vite.config.ts):
+# build fresh every run so this always serves what's actually on disk, not
+# a stale build from last time. npm install only when node_modules is
+# missing/out of date -- ci is fast when it's already in sync.
+if [ -d frontend ]; then
+  ( cd frontend && npm ci --silent && npm run build )
+else
+  echo "No frontend/ found -- expected src/frontend/ (Vite+React app)." >&2
+  exit 1
+fi
+
 if [ ! -f certs/cert.pem ] || [ ! -f certs/key.pem ]; then
   echo "Generating a self-signed TLS cert (certs/)..."
   mkdir -p certs

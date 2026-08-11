@@ -1,0 +1,23 @@
+/* Global reset only -- Picker and Cook keep their own color palettes and
+   page-level layout (radial-gradient cream page vs. full-viewport black
+   "OLED screen") scoped to their own root wrapper (.picker-page /
+   .cook-stage), not to bare html/body. In a multi-page site each page got
+   its own <body> styling for free on a fresh document load; in this SPA
+   both routes share the same <body>, so page-specific rules have to live
+   on something React actually mounts/unmounts, not the tag itself. */
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+body {
+  font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+button {
+  font-family: inherit;
+}

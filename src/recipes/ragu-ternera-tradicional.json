@@ -110,16 +110,34 @@
     }
   ],
   "steps": [
-    "Saca la carne de la nevera 30 minutos antes, sécala bien con papel de cocina y salpimiéntala generosamente.",
+    {
+      "text": "Saca la carne de la nevera 30 minutos antes, sécala bien con papel de cocina y salpimiéntala generosamente.",
+      "timer_seconds": 1800
+    },
     "Calienta una olla de fondo grueso a fuego medio-alto, añade el aceite y dora la carne en 2 o 3 tandas sin llenar la olla. Resérvala.",
-    "Si usas panceta, cocínala primero unos 5 minutos; añade cebolla, zanahoria y apio y cocina 10-12 minutos; añade el ajo y cocina 1 minuto más.",
-    "Añade el concentrado de tomate y cocina 2 minutos removiendo.",
-    "Añade el vino tinto, rasca bien el fondo de la olla y deja reducir 5-8 minutos.",
+    {
+      "text": "Si usas panceta, cocínala primero unos 5 minutos; añade cebolla, zanahoria y apio y cocina 10-12 minutos; añade el ajo y cocina 1 minuto más.",
+      "timer_seconds": 720
+    },
+    {
+      "text": "Añade el concentrado de tomate y cocina 2 minutos removiendo.",
+      "timer_seconds": 120
+    },
+    {
+      "text": "Añade el vino tinto, rasca bien el fondo de la olla y deja reducir 5-8 minutos.",
+      "timer_seconds": 480
+    },
     "Incorpora la carne, el tomate triturado, el caldo, la Worcestershire, la soja, el laurel, el romero, el tomillo y el parmesano. El líquido debe casi cubrir la carne; añade más caldo si hace falta.",
     "Cuando rompa a hervir, baja el fuego al mínimo hasta que haya un hervor muy suave -una burbuja cada 5-10 segundos- y deja la tapa medio puesta.",
-    "Cocina así 3-4 horas, removiendo cada 20-30 minutos y añadiendo caldo caliente si el líquido baja demasiado.",
+    {
+      "text": "Cocina así 3-4 horas, removiendo cada 20-30 minutos y añadiendo caldo caliente si el líquido baja demasiado.",
+      "timer_seconds": 14400
+    },
     "Cuando la carne se rompa con un tenedor sin hacer fuerza, retira el laurel, el romero y los restos de parmesano, y desmenúzala.",
-    "Cocina 15-20 minutos más, hasta que la salsa quede espesa y brillante.",
+    {
+      "text": "Cocina 15-20 minutos más, hasta que la salsa quede espesa y brillante.",
+      "timer_seconds": 1200
+    },
     "Cuece la pasta al dente, guardando una taza del agua de cocción.",
     "Añade la pasta directamente al ragú, con un poco del agua de cocción si hace falta, remueve un minuto y sirve con abundante parmesano rallado."
   ],

@@ -20,7 +20,10 @@
     {"item": "sal (ganache/decoración)", "amount": null, "unit": "pizca, opcional"}
   ],
   "steps": [
-    "Si quieres base, tritura las galletas, mézclalas con la mantequilla derretida, presiona en el molde y hornea 10 minutos a 180°C o enfría 20 minutos en la nevera.",
+    {
+      "text": "Si quieres base, tritura las galletas, mézclalas con la mantequilla derretida, presiona en el molde y hornea 10 minutos a 180°C o enfría 20 minutos en la nevera.",
+      "timer_seconds": 600
+    },
     "Bate el queso crema hasta que esté liso, añade el azúcar y mezcla, incorpora la vainilla.",
     "Añade los huevos uno a uno, mezclando suave sin sobrebatir.",
     "Agrega la maicena y mezcla solo hasta integrar, luego añade la nata y mezcla hasta que quede homogéneo.",
@@ -29,9 +32,18 @@
     "Añade el dulce de leche a la Parte B junto con el chocolate blanco derretido extra, y mezcla hasta que quede homogéneo.",
     "Vierte la mezcla blanca en el molde, añade cucharadas de la mezcla de dulce de leche encima en capas alternas.",
     "Con un palillo o cuchillo, haz movimientos suaves en espiral para crear el efecto marmolado, sin mezclar en exceso.",
-    "Precalienta el horno a 160°C y hornea 50-60 minutos, hasta que el centro quede ligeramente tembloroso.",
-    "Apaga el horno y deja la tarta dentro 30 minutos con la puerta entreabierta, luego sácala y enfríala a temperatura ambiente.",
-    "Refrigera mínimo 6 horas, idealmente toda la noche.",
+    {
+      "text": "Precalienta el horno a 160°C y hornea 50-60 minutos, hasta que el centro quede ligeramente tembloroso.",
+      "timer_seconds": 3600
+    },
+    {
+      "text": "Apaga el horno y deja la tarta dentro 30 minutos con la puerta entreabierta, luego sácala y enfríala a temperatura ambiente.",
+      "timer_seconds": 1800
+    },
+    {
+      "text": "Refrigera mínimo 6 horas, idealmente toda la noche.",
+      "timer_seconds": 21600
+    },
     "Para el ganache: calienta la nata sin que hierva, añade el dulce de leche y la mantequilla, y mezcla hasta que quede brillante y suave (añade una pizca de sal si quieres contraste).",
     "Decora con hilos de ganache, virutas de chocolate blanco, nueces tostadas y, si quieres, sal en escamas."
   ],

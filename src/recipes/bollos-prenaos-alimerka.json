@@ -47,17 +47,35 @@
   "steps": [
     "Prepara el tangzhong: escalda la harina de fuerza (25 g) con la leche (125 g) a fuego suave sin dejar de remover hasta que espese y forme una papilla que deje surco con la varilla (unos 65°C). Deja enfriar.",
     "Mezcla todos los ingredientes de la masa (tangzhong, harina, leche, huevos, azúcar y levadura) excepto la sal y la mantequilla.",
-    "Deja reposar la masa 20 minutos.",
-    "Añade la sal y amasa 5 minutos.",
-    "Incorpora la mantequilla poco a poco y amasa 10-15 minutos, hasta que la masa esté lisa y elástica.",
-    "Deja fermentar la masa 1½-2 horas.",
+    {
+      "text": "Deja reposar la masa 20 minutos.",
+      "timer_seconds": 1200
+    },
+    {
+      "text": "Añade la sal y amasa 5 minutos.",
+      "timer_seconds": 300
+    },
+    {
+      "text": "Incorpora la mantequilla poco a poco y amasa 10-15 minutos, hasta que la masa esté lisa y elástica.",
+      "timer_seconds": 900
+    },
+    {
+      "text": "Deja fermentar la masa 1½-2 horas.",
+      "timer_seconds": 7200
+    },
     "Divide la masa en bolas de 40 g.",
     "Rellena cada bola con un trocito de chorizo y ciérrala bien, dejando la costura hacia abajo.",
     "Coloca los bollos en una bandeja, cúbrelos y déjalos toda la noche en la nevera.",
-    "Al día siguiente, saca los bollos de la nevera aproximadamente 1 hora antes de hornear.",
+    {
+      "text": "Al día siguiente, saca los bollos de la nevera aproximadamente 1 hora antes de hornear.",
+      "timer_seconds": 3600
+    },
     "Mientras se atemperan, precalienta el horno a 185°C.",
     "Pinta los bollos con huevo batido.",
-    "Hornea 18-20 minutos hasta que estén dorados.",
+    {
+      "text": "Hornea 18-20 minutos hasta que estén dorados.",
+      "timer_seconds": 1200
+    },
     "Al salir del horno, pincela con mantequilla derretida para que la corteza quede muy tierna."
   ],
   "summary": "Una masa enriquecida con tangzhong que retiene mucha humedad se amasa hasta quedar lisa y elástica, se rellena con trocitos de chorizo semicurado en bolas de 40 gramos y fermenta toda la noche en la nevera para ganar sabor. Al día siguiente se pintan con huevo batido y se hornean a 185°C hasta dorar, terminando con un pincelado de mantequilla derretida que deja la corteza muy tierna.",

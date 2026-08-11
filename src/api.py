@@ -18,7 +18,15 @@ that should hear the answer, not whichever machine happens to run the API.
 (The CLI scripts are different: there, this same machine IS the device the
 user is standing next to, so they use common.speak() to play locally instead.)
 
-Usage: poc/run_web.sh   (starts uvicorn on https://0.0.0.0:3000)
+Frontend: a React SPA (src/frontend/, Picker "/" + Cook "/cook", one
+react-router app) built by Vite into src/static_dist/ -- see
+src/frontend/vite.config.ts. This file serves that build (mounts below +
+the catch-all route at the bottom) alongside the /api/* endpoints; it does
+NOT run the frontend's dev server (that's `npm run dev` in src/frontend/,
+which proxies /api/* back to this server -- see vite.config.ts).
+
+Usage: ./run_web.sh   (builds the frontend if needed, starts uvicorn on
+                        https://0.0.0.0:3000)
 """
 import base64
 import tempfile
@@ -35,7 +43,12 @@ from common import load_state, clear_state, synthesize
 from recipe_engine import load_recipes, next_step, previous_step, process_question, request_recipe
 
 BASE_DIR = Path(__file__).parent
-STATIC_DIR = BASE_DIR / "static"
+# npm run build's output (src/frontend/vite.config.ts's outDir) -- doesn't
+# exist until that's been run at least once, hence check_dir=False on the
+# mounts below (a fresh checkout should still boot and serve /api/*
+# instead of crashing at import time; see the catch-all route for the
+# "not built yet" message a browser would actually hit).
+STATIC_DIST_DIR = BASE_DIR / "static_dist"
 
 # NOTE: no auth on this app by design (removed per user request) -- it's
 # being sent to a real person to test over the public internet and a
@@ -44,7 +57,12 @@ STATIC_DIR = BASE_DIR / "static"
 # with the URL can trigger whisper/LLM/piper calls on this machine).
 
 app = FastAPI(title="Cook-It")
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+# Vite's public/ passthrough (face SVGs -- see
+# frontend/public/assets/README.md, favicon) and its hashed JS/CSS bundle
+# (build.assetsDir: 'bundle' in vite.config.ts, kept separate from
+# public/assets/ on purpose so the two don't share a directory).
+app.mount("/assets", StaticFiles(directory=STATIC_DIST_DIR / "assets", check_dir=False), name="face-assets")
+app.mount("/bundle", StaticFiles(directory=STATIC_DIST_DIR / "bundle", check_dir=False), name="bundle")
 
 _whisper_model = None  # loaded once at server startup, not per-request
 
@@ -58,9 +76,9 @@ def load_whisper_model():
     print(f"  Whisper ready in {time.time() - t0:.1f}s")
 
 
-@app.get("/")
-def index():
-    return FileResponse(STATIC_DIR / "index.html")
+@app.get("/favicon.svg")
+def favicon():
+    return FileResponse(STATIC_DIST_DIR / "favicon.svg")
 
 
 @app.get("/api/state")
@@ -232,3 +250,24 @@ async def api_question(audio: UploadFile):
             "tts_synth": round(synth_time, 2),
         },
     }
+
+
+# --- SPA catch-all -----------------------------------------------------
+# MUST be the last route registered: FastAPI/Starlette matches routes in
+# registration order, so every /api/* route and the two mounts above only
+# take effect at all because they were added first. This one matches
+# anything else -- "/", "/cook", and any client-side route react-router
+# adds later -- and always serves the same built index.html; react-router
+# reads the URL client-side and renders Picker or Cook accordingly.
+@app.get("/{full_path:path}")
+def spa_catch_all(full_path: str):
+    index_path = STATIC_DIST_DIR / "index.html"
+    if not index_path.exists():
+        return JSONResponse(
+            {
+                "error": "Frontend not built yet -- run 'npm run build' in src/frontend/ "
+                         "(see src/frontend/vite.config.ts for the output path)."
+            },
+            status_code=503,
+        )
+    return FileResponse(index_path)
