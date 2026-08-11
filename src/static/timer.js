@@ -1,0 +1,170 @@
+/**
+ * Cook-It step timers -- pure logic, no rendering here (app.js wires this
+ * into the UI). Kept in its own file so the timer logic can be reused/tested
+ * on its own while the card/step UI ("la cara") is redesigned separately.
+ *
+ * Data contract with the recipe interpreter:
+ *   Today each step is a plain string (see recipe_engine.py / recipes/*.json).
+ *   The recommended next step there is to let a step optionally be an
+ *   object instead, e.g.:
+ *     {"text": "Hornea 40-50 minutos, hasta que...", "timer_seconds": 2700}
+ *   parseStepTimerSeconds() below already prefers that field the moment it
+ *   shows up (untouched Python/schema for now, per what was asked -- this
+ *   file only needs to agree on the field name in advance). Until then, and
+ *   as a safety net afterwards for any step missing the field, it falls
+ *   back to guessing a duration straight from the step's own Spanish text
+ *   ("10 minutos", "40-50 minutos", "1 hora y media", "3 o 4 horas"...).
+ */
+
+// --- Reading a duration out of a step ------------------------------------
+
+function stepText(step) {
+  return typeof step === 'string' ? step : (step && step.text) || '';
+}
+
+const _TIME_UNIT_SECONDS = {
+  hora: 3600, horas: 3600, h: 3600,
+  minuto: 60, minutos: 60, min: 60, mins: 60,
+};
+
+/**
+ * Returns the timer duration a step needs, in whole seconds, or null if the
+ * step doesn't call for one (most steps won't -- this is only for "hornea
+ * 40 minutos", "deja reposar 10 minutos", "cuece 1 hora"-style steps).
+ */
+function parseStepTimerSeconds(step) {
+  if (step && typeof step === 'object' && typeof step.timer_seconds === 'number' && step.timer_seconds > 0) {
+    return Math.round(step.timer_seconds);
+  }
+
+  const text = stepText(step).toLowerCase();
+
+  // Range, e.g. "40-50 minutos" / "30 a 40 min" / "3 o 4 horas" -> upper
+  // bound, so the timer never runs out before the dish is actually ready.
+  let m = text.match(/(\d+)\s*(?:-|–|a|o)\s*(\d+)\s*(horas?|h\b|minutos?|mins?|min\b)/);
+  if (m) return parseInt(m[2], 10) * (_TIME_UNIT_SECONDS[m[3]] || 60);
+
+  // "1 hora y media" / "1 hora y 30 minutos"
+  m = text.match(/(\d+)\s*(horas?|h\b)\s*y\s*(media|(\d+)\s*(?:minutos?|mins?|min\b))/);
+  if (m) {
+    const hoursSec = parseInt(m[1], 10) * 3600;
+    const extraSec = m[3] === 'media' ? 1800 : parseInt(m[4], 10) * 60;
+    return hoursSec + extraSec;
+  }
+
+  // Plain "10 minutos" / "2 horas" / "45 min"
+  m = text.match(/(\d+)\s*(horas?|h\b|minutos?|mins?|min\b)/);
+  if (m) return parseInt(m[1], 10) * (_TIME_UNIT_SECONDS[m[2]] || 60);
+
+  return null;
+}
+
+function hasStepTimer(step) {
+  return parseStepTimerSeconds(step) !== null;
+}
+
+/** Seconds -> "mm:ss" (goes past 59:59 into "90:00" etc., no need for hh). */
+function formatTimer(totalSeconds) {
+  const s = Math.max(0, Math.round(totalSeconds));
+  const mm = Math.floor(s / 60);
+  const ss = s % 60;
+  return `${mm}:${String(ss).padStart(2, '0')}`;
+}
+
+// --- The countdown itself --------------------------------------------------
+
+// A few upbeat variants so it doesn't say the exact same line every time --
+// "algo guay" as requested, not a flat "timer finished" notice.
+const TIMER_FINISHED_MESSAGES = [
+  '⏰ ¡Tiempo terminado! A seguir cocinando 👨‍🍳',
+  '⏰ ¡Listo el tiempo! Vamos con el siguiente paso 🔥',
+  '⏰ ¡Ding! Tiempo cumplido, a por el siguiente paso 🍳',
+  '⏰ ¡Se acabó el tiempo! Sigamos cocinando 🥘',
+];
+
+function randomTimerFinishedMessage() {
+  return TIMER_FINISHED_MESSAGES[Math.floor(Math.random() * TIMER_FINISHED_MESSAGES.length)];
+}
+
+/**
+ * Creates a countdown timer controller. Not started automatically -- call
+ * .start() (e.g. on the "poner temporizador" click).
+ *
+ * Uses a wall-clock end time (Date.now()-based) rather than just decrementing
+ * a counter every tick, so it stays accurate even if the tab is backgrounded
+ * and timers get throttled.
+ *
+ * @param {number} seconds - countdown length
+ * @param {Object} [callbacks]
+ * @param {(remainingSeconds: number, state: string) => void} [callbacks.onTick]
+ * @param {(message: string) => void} [callbacks.onFinish] - message is one of
+ *   TIMER_FINISHED_MESSAGES, ready to show/speak as-is.
+ */
+function createStepTimer(seconds, { onTick, onFinish } = {}) {
+  let remainingMs = Math.max(0, Math.round(seconds)) * 1000;
+  let endAt = null; // Date.now()-space deadline while running
+  let intervalId = null;
+  let state = 'idle'; // idle | running | paused | finished | cancelled
+
+  function stopInterval() {
+    if (intervalId !== null) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+  }
+
+  function tick() {
+    const leftMs = Math.max(0, endAt - Date.now());
+    if (onTick) onTick(Math.ceil(leftMs / 1000), state);
+    if (leftMs <= 0) finish();
+  }
+
+  function finish() {
+    stopInterval();
+    remainingMs = 0;
+    state = 'finished';
+    if (onFinish) onFinish(randomTimerFinishedMessage());
+  }
+
+  const controller = {
+    start() {
+      if (state === 'running' || state === 'finished') return;
+      state = 'running';
+      endAt = Date.now() + remainingMs;
+      tick();
+      // Ticks faster than 1s so the displayed second changes right on time
+      // instead of lagging behind the real deadline.
+      intervalId = setInterval(tick, 250);
+    },
+    pause() {
+      if (state !== 'running') return;
+      remainingMs = Math.max(0, endAt - Date.now());
+      stopInterval();
+      state = 'paused';
+      if (onTick) onTick(Math.ceil(remainingMs / 1000), state);
+    },
+    resume() {
+      controller.start();
+    },
+    cancel() {
+      stopInterval();
+      state = 'cancelled';
+    },
+    reset(newSeconds = seconds) {
+      stopInterval();
+      remainingMs = Math.max(0, Math.round(newSeconds)) * 1000;
+      state = 'idle';
+      if (onTick) onTick(Math.ceil(remainingMs / 1000), state);
+    },
+    get state() {
+      return state;
+    },
+    get remainingSeconds() {
+      return state === 'running'
+        ? Math.ceil(Math.max(0, endAt - Date.now()) / 1000)
+        : Math.ceil(remainingMs / 1000);
+    },
+  };
+
+  return controller;
+}

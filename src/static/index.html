@@ -270,6 +270,55 @@
     border-left: 6px solid var(--orange);
   }
 
+  /* --- Step timer: functional placeholder styling only, restyle freely --- */
+  .step-timer:empty { display: none; }
+  .step-timer {
+    margin-top: 10px;
+  }
+  .timer-start {
+    width: 100%;
+    padding: 12px 10px;
+    border: 1px dashed var(--orange-light);
+    border-radius: 14px;
+    background: var(--cream-2);
+    color: var(--orange-dark);
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .timer-start:hover { background: var(--cream); }
+  .timer-running {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 14px;
+    background: var(--cream-2);
+  }
+  .timer-countdown {
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--orange-dark);
+  }
+  .timer-cancel {
+    border: none;
+    background: none;
+    color: var(--brown-soft);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+  .timer-finished {
+    text-align: center;
+    padding: 12px 10px;
+    border-radius: 14px;
+    background: #E4EFD8;
+    color: var(--green-ok);
+    font-weight: 700;
+  }
+
   .tip-box {
     margin-top: 14px;
     background: #FFF3E0;
@@ -381,6 +430,7 @@
 
 <!-- Relative path (no leading slash): works both mounted at the domain root
      (dev, :3000) and reverse-proxied under a subpath, e.g. Caddy /cookit/*. -->
+<script src="static/timer.js"></script>
 <script src="static/app.js"></script>
 
 </body>
