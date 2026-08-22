@@ -39,6 +39,7 @@ from fastapi.staticfiles import StaticFiles
 from faster_whisper import WhisperModel
 from pydantic import BaseModel
 
+import pantry
 from common import load_state, clear_state, synthesize
 from recipe_engine import load_recipes, next_step, previous_step, process_question, request_recipe
 
@@ -250,6 +251,132 @@ async def api_question(audio: UploadFile):
             "tts_synth": round(synth_time, 2),
         },
     }
+
+
+# --- Pantry: "cook with what I have" -----------------------------------
+# Photo -> ingredients -> ideas -> a draft the user negotiates down (see
+# pantry.py for the flow). Unlike the mic path, these endpoints return NO
+# audio except /confirm: the whole negotiation is tap-driven on screen
+# (correct the list, tap an idea, tick what you're missing), so synthesizing
+# speech for each round-trip would only add latency to something the user is
+# looking at anyway. Once they confirm, /confirm hands off to the Cook page
+# and speaks -- exactly like /api/recipes/select.
+
+def _pantry_error(e, status=500):
+    reason = str(e)
+    messages = {
+        "no_pantry_session": "No hay ninguna sesión de ingredientes activa. Haz una foto primero.",
+        "no_draft": "Todavía no hay ninguna receta elegida.",
+        # Excluding a defining ingredient (the eggs of a tortilla) has no
+        # answer -- the draft is kept as-is and the user is pointed back at
+        # the other ideas rather than shown an error.
+        "impossible_without": "Sin ese ingrediente esta receta ya no sale. Prueba con otra idea.",
+    }
+    return JSONResponse(
+        {"ok": False, "reason": reason, "error": messages.get(reason, reason)},
+        status_code=409 if reason in messages else status,
+    )
+
+
+@app.get("/api/pantry/state")
+def pantry_state():
+    return pantry.get() or {"active": False}
+
+
+@app.post("/api/pantry/reset")
+def pantry_reset():
+    pantry.reset()
+    return {"ok": True}
+
+
+@app.post("/api/pantry/photo")
+async def pantry_photo(photo: UploadFile):
+    """Step 1-2: the phone's picture in, a list of ingredient NAMES out.
+
+    The list is deliberately returned for the user to review rather than fed
+    straight into a recipe -- every vision model misreads a cluttered
+    counter sometimes, and a wrong ingredient here would poison every step
+    after it (see pantry.py's module docstring).
+    """
+    image_bytes = await photo.read()
+    if not image_bytes:
+        return JSONResponse(
+            {"ok": False, "reason": "empty_photo", "error": "No he recibido ninguna foto."},
+            status_code=400,
+        )
+    try:
+        names, vision_time, backend = pantry.identify_ingredients(image_bytes)
+    except Exception as e:
+        return JSONResponse(
+            {"ok": False, "reason": "vision_error", "error": str(e)},
+            status_code=500,
+        )
+    state = pantry.start(names, vision_time, backend)
+    return {"ok": True, "state": state, "latency": {"vision": round(vision_time, 2)}}
+
+
+class PantryIngredientsRequest(BaseModel):
+    ingredients: list[str]
+
+
+@app.post("/api/pantry/ingredients")
+def pantry_ingredients(body: PantryIngredientsRequest):
+    """Step 3: the corrected ingredient list -> 2-3 recipe ideas. Setting the
+    list and asking for ideas is one call because there's no useful state in
+    between -- the user taps "buscar recetas" once and waits once."""
+    try:
+        pantry.set_ingredients(body.ingredients)
+        return {"ok": True, "state": pantry.suggest()}
+    except ValueError as e:
+        return _pantry_error(e)
+    except Exception as e:
+        return JSONResponse({"ok": False, "reason": "llm_error", "error": str(e)}, status_code=500)
+
+
+class PantryChooseRequest(BaseModel):
+    name: str
+
+
+@app.post("/api/pantry/choose")
+def pantry_choose(body: PantryChooseRequest):
+    """Step 4: picked an idea -> the full recipe against their ingredients,
+    plus the checklist of what they haven't said they have."""
+    try:
+        return {"ok": True, "state": pantry.choose(body.name)}
+    except ValueError as e:
+        return _pantry_error(e)
+    except Exception as e:
+        return JSONResponse({"ok": False, "reason": "llm_error", "error": str(e)}, status_code=500)
+
+
+class PantryExcludeRequest(BaseModel):
+    items: list[str]
+
+
+@app.post("/api/pantry/exclude")
+def pantry_exclude(body: PantryExcludeRequest):
+    """Step 5: "no tengo huevos" -> same dish, rebuilt without them."""
+    try:
+        return {"ok": True, "state": pantry.exclude(body.items)}
+    except ValueError as e:
+        return _pantry_error(e)
+    except Exception as e:
+        return JSONResponse({"ok": False, "reason": "llm_error", "error": str(e)}, status_code=500)
+
+
+@app.post("/api/pantry/confirm")
+def pantry_confirm():
+    """Step 6 answered "yes": promotes the draft to the active cooking
+    session and speaks the opening line, same shape as /api/recipes/select
+    so the frontend can hand off to /cook with no special case."""
+    try:
+        data = pantry.confirm()
+    except ValueError as e:
+        return _pantry_error(e)
+    spoken_text = (
+        f"{data['summary']} Empecemos. Paso 1 de {data['total_steps']}: {data['step_text']}"
+    )
+    return _respond_with_audio({"type": "new_recipe", "data": data, "spoken_text": spoken_text})
 
 
 # --- SPA catch-all -----------------------------------------------------

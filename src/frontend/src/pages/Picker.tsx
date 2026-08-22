@@ -2,10 +2,11 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RecipeList from '../components/RecipeList';
 import CookingLoader from '../components/CookingLoader';
+import PantryFlow from '../components/PantryFlow';
 import { useAudioPlayer } from '../hooks/useAudioPlayer';
 import { useMicRecorder } from '../hooks/useMicRecorder';
 import {
-  askQuestion, getState, isActiveState, listRecipes, selectRecipe,
+  askQuestion, getState, isActiveState, listRecipes, resetPantry, selectRecipe,
   type RecipeListItem,
 } from '../api';
 import './Picker.css';
@@ -33,6 +34,10 @@ export default function Picker() {
   const [statusText, setStatusText] = useState<ReactNode>('Toca el micrófono y pide una receta');
   const [userText, setUserText] = useState('');
   const [busy, setBusy] = useState(false);
+  // "Cook with what I have" takes over the card when open -- it's a
+  // multi-step negotiation (photo -> ingredients -> ideas -> draft), not
+  // something that fits next to the tap-to-pick grid.
+  const [pantryOpen, setPantryOpen] = useState(false);
 
   const resetToIdle = useCallback(() => {
     setStatusVariant('idle');
@@ -105,6 +110,14 @@ export default function Picker() {
     }
   }, [mic.recording]);
 
+  async function openPantry() {
+    // Always start from the camera: a half-finished pantry session left
+    // over from a previous visit would otherwise reopen mid-negotiation
+    // with ingredients the user has long since put away.
+    await resetPantry().catch(() => {});
+    setPantryOpen(true);
+  }
+
   async function handleSelectRecipe(name: string) {
     // Tapping a recipe card: starts that recipe directly, same result
     // shape as asking for it by voice, but skips STT entirely. Local
@@ -171,13 +184,20 @@ export default function Picker() {
           <div id="userText">{userText}</div>
         </div>
 
-        <div className="card placeholder">
-          <div className="placeholder-title">👨‍🍳 ¿Qué cocinamos hoy?</div>
-          <RecipeList recipes={recipes} onSelect={handleSelectRecipe} />
-          <div className="examples">
-            <span>O pide cualquier otra por voz: "Cómo se hace una paella"</span>
+        {pantryOpen ? (
+          <PantryFlow onConfirmed={goToCook} onCancel={() => setPantryOpen(false)} />
+        ) : (
+          <div className="card placeholder">
+            <div className="placeholder-title">👨‍🍳 ¿Qué cocinamos hoy?</div>
+            <RecipeList recipes={recipes} onSelect={handleSelectRecipe} />
+            <div className="examples">
+              <span>O pide cualquier otra por voz: "Cómo se hace una paella"</span>
+            </div>
+            <button className="pantry-open-btn" disabled={busy} onClick={openPantry}>
+              📷 …o cocina con lo que tengas
+            </button>
           </div>
-        </div>
+        )}
       </div>
 
       <footer>Todo corre en tu ordenador: whisper (STT) · gemma3 vía Ollama (LLM) · Piper (TTS)</footer>

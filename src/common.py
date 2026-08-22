@@ -17,22 +17,53 @@ VOICE_PATH = BASE_DIR / "voices" / f"{COOKIT_VOICE}.onnx"
 
 OUT_WAV = BASE_DIR / "assistant_out.wav"
 STATE_PATH = BASE_DIR / "session_state.json"
+# The "cook with what I have" flow (pantry.py) -- a recipe being NEGOTIATED
+# (photo -> ingredients -> ideas -> draft), which is a different thing from
+# one being COOKED. Deliberately a separate file: only pantry.confirm()
+# promotes a draft into STATE_PATH, so an abandoned pantry session can never
+# make /api/state look like there's an active recipe.
+PANTRY_STATE_PATH = BASE_DIR / "pantry_state.json"
+
+
+def _load_json(path):
+    if not path.exists():
+        return None
+    return json.loads(path.read_text())
+
+
+def _save_json(path, data):
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2))
+
+
+def _clear(path):
+    if path.exists():
+        path.unlink()
 
 
 def load_state():
     """Returns the active cooking session's state, or None if there isn't one."""
-    if not STATE_PATH.exists():
-        return None
-    return json.loads(STATE_PATH.read_text())
+    return _load_json(STATE_PATH)
 
 
 def save_state(state):
-    STATE_PATH.write_text(json.dumps(state, ensure_ascii=False, indent=2))
+    _save_json(STATE_PATH, state)
 
 
 def clear_state():
-    if STATE_PATH.exists():
-        STATE_PATH.unlink()
+    _clear(STATE_PATH)
+
+
+def load_pantry():
+    """Returns the in-progress pantry session, or None if there isn't one."""
+    return _load_json(PANTRY_STATE_PATH)
+
+
+def save_pantry(state):
+    _save_json(PANTRY_STATE_PATH, state)
+
+
+def clear_pantry():
+    _clear(PANTRY_STATE_PATH)
 
 
 def synthesize(text):

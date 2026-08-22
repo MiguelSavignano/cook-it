@@ -170,6 +170,27 @@ header p {
   color: var(--brown-soft);
 }
 
+/* Entry point into the "cook with what I have" flow (PantryFlow.tsx).
+   Deliberately secondary to the recipe grid above it: picking a known
+   recipe is still the common case, this is the "nothing planned, what's
+   in the fridge" path. */
+.pantry-open-btn {
+  margin-top: 16px;
+  width: 100%;
+  border: 1px dashed rgba(232, 112, 58, 0.45);
+  background: transparent;
+  color: var(--orange-dark);
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.pantry-open-btn:hover { background: var(--cream-2); }
+.pantry-open-btn:disabled { opacity: 0.5; cursor: default; }
+
 footer {
   margin-top: 28px;
   font-size: 0.75rem;
