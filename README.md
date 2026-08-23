@@ -6,6 +6,7 @@ no token cost. Inspired by [BMO local AI agent](https://www.youtube.com/watch?v=
 - [`docs/spec.md`](docs/spec.md) — project spec, architecture, roadmap.
 - [`docs/feasibility.md`](docs/feasibility.md) — feasibility analysis and real latency benchmarks.
 - [`docs/voice.md`](docs/voice.md) — details of the voice subsystem (STT/TTS).
+- [`docs/scaling.md`](docs/scaling.md) — how cooking for a different number of people works.
 
 This repo is the **proof of concept**: it lives in [`src/`](src/) — a web API (FastAPI) + a
 voice interface in the browser, plus a couple of CLI scripts to try the pipeline without one.
