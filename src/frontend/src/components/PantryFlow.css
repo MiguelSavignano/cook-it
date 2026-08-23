@@ -1,0 +1,200 @@
+/* "Cook with what I have" panel (PantryFlow.tsx). Sits inside the picker's
+   .card, so it inherits the page palette from Picker.css's :root. */
+
+.card.pantry {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pantry-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pantry-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--brown-soft);
+  line-height: 1.45;
+}
+
+.pantry-error {
+  background: #FCE8E4;
+  color: #A33418;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+}
+
+.pantry-busy {
+  color: var(--orange-dark);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* --- Buttons --- */
+.pantry-primary {
+  border: none;
+  border-radius: 14px;
+  padding: 14px 18px;
+  background: linear-gradient(145deg, var(--orange-light), var(--orange));
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+.pantry-primary:active { transform: scale(0.98); }
+.pantry-primary:disabled { opacity: 0.5; cursor: default; box-shadow: none; }
+
+.pantry-link {
+  background: none;
+  border: none;
+  color: var(--brown-soft);
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px;
+}
+.pantry-link:disabled { opacity: 0.5; cursor: default; }
+
+/* The file input is the actual control; the <label> is what gets styled,
+   so the whole pill is tappable and the raw "Choose file" chrome is gone. */
+.pantry-photo-btn {
+  display: block;
+  text-align: center;
+  border-radius: 14px;
+  padding: 18px;
+  background: linear-gradient(145deg, var(--orange-light), var(--orange));
+  color: white;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.pantry-photo-btn input { display: none; }
+
+/* --- Ingredient chips --- */
+.pantry-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pantry-chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--cream-2);
+  border: 1px solid rgba(232, 112, 58, 0.18);
+  border-radius: 999px;
+  padding: 6px 8px 6px 12px;
+  font-size: 0.85rem;
+  color: var(--brown);
+}
+.pantry-chips li button {
+  border: none;
+  background: rgba(74, 46, 30, 0.1);
+  color: var(--brown);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 4px 8px;
+}
+.pantry-chips li button:hover { background: rgba(232, 112, 58, 0.25); }
+.pantry-chips li button:disabled { opacity: 0.4; cursor: default; }
+
+/* Step 6's checklist reads as a question, not as things you already have --
+   hence the distinct (warmer, unfilled) treatment. */
+.pantry-chips.missing li {
+  background: white;
+  border-style: dashed;
+}
+
+.pantry-add {
+  display: flex;
+  gap: 8px;
+}
+.pantry-add input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid rgba(232, 112, 58, 0.25);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--brown);
+  background: var(--cream);
+}
+.pantry-add input:focus { outline: 2px solid var(--orange-light); }
+.pantry-add button {
+  border: 1px solid rgba(232, 112, 58, 0.3);
+  background: var(--cream-2);
+  color: var(--brown);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.pantry-add button:disabled { opacity: 0.45; cursor: default; }
+
+/* --- Suggestions --- */
+.pantry-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pantry-suggestion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  text-align: left;
+  background: var(--cream-2);
+  border: 1px solid rgba(232, 112, 58, 0.18);
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+.pantry-suggestion:hover { background: var(--cream); }
+.pantry-suggestion:active { transform: scale(0.98); }
+.pantry-suggestion:disabled { opacity: 0.55; cursor: default; }
+.pantry-suggestion-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--brown);
+  text-transform: capitalize;
+}
+.pantry-suggestion-why {
+  font-size: 0.8rem;
+  color: var(--brown-soft);
+}
+.pantry-suggestion-missing {
+  font-size: 0.75rem;
+  color: var(--orange-dark);
+  font-weight: 600;
+}
+
+/* --- Draft --- */
+.pantry-draft-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--brown);
+  text-transform: capitalize;
+}
+.pantry-excluded {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--brown-soft);
+  font-style: italic;
+}

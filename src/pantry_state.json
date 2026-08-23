@@ -1,0 +1,12 @@
+{
+  "phase": "ingredients",
+  "ingredients": [
+    "leche",
+    "huevos"
+  ],
+  "excluded": [],
+  "suggestions": [],
+  "draft": null,
+  "vision_time": 11.03,
+  "vision_backend": "moondream"
+}
