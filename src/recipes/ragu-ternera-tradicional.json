@@ -129,7 +129,10 @@
       "timer_seconds": 480
     },
     "Incorpora la carne, el tomate triturado, el caldo, la Worcestershire, la soja, el laurel, el romero, el tomillo y el parmesano. El líquido debe casi cubrir la carne; añade más caldo si hace falta.",
-    "Cuando rompa a hervir, baja el fuego al mínimo hasta que haya un hervor muy suave -una burbuja cada 5-10 segundos- y deja la tapa medio puesta.",
+    {
+      "text": "Cuando rompa a hervir, baja el fuego al mínimo hasta que haya un hervor muy suave -una burbuja cada 5-10 segundos- y deja la tapa medio puesta.",
+      "tip": "El punto correcto es un hervor tan suave que solo sube una burbuja cada 5-10 segundos: si hierve a borbotones está demasiado fuerte, y si no sube ninguna burbuja está demasiado flojo."
+    },
     {
       "text": "Cocina así 3-4 horas, removiendo cada 20-30 minutos y añadiendo caldo caliente si el líquido baja demasiado.",
       "timer_seconds": 14400
@@ -137,11 +140,12 @@
     "Cuando la carne se rompa con un tenedor sin hacer fuerza, retira el laurel, el romero y los restos de parmesano, y desmenúzala.",
     {
       "text": "Cocina 15-20 minutos más, hasta que la salsa quede espesa y brillante.",
-      "timer_seconds": 1200
+      "timer_seconds": 1200,
+      "tip": "Prueba la sal solo ahora, al final, porque la soja, la Worcestershire y el parmesano ya aportan bastante."
     },
     "Cuece la pasta al dente, guardando una taza del agua de cocción.",
     "Añade la pasta directamente al ragú, con un poco del agua de cocción si hace falta, remueve un minuto y sirve con abundante parmesano rallado."
   ],
   "summary": "600 gramos de ternera se doran y se cuecen muy despacio, durante 3 o 4 horas a fuego mínimo, junto a un sofrito de cebolla, zanahoria y apio, tomate, vino tinto y hierbas aromáticas, hasta que el colágeno se convierte en gelatina y la carne se deshace sola; se desmenuza, se reduce la salsa y se mezcla con pasta fresca y parmesano justo antes de servir.",
-  "tip": "El punto correcto del fuego durante la cocción lenta es un hervor tan suave que solo sube una burbuja cada 5-10 segundos -si hierve a borbotones está demasiado fuerte, y si no hay ninguna burbuja está demasiado flojo. Prueba la sal solo al final, porque la soja, la Worcestershire y el parmesano ya aportan bastante, y el ragú está aún más bueno al día siguiente."
+  "tip": "El ragú está aún más bueno al día siguiente."
 }

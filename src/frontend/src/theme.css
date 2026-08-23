@@ -1,10 +1,98 @@
-/* Global reset only -- Picker and Cook keep their own color palettes and
-   page-level layout (radial-gradient cream page vs. full-viewport black
-   "OLED screen") scoped to their own root wrapper (.picker-page /
-   .cook-stage), not to bare html/body. In a multi-page site each page got
-   its own <body> styling for free on a fresh document load; in this SPA
-   both routes share the same <body>, so page-specific rules have to live
-   on something React actually mounts/unmounts, not the tag itself. */
+/* --- The palette, in both themes -------------------------------------------
+
+   One semantic token set, two sets of values. Both routes read the same
+   names, so a component never knows (or asks) which theme is on: the
+   Picker's cream page and the Cook screen's charcoal panel are the SAME
+   tokens with different values, not two hardcoded palettes.
+
+   Which values apply:
+     - the bare :root block          -- LIGHT, and it is what you get unless
+       you say otherwise. Deliberately NOT `prefers-color-scheme`: a kitchen
+       screen is read in daylight and under bright kitchen lights far more
+       often than in the dark, so the OS's usual evening switch to dark is
+       the wrong default here even where it's the right one everywhere else.
+     - :root[data-theme="dark"]      -- an explicit choice, remembered in
+       localStorage (see hooks/useTheme.ts; index.html applies it before the
+       first paint so the page never flashes light on the way to dark).
+
+   Design constraints baked into the values:
+     - the ember (orange) family is the brand and stays put across themes;
+       only the ink ON it flips (--on-ember), since #FFF works over orange
+       on cream and dark brown works better over it on charcoal.
+     - the timer accent is the one color reserved for "something is on the
+       clock". Cyan glows on charcoal but is unreadable on cream, so light
+       swaps it for a deep teal of the same role.
+     - dark surfaces are translucent white over the page rather than fixed
+       greys, so they keep working over the Picker's gradient. */
+
+:root {
+  /* Light */
+  --bg: #FFF6EC;
+  --bg-2: #FDEBD3;
+  --surface: #FFFFFF;
+  --surface-2: #FDEBD3;
+  --surface-line: rgba(232, 112, 58, 0.18);
+
+  --ink: #4A2E1E;
+  --ink-soft: #8A6A55;
+  --ink-faint: rgba(138, 106, 85, 0.65);
+
+  --ember: #E8703A;
+  --ember-light: #FFB37B;
+  /* The one that has to hold up as TEXT, so it differs per theme: a
+     mid-orange is readable on cream, but on charcoal the light end is. */
+  --ember-strong: #C9541F;
+  --ember-line: rgba(232, 112, 58, 0.35);
+  --on-ember: #FFFFFF;
+
+  --timer: #0F7F97;
+  --timer-soft: rgba(15, 127, 151, 0.1);
+  --timer-line: rgba(15, 127, 151, 0.35);
+
+  --ok-ink: #6B8E4E;
+  --danger-bg: #FCE8E4;
+  --danger-ink: #A33418;
+
+  --shadow: 0 10px 30px rgba(74, 46, 30, 0.15);
+}
+
+:root[data-theme='dark'] {
+  --bg: #16130F;
+  --bg-2: #100E0B;
+  --surface: rgba(243, 236, 223, 0.06);
+  --surface-2: rgba(243, 236, 223, 0.09);
+  --surface-line: rgba(243, 236, 223, 0.1);
+
+  --ink: #F3ECDF;
+  --ink-soft: rgba(243, 236, 223, 0.55);
+  --ink-faint: rgba(243, 236, 223, 0.32);
+
+  --ember: #E8703A;
+  --ember-light: #FFB37B;
+  --ember-strong: #FFB37B;
+  --ember-line: rgba(255, 179, 123, 0.35);
+  --on-ember: #2A1608;
+
+  --timer: #55D8F2;
+  --timer-soft: rgba(85, 216, 242, 0.1);
+  --timer-line: rgba(85, 216, 242, 0.4);
+
+  --ok-ink: #A9CC7F;
+  --danger-bg: rgba(216, 57, 31, 0.18);
+  --danger-ink: #FFB0A0;
+
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* Global reset. Page-level layout still belongs to each route's own root
+   wrapper (.picker-page / .cook-stage), not to bare html/body: in the old
+   multi-page site every page got a fresh document, but in this SPA both
+   routes share one <body>, so page-specific rules have to live on
+   something React actually mounts and unmounts.
+
+   The background here is the exception -- it has to be on the document
+   itself so the browser paints the right color behind the safe areas and
+   in the overscroll gutter, and so the address bar picks it up. */
 * {
   box-sizing: border-box;
 }
@@ -15,8 +103,15 @@ body,
   padding: 0;
   height: 100%;
 }
+html {
+  background: var(--bg);
+  color-scheme: light;
+}
+:root[data-theme='dark'] { color-scheme: dark; }
 body {
   font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
 }
 button {
   font-family: inherit;

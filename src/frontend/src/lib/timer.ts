@@ -6,9 +6,10 @@
  *
  * Data contract with the recipe interpreter:
  *   A step is normally a plain string. A local recipe's JSON (see
- *   src/recipes/*.json) instead gives an object for any step that needs a
- *   timer:
- *     {"text": "Hornea 40-50 minutos, hasta que...", "timer_seconds": 2700}
+ *   src/recipes/*.json) instead gives an object for any step that needs
+ *   more than its text -- a timer, advice of its own, or both:
+ *     {"text": "Hornea 40-50 minutos, hasta que...", "timer_seconds": 2700,
+ *      "tip": "Sácalas cuando el centro aún esté blando..."}
  *   parseStepTimerSeconds() below prefers that field the moment it's
  *   there -- recipe_engine.py's step_text() reads the same shape on the
  *   Python side wherever a step goes into spoken text or an LLM prompt.
@@ -19,13 +20,23 @@
  *   "40-50 minutos", "1 hora y media", "3 o 4 horas"...).
  */
 
-export type Step = string | { text: string; timer_seconds?: number };
+export type Step = string | { text: string; timer_seconds?: number; tip?: string };
 
 // --- Reading a duration out of a step ------------------------------------
 
 export function stepText(step: Step | null | undefined): string {
   if (typeof step === 'string') return step;
   return step?.text ?? '';
+}
+
+/**
+ * Advice about THIS step, if the recipe gives any. Distinct from the
+ * recipe-level tip (one per dish, shown with the summary before step 1):
+ * this one only ever shows on the step it belongs to.
+ */
+export function stepTip(step: Step | null | undefined): string {
+  if (step && typeof step === 'object') return step.tip ?? '';
+  return '';
 }
 
 const TIME_UNIT_SECONDS: Record<string, number> = {

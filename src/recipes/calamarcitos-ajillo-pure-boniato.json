@@ -79,17 +79,23 @@
     "Escúrrelos bien y tritúralos o aplástalos con un pasapurés.",
     "Incorpora la mantequilla y mezcla.",
     "Añade poco a poco la leche caliente (o nata) hasta obtener una textura cremosa.",
-    "Ajusta de sal, pimienta y, si te gusta, una pizca de nuez moscada. Reserva caliente.",
-    "Seca muy bien los calamarcitos con papel de cocina.",
+    {
+      "text": "Ajusta de sal, pimienta y, si te gusta, una pizca de nuez moscada. Reserva caliente.",
+      "tip": "Para un toque especial, añade al puré una cucharadita de miel o una pizca de pimentón ahumado."
+    },
+    {
+      "text": "Seca muy bien los calamarcitos con papel de cocina.",
+      "tip": "Secarlos de verdad es lo que hace que se doren en vez de cocerse."
+    },
     "Calienta una sartén grande a fuego fuerte y añade el aceite de oliva.",
     "Incorpora los ajos laminados y dóralos 30-60 segundos, sin que se quemen.",
     {
       "text": "Añade los calamarcitos en una sola capa (si no caben, cocina en dos tandas) y cocina 2-3 minutos, removiendo continuamente.",
-      "timer_seconds": 180
+      "timer_seconds": 180,
+      "tip": "No prolongues la cocción: entre 5 y 15 minutos los calamarcitos quedan gomosos."
     },
     "Apaga el fuego, añade el perejil picado, unas gotas de limón y rectifica de sal.",
     "Sirve una base de puré de boniato con los calamarcitos encima, rociados con el aceite de ajo de la sartén y un poco más de perejil y limón."
   ],
-  "summary": "Un puré de boniato cremoso con mantequilla y un toque de nuez moscada sirve de base a unos calamarcitos salteados muy rápido en aceite de ajo dorado, terminados con perejil fresco y unas gotas de limón para un plato ligero y resuelto en menos de 40 minutos.",
-  "tip": "Seca muy bien los calamarcitos antes de cocinarlos para que se doren en vez de cocerse, y no prolongues la cocción -entre 5 y 15 minutos quedan gomosos. Para un toque especial, añade al puré una cucharadita de miel o una pizca de pimentón ahumado."
+  "summary": "Un puré de boniato cremoso con mantequilla y un toque de nuez moscada sirve de base a unos calamarcitos salteados muy rápido en aceite de ajo dorado, terminados con perejil fresco y unas gotas de limón para un plato ligero y resuelto en menos de 40 minutos."
 }

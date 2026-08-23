@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RecipeList from '../components/RecipeList';
 import CookingLoader from '../components/CookingLoader';
+import ThemeToggle from '../components/ThemeToggle';
 import PantryFlow from '../components/PantryFlow';
 import { useAudioPlayer } from '../hooks/useAudioPlayer';
 import { useMicRecorder } from '../hooks/useMicRecorder';
@@ -158,6 +159,7 @@ export default function Picker() {
   return (
     <div className="picker-page">
       <header>
+        <ThemeToggle />
         <h1>🍳 Cook-It</h1>
         <p>Tu ayudante de cocina, 100% local y por voz</p>
       </header>

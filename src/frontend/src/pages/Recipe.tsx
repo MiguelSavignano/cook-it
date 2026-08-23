@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ShareButton from '../components/ShareButton';
+import ThemeToggle from '../components/ThemeToggle';
 import { stashPendingAudio } from '../lib/pendingAudio';
-import { hasStepTimer, parseStepTimerSeconds, stepText } from '../lib/timer';
+import { hasStepTimer, parseStepTimerSeconds, stepText, stepTip } from '../lib/timer';
 import { getRecipe, startRecipe, type Recipe as RecipeData } from '../api';
 import './Recipe.css';
 
@@ -117,9 +118,12 @@ export default function Recipe() {
   return (
     <div className="recipe-page">
       <div className="recipe-sheet">
-        <button className="recipe-back" onClick={() => navigate('/')} aria-label="Volver a las recetas">
-          ⟵ Recetas
-        </button>
+        <div className="recipe-topbar">
+          <button className="recipe-back" onClick={() => navigate('/')} aria-label="Volver a las recetas">
+            ⟵ Recetas
+          </button>
+          <ThemeToggle />
+        </div>
 
         <h1 className="recipe-name">{recipe.name}</h1>
         <div className="recipe-meta">
@@ -163,11 +167,14 @@ export default function Recipe() {
                     ⏱️ {timerLabel(parseStepTimerSeconds(step) as number)}
                   </span>
                 )}
+                {stepTip(step) && <span className="step-tip">💡 {stepTip(step)}</span>}
               </li>
             ))}
           </ol>
         </section>
 
+        {/* The dish's general advice. Anything specific to one step is
+            printed with that step above -- see stepTip(). */}
         {recipe.tip && <div className="recipe-tip"><b>💡 Tip:</b> {recipe.tip}</div>}
 
         <div className="recipe-actions">

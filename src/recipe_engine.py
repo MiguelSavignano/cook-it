@@ -57,8 +57,15 @@ fuego lento con el azúcar moreno, la miel, el ron y la vainilla hasta obtener u
 incorporando la canela al final si se desea.'",
   "ingredients": [{"item": "...", "amount": "...", "unit": "..."}],
   "steps": ["paso 1, imperativo y claro, uno por elemento de la lista", "paso 2", "..."],
-  "tip": "un truco o consejo especial de cocina relacionado con esta receta, algo útil y no obvio"
+  "tip": "UN consejo sobre el plato entero (no sobre un paso concreto), útil y no obvio; se le da \
+al usuario al principio, junto con el resumen, antes de empezar a cocinar. Si no se te ocurre \
+ninguno que sea general de verdad, devuelve una cadena vacía"
 }
+
+Un paso puede ser un texto suelto o, si ese paso concreto tiene un truco propio, un objeto \
+{"text": "el paso", "tip": "el truco de ESE paso"}. Usa la forma con "tip" solo cuando el \
+consejo sea de verdad de ese paso y no del plato en general: es mejor un paso sin tip que un \
+tip de relleno.
 
 Si el mensaje del usuario incluye una sección "RECETA LOCAL" con ingredientes y pasos ya \
 definidos: esa es la fuente autorizada y el programa que te llama la va a usar directamente, \
@@ -77,12 +84,19 @@ grano, no repitas la receta entera ni la lista de pasos, solo contesta la pregun
 
 def step_text(step):
     """A recipe step is usually a plain string, but a local recipe's JSON may
-    give a step that needs a timer as {"text": "...", "timer_seconds": N}
-    instead (see src/recipes/*.json and frontend/src/lib/timer.ts's matching
-    stepText()) -- this is the one place that needs to know about both
-    shapes before a step goes into spoken text or an LLM prompt. The
-    frontend gets the raw step (string or object) as-is via /api/state and
-    reads .timer_seconds itself; the LLM/TTS side only ever wants the text."""
+    give an object instead when the step needs anything beyond its text:
+
+        {"text": "Hornea 40-50 minutos...", "timer_seconds": 3000,
+         "tip": "Sácalas cuando el centro aún esté blando..."}
+
+    Both keys are optional and independent. A step's "tip" is advice about
+    THAT step; the recipe-level "tip" (also optional) is the one piece of
+    whole-dish advice, shown with the summary before step 1 -- see
+    src/recipes/*.json and frontend/src/lib/timer.ts's matching stepText().
+
+    This is the one place on the Python side that needs to know about both
+    shapes, since the LLM/TTS side only ever wants the text. The frontend
+    gets the raw step as-is via /api/state and reads the rest itself."""
     return step["text"] if isinstance(step, dict) else step
 
 
@@ -208,7 +222,7 @@ def request_recipe(user_text):
     """Main entry point: processes a recipe request by voice/text and saves the
     session state. Only calls the LLM when it's actually needed:
 
-    1. Local recipe WITH summary/tip already cached in its JSON -> 0 LLM calls.
+    1. Local recipe with a summary already cached in its JSON -> 0 LLM calls.
     2. Recipe that isn't local but was already asked before (cache in
        cache_llm/) -> 0 LLM calls.
     3. Anything else -> the LLM is called (and if not local, the result is
@@ -222,9 +236,12 @@ def request_recipe(user_text):
     llm_time = 0.0
     generated = None  # whatever the LLM or the general cache returns, if any
 
-    if local_recipe and local_recipe.get("summary") and local_recipe.get("tip"):
+    # The summary is what the LLM would be called for; the recipe-level tip is
+    # optional (most recipes now carry their advice per step instead -- see
+    # step_text/step_tip), so its absence must NOT force a generation.
+    if local_recipe and local_recipe.get("summary"):
         summary = local_recipe["summary"]
-        tip = local_recipe["tip"]
+        tip = local_recipe.get("tip", "")
     else:
         generated = None if local_recipe else _read_general_cache(user_text)
         if generated is None:

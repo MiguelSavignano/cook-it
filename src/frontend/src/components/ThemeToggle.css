@@ -1,0 +1,21 @@
+/* Deliberately quiet: it sits in the corner of both routes' headers and
+   should never compete with the mic or the current step. 44px so it's still
+   a real touch target at that visual weight. */
+.theme-toggle {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--ink-soft);
+  border-radius: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.theme-toggle:hover { color: var(--ink); }
+.theme-toggle:active { background: var(--surface); transform: scale(0.94); }

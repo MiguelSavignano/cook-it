@@ -14,39 +14,45 @@
      a few lines tall and should read as a card, not as an empty page. */
   align-items: flex-start;
   padding: 20px 14px 56px;
-  background: radial-gradient(circle at top, var(--cream) 0%, var(--cream-2) 100%);
-  color: var(--brown);
+  background: radial-gradient(circle at top, var(--bg) 0%, var(--surface-2) 100%);
+  color: var(--ink);
   font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 .recipe-sheet {
   width: 100%;
   max-width: 620px;
-  background: white;
+  background: var(--surface);
   border-radius: 22px;
   box-shadow: var(--shadow);
-  border: 1px solid rgba(232, 112, 58, 0.15);
+  border: 1px solid var(--surface-line);
   padding: 20px 22px 26px;
 }
 
+.recipe-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
 .recipe-back {
   border: none;
   background: transparent;
-  color: var(--brown-soft);
+  color: var(--ink-soft);
   font-family: inherit;
   font-size: 0.9rem;
   font-weight: 600;
   padding: 4px 0;
   cursor: pointer;
 }
-.recipe-back:hover { color: var(--orange-dark); }
+.recipe-back:hover { color: var(--ember-strong); }
 
 .recipe-name {
   margin: 6px 0 8px;
   font-size: 1.9rem;
   line-height: 1.15;
   letter-spacing: -0.5px;
-  color: var(--orange-dark);
+  color: var(--ember-strong);
 }
 
 .recipe-meta {
@@ -54,15 +60,15 @@
   flex-wrap: wrap;
   gap: 8px;
   font-size: 0.82rem;
-  color: var(--brown-soft);
+  color: var(--ink-soft);
 }
 .recipe-meta > span {
-  background: var(--cream-2);
+  background: var(--surface-2);
   border-radius: 999px;
   padding: 4px 10px;
 }
 .recipe-generated {
-  color: var(--orange-dark);
+  color: var(--ember-strong);
   cursor: help;
 }
 
@@ -70,7 +76,7 @@
   margin: 16px 0 0;
   font-size: 1rem;
   line-height: 1.5;
-  color: var(--brown);
+  color: var(--ink);
 }
 
 .recipe-section { margin-top: 24px; }
@@ -79,7 +85,7 @@
   font-size: 1.05rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--brown-soft);
+  color: var(--ink-soft);
 }
 
 .recipe-ingredients {
@@ -99,10 +105,10 @@
 }
 /* Zebra striping instead of rules: the amounts are right-aligned across a
    gap, and the eye needs something to carry it across the row. */
-.recipe-ingredients li:nth-child(odd) { background: var(--cream); }
+.recipe-ingredients li:nth-child(odd) { background: var(--bg); }
 .ingredient-item { text-transform: capitalize; }
 .ingredient-amount {
-  color: var(--brown-soft);
+  color: var(--ink-soft);
   font-size: 0.88rem;
   white-space: nowrap;
 }
@@ -115,15 +121,24 @@
   line-height: 1.5;
 }
 .recipe-steps li::marker {
-  color: var(--orange);
+  color: var(--ember);
   font-weight: 700;
 }
 .step-body { margin-right: 8px; }
+/* A step's own tip: its own line under the step, quieter than the
+   instruction, so it reads as an aside and never as another thing to do. */
+.step-tip {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
 .step-timer-badge {
   display: inline-block;
   white-space: nowrap;
-  background: var(--cream-2);
-  color: var(--orange-dark);
+  background: var(--surface-2);
+  color: var(--ember-strong);
   border-radius: 999px;
   padding: 2px 9px;
   font-size: 0.78rem;
@@ -132,8 +147,8 @@
 
 .recipe-tip {
   margin-top: 22px;
-  background: var(--cream);
-  border-left: 4px solid var(--orange-light);
+  background: var(--bg);
+  border-left: 4px solid var(--ember-light);
   border-radius: 0 12px 12px 0;
   padding: 12px 14px;
   font-size: 0.92rem;
@@ -152,8 +167,8 @@
   flex: 1 1 240px;
   border: none;
   border-radius: 999px;
-  background: linear-gradient(145deg, var(--orange-light), var(--orange));
-  color: white;
+  background: linear-gradient(145deg, var(--ember-light), var(--ember));
+  color: var(--on-ember);
   font-family: inherit;
   font-size: 1.02rem;
   font-weight: 700;
@@ -168,7 +183,7 @@
 
 .recipe-error {
   margin-top: 12px;
-  color: var(--orange-dark);
+  color: var(--ember-strong);
   font-size: 0.9rem;
   font-weight: 600;
 }
@@ -179,11 +194,11 @@
 .recipe-missing-title {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--brown);
+  color: var(--ink);
   margin-bottom: 6px;
 }
 .recipe-missing p {
-  color: var(--brown-soft);
+  color: var(--ink-soft);
   font-size: 0.95rem;
   line-height: 1.5;
   margin: 0 0 20px;

@@ -13,6 +13,9 @@ export type StepTimerPhase = 'ready' | 'running' | 'finished';
  */
 export function useStepTimer() {
   const [seconds, setSecondsState] = useState<number | null>(null);
+  // Seconds still on the clock. Same number `display` is formatted from, kept
+  // raw so the UI can draw a progress ring out of remaining/seconds.
+  const [remaining, setRemaining] = useState<number | null>(null);
   const [phase, setPhase] = useState<StepTimerPhase>('ready');
   const [display, setDisplay] = useState('0:00');
   const [message, setMessage] = useState('');
@@ -31,6 +34,7 @@ export function useStepTimer() {
     (newSeconds: number | null) => {
       stopController();
       setSecondsState(newSeconds);
+      setRemaining(newSeconds);
       setPhase('ready');
       setMessage('');
       setDisplay(newSeconds ? formatTimer(newSeconds) : '0:00');
@@ -43,9 +47,13 @@ export function useStepTimer() {
     setPhase('running');
     setMessage('');
     const controller = createStepTimer(seconds, {
-      onTick: (remaining) => setDisplay(formatTimer(remaining)),
+      onTick: (left) => {
+        setRemaining(left);
+        setDisplay(formatTimer(left));
+      },
       onFinish: (msg) => {
         controllerRef.current = null;
+        setRemaining(0);
         playTimerBeep();
         setPhase('finished');
         setDisplay('⏰');
@@ -63,6 +71,7 @@ export function useStepTimer() {
     stopController();
     setPhase('ready');
     setMessage('');
+    setRemaining(seconds);
     setDisplay(seconds ? formatTimer(seconds) : '0:00');
   }, [seconds, stopController]);
 
@@ -70,5 +79,5 @@ export function useStepTimer() {
   // component that owns this hook going away.
   useEffect(() => stopController, [stopController]);
 
-  return { seconds, phase, display, message, setSeconds, start, cancel };
+  return { seconds, remaining, phase, display, message, setSeconds, start, cancel };
 }

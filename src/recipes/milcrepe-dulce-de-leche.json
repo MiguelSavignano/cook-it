@@ -70,7 +70,10 @@
       "text": "Cocina 1-2 minutos por cada lado, hasta que esté dorada pero flexible.",
       "timer_seconds": 120
     },
-    "Repite hasta terminar toda la masa (18-22 crepes) y déjalas enfriar por completo, separadas entre sí.",
+    {
+      "text": "Repite hasta terminar toda la masa (18-22 crepes) y déjalas enfriar por completo, separadas entre sí.",
+      "tip": "Deja enfriar las crepes por completo y por separado antes de montar: si se apilan calientes o juntas se pegan y se rompen al separarlas."
+    },
     "Monta la nata con el azúcar glas hasta que quede firme.",
     "Incorpora el dulce de leche a la nata montada con cuidado (o alterna capas de nata y dulce de leche por separado).",
     "Coloca la primera crepe como base y extiende una capa fina de relleno.",
@@ -82,5 +85,5 @@
     }
   ],
   "summary": "Crepes finas cocinadas una a una en sartén y enfriadas por completo se apilan en capas alternas con nata montada mezclada con dulce de leche hasta formar una tarta de 18-20 pisos, que se deja reposar en frío varias horas para que asiente antes de cortarla.",
-  "tip": "Deja enfriar las crepes por completo y por separado antes de montar la tarta: si se apilan calientes o juntas se pegan y se rompen al separarlas. (Esta receta se guardó solo con la lista de ingredientes; los pasos son el método estándar de un milcrepe, ajústalos si tu técnica real es distinta.)"
+  "tip": "Esta receta se guardó solo con la lista de ingredientes; los pasos son el método estándar de un milcrepe, ajústalos si tu técnica real es distinta."
 }

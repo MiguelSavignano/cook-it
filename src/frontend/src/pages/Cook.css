@@ -1,105 +1,31 @@
-:root {
-  --orange: #E8703A;
-  --orange-light: #FFB37B;
-  /* "Bimo Chef" robot palette. The whole viewport IS the device's OLED
-     panel (see docs/hardware.md -- a 2.42" SSD1309 sits behind the face
-     window on the real enclosure) -- so the page background itself is
-     the black "screen", with the glowing blue mic button as the only
-     chrome. The cream/white body + chef hat from the reference art are
-     the physical printed case, not something the display renders. */
-  --screen: #0B0C0E;
-  --screen-blue: #55D8F2;
-  --screen-glow: rgba(85, 216, 242, 0.55);
-  --ink: #F3ECDF;
-  --ink-soft: rgba(243, 236, 223, 0.6);
-}
-
-/* --- Layout: nav buttons pinned to the left/right edges (thumb reach when
-   the phone is held/propped up in landscape), everything else centered
-   between them. See the orientation:landscape media query below for the
-   sizing this is tuned for. This is the page's root element (see
-   Cook.tsx) -- in the old multi-page static site this sizing/background
-   lived on <body> since every page got a fresh document; in the SPA both
-   routes share one <body>, so it lives on the root wrapper each page
-   actually mounts instead. --- */
+/* --- Layout: one vertical column, portrait phone first. The recipe is a
+   strip you swipe (up = next); the only pinned chrome is the topbar, the
+   swipe bar and the ask bar. This is the page's root element (see
+   Cook.tsx) -- in the SPA both routes share one <body>, so the page-level
+   background/sizing lives here rather than on the tag. --- */
 .cook-stage {
   height: 100dvh;
   height: 100vh; /* fallback for browsers without dvh */
   width: 100%;
-  display: grid;
-  grid-template-columns: minmax(56px, 84px) 1fr minmax(56px, 84px);
-  background: var(--screen);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
   color: var(--ink);
   font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  overflow: hidden; /* this is a fixed "device screen", not a scrolling page */
+  overflow: hidden; /* a fixed "device screen", not a scrolling page */
   overscroll-behavior: none;
   user-select: none;
   -webkit-user-select: none;
+  padding: max(10px, env(safe-area-inset-top)) 0 max(10px, env(safe-area-inset-bottom));
 }
 
-.side-nav {
-  border: none;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  color: var(--ink);
-  font-weight: 700;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-.side-nav .arrow { font-size: clamp(1.6rem, 6vh, 2.6rem); line-height: 1; }
-.side-nav .side-label {
-  font-size: 0.62rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.side-nav.prev {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--ink-soft);
-  border-radius: 0 18px 18px 0;
-  padding-left: max(4px, env(safe-area-inset-left));
-}
-.side-nav.next {
-  background: linear-gradient(145deg, var(--orange-light), var(--orange));
-  color: #2a1608;
-  border-radius: 18px 0 0 18px;
-  padding-right: max(4px, env(safe-area-inset-right));
-}
-.side-nav:disabled { opacity: 0.3; cursor: default; }
-.side-nav:active:not(:disabled) { transform: scale(0.97); }
-.side-nav[hidden] { visibility: hidden; }
-
-.cook-center {
-  min-width: 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px;
-  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
-  overflow: hidden;
-}
-
+/* --- Topbar --- */
 .cook-topbar {
-  width: 100%;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex: 0 0 auto;
-}
-.back-btn {
-  background: none;
-  border: none;
-  font-size: 1.3rem;
-  color: var(--screen-blue);
-  cursor: pointer;
-  padding: 2px 6px;
-  flex: 0 0 auto;
-  touch-action: manipulation;
+  gap: 6px;
+  padding: 0 8px 12px;
 }
 .cook-title {
   flex: 1 1 auto;
@@ -107,154 +33,343 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 700;
-  color: var(--ink);
+  font-weight: 600;
+  font-size: clamp(0.9rem, 2.2vh, 1rem);
   text-transform: capitalize;
-  font-size: clamp(0.85rem, 2.6vh, 1.05rem);
 }
-.cook-progress {
+.step-counter {
   flex: 0 0 auto;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
+  align-items: baseline;
+  gap: 1px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
 }
-.dots { display: flex; gap: 3px; }
-.dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); }
-.dot.done { background: var(--orange); }
-.dot.current { background: var(--screen-blue); box-shadow: 0 0 0 2px var(--screen-glow); }
-.progress-label { font-size: 0.64rem; color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+.counter-now { font-size: clamp(1.1rem, 3vh, 1.4rem); color: var(--ink); }
+.counter-total { font-size: 0.85rem; color: var(--ink-faint); }
+.step-counter.done { font-size: 0.9rem; color: var(--ember-light); }
+.step-counter.intro { font-size: 0.8rem; font-weight: 600; color: var(--ink-faint); }
 
-/* Slot shared by the mic button and StepTimer (see Cook.tsx) -- whichever
-   one is relevant gets mounted here, filling essentially the entire
-   viewport (topbar/step strip float thinly at the edges). */
-.voice-wrap {
-  flex: 1 1 auto;
-  min-height: 0;
-  width: 100%;
+/* Ghost square button, used for every icon-only control in the chrome. */
+.icon-btn {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.5vh;
-  position: relative;
-}
-.voice-hint {
-  font-size: 0.72rem;
+  border: none;
+  background: none;
   color: var(--ink-soft);
-  text-align: center;
-  min-height: 1.1em;
-}
-
-/* The tap-to-ask target. Same job as the Picker's #micBtn, but sized off
-   vh (this page is landscape-first and the button is the main thing in the
-   slot) and drawn in the screen's blue rather than the site's orange --
-   the rest of this route is the black OLED panel, see the palette above. */
-.cook-mic {
-  width: 22vh;
-  height: 22vh;
-  max-width: 128px;
-  max-height: 128px;
-  min-width: 72px;
-  min-height: 72px;
-  border-radius: 50%;
-  border: 2px solid var(--screen-blue);
-  background: rgba(85, 216, 242, 0.08);
-  box-shadow: 0 0 18px var(--screen-glow);
-  font-size: 3rem;
-  line-height: 1;
+  border-radius: 12px;
   cursor: pointer;
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.icon-btn:active:not(:disabled) { background: var(--surface); transform: scale(0.94); }
+.icon-btn:disabled { opacity: 0.25; cursor: default; }
+
+/* --- The strip: done above, now in the middle, next peeking below --- */
+.strip-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  padding: 0 18px 0 14px;
+  overflow: hidden;
+  /* The browser must not claim the vertical gesture for scrolling or
+     pull-to-refresh -- without this useSwipeNav never sees a pointermove. */
+  touch-action: none;
+}
+/* The line every step hangs off. Fades at both ends so the strip reads as
+   a section of something longer, not a list with a start and an end. */
+.rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 39px;
+  width: 2px;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    var(--surface-line) 12%,
+    var(--surface-line) 76%,
+    transparent 100%);
+}
+.strip {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+}
+/* Only while snapping back after a gesture -- during the drag the strip
+   must track the finger with no easing at all. */
+.strip.settling { transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1); }
+.strip-loading { padding-left: 66px; color: var(--ink-soft); }
+
+/* What's below continues past the edge instead of stopping dead. */
+.strip-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 72px;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, var(--bg) 82%);
+}
+
+.step-row {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  min-width: 0;
+}
+.step-row.past, .step-row.next { opacity: 0.42; }
+.step-row.past .row-text {
+  /* One line only: it's a reminder of where you came from, not something
+     to read again. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.row-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: clamp(0.85rem, 2vh, 0.95rem);
+  line-height: 1.4;
+  padding-top: 3px;
+}
+.step-row.next .row-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* --- The node on the rail (and, when the step has one, its timer ring) --- */
+.node {
+  flex: 0 0 auto;
+  width: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
 }
-.cook-mic:active { transform: scale(0.96); }
-.cook-mic.listening {
-  background: rgba(216, 57, 31, 0.18);
-  border-color: #ff7a5c;
-  animation: cook-mic-pulse 1.1s infinite;
+.step-row.current .node { height: 52px; }
+.node-ring { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+.ring-track { fill: var(--bg); stroke: var(--surface-line); stroke-width: 2.5; }
+.ring-progress {
+  fill: none;
+  stroke: var(--timer);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.25s linear;
 }
-.cook-mic.thinking {
-  background: rgba(224, 169, 92, 0.18);
-  border-color: #e0a95c;
-  animation: cook-mic-glow 1.4s infinite;
+.node-number {
+  position: relative;
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
-@keyframes cook-mic-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(255, 122, 92, 0.45); }
-  70%  { box-shadow: 0 0 0 18px rgba(255, 122, 92, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 122, 92, 0); }
-}
-@keyframes cook-mic-glow {
-  0%, 100% { box-shadow: 0 0 10px rgba(224, 169, 92, 0.35); }
-  50%      { box-shadow: 0 0 26px rgba(224, 169, 92, 0.75); }
-}
-
-/* Pinned thin strip under the mic button -- the button keeps most of the
-   screen, this is a caption/status strip, not a competing panel. */
-.step-area {
-  width: 100%;
-  flex: 0 0 auto;
-  max-height: 34vh;
-  overflow-y: auto;
+.node-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 5px;
-}
-.user-text, .answer-box {
-  font-size: 0.75rem;
-  text-align: center;
-  width: 100%;
-}
-.user-text { color: var(--ink-soft); font-style: italic; min-height: 1.1em; }
-.answer-box {
-  background: rgba(255, 255, 255, 0.06);
-  border-left: 3px solid var(--screen-blue);
-  border-radius: 10px;
-  padding: 8px 12px;
-  color: var(--ink);
-}
-.current-step {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 14px;
-  padding: 8px 14px;
-  font-size: clamp(0.8rem, 2.2vh, 1rem);
-  line-height: 1.3;
-  font-weight: 600;
-  color: var(--ink);
-  border-left: 3px solid var(--orange);
-  text-align: center;
-}
-.finished-msg { font-size: 1.1rem; font-weight: 700; }
-.tip-box {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border-left: 3px solid var(--orange-light);
-  border-radius: 10px;
-  padding: 6px 10px;
+  justify-content: center;
+  border: 1.5px solid var(--ink-faint);
+  background: var(--bg);
   font-size: 0.7rem;
+  font-weight: 600;
   color: var(--ink-soft);
 }
-.tip-box b { color: var(--orange-light); }
-.home-btn {
-  background: none;
-  border: 1px solid var(--screen-blue);
-  color: var(--screen-blue);
-  border-radius: 999px;
-  padding: 6px 16px;
-  font-size: 0.8rem;
-  cursor: pointer;
+.node-dot.done { border-color: transparent; background: var(--surface-line); color: var(--ember); }
+.node-dot.intro { width: 34px; height: 34px; border-color: var(--ember); color: var(--ember); }
+.node-dot.big { width: 38px; height: 38px; }
+
+/* --- The current step: the only thing sized to be read from across the
+   kitchen --- */
+.row-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 2px;
+}
+.step-headline {
+  font-weight: 600;
+  line-height: 1.24;
+  letter-spacing: -0.015em;
+  text-wrap: pretty;
+}
+/* Set by headlineSize() in Cook.tsx -- see the note there. */
+.step-headline.size-lg { font-size: clamp(1.25rem, 3.6vh, 1.75rem); }
+.step-headline.size-md { font-size: clamp(1.05rem, 2.9vh, 1.35rem); }
+.step-headline.size-sm { font-size: clamp(0.95rem, 2.4vh, 1.15rem); }
+
+/* The intro's own line: the dish, above the summary that explains it. The
+   topbar names it too, but that one is a nameplate you stop reading -- here
+   it's the title of what you're about to be told. */
+.intro-name {
+  font-size: clamp(1.25rem, 3.6vh, 1.7rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-transform: capitalize;
+  margin-bottom: -4px;
+}
+/* The summary is prose, not an instruction: lighter than a step's text so
+   the two never read as the same kind of thing. */
+.step-row.current .intro-name + .step-headline {
+  font-weight: 400;
+  color: var(--ink-soft);
+  line-height: 1.45;
 }
 
-/* Extra-short landscape viewports (phone lying flat, browser chrome
-   eating into the height): the mic button already shrinks on its own
-   (sized off vh, see .cook-mic) -- this just reclaims a bit more room for
-   the step strip and tightens its own padding. */
-@media (orientation: landscape) and (max-height: 380px) {
-  .step-area { max-height: 42vh; }
-  .cook-center { gap: 2px; padding-top: 4px; }
-  .current-step { font-size: 0.82rem; padding: 6px 10px; }
+.user-text { font-size: 0.8rem; font-style: italic; color: var(--ink-faint); }
+.answer-box {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  padding: 10px 13px;
+  border-radius: 14px;
+  background: var(--surface);
+  border-left: 2px solid var(--timer);
+}
+.tip-box {
+  display: flex;
+  gap: 9px;
+  padding: 11px 13px;
+  border-radius: 14px;
+  background: var(--surface);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+/* The tip is a reminder, not the instruction -- and it's spoken in full
+   anyway, so it never gets to push the step off the screen. */
+.tip-box span:last-child {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.tip-icon { flex: 0 0 auto; color: var(--ember-light); padding-top: 1px; }
+
+.home-btn {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--surface-line);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* The incoming step arrives from the side it came from, so the direction of
+   travel is never ambiguous. */
+.step-row.current.from-up { animation: step-in-up 0.26s cubic-bezier(0.22, 1, 0.36, 1); }
+.step-row.current.from-down { animation: step-in-down 0.26s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes step-in-up {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes step-in-down {
+  from { opacity: 0; transform: translateY(-26px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Swipe bar: the hint plus the same two moves as buttons, for keyboard,
+   screen readers and anyone on a mouse --- */
+.swipe-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px 8px;
+}
+.swipe-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--ink-faint);
+}
+
+/* --- Ask bar: the whole pill is the tap target (a mic button you have to
+   aim at is the wrong shape for greasy hands) --- */
+.ask-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 14px;
+  padding: 9px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--surface-line);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.15s ease;
+}
+.ask-mic {
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, var(--ember-light), var(--ember));
+  color: var(--on-ember);
+}
+.ask-label { flex: 1 1 auto; min-width: 0; }
+.ask-bar:active { transform: scale(0.99); }
+.ask-bar.listening { border-color: #ff7a5c; color: var(--ink); }
+.ask-bar.listening .ask-mic { animation: ask-pulse 1.1s infinite; }
+.ask-bar.thinking .ask-mic { animation: ask-glow 1.4s infinite; }
+@keyframes ask-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 122, 92, 0.5); }
+  70%  { box-shadow: 0 0 0 16px rgba(255, 122, 92, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 122, 92, 0); }
+}
+@keyframes ask-glow {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.3); }
+}
+
+/* Landscape (the phone propped on the counter, the old orientation): the
+   neighbouring steps are what gives way -- the current step keeps the room. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .step-row.past, .step-row.next { display: none; }
+  .rail { display: none; }
+  .strip { justify-content: center; }
+  .cook-topbar { padding-bottom: 6px; }
+  .swipe-bar { padding-top: 0; padding-bottom: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strip.settling { transition: none; }
+  .step-row.current.from-up,
+  .step-row.current.from-down { animation: none; }
+  .ask-bar.listening .ask-mic,
+  .ask-bar.thinking .ask-mic { animation: none; }
 }

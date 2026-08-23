@@ -54,17 +54,22 @@
     },
     {
       "text": "Añade la sal y amasa 5 minutos.",
-      "timer_seconds": 300
+      "timer_seconds": 300,
+      "tip": "La sal va al final del amasado, no al principio, para que el gluten se desarrolle primero."
     },
     {
       "text": "Incorpora la mantequilla poco a poco y amasa 10-15 minutos, hasta que la masa esté lisa y elástica.",
-      "timer_seconds": 900
+      "timer_seconds": 900,
+      "tip": "Incorpora la mantequilla en varias tandas, sin añadir la siguiente hasta que la anterior esté totalmente integrada."
     },
     {
       "text": "Deja fermentar la masa 1½-2 horas.",
       "timer_seconds": 7200
     },
-    "Divide la masa en bolas de 40 g.",
+    {
+      "text": "Divide la masa en bolas de 40 g.",
+      "tip": "El tamaño de las bolas (40 g) es clave para que salgan como los bollos de bollería industrial."
+    },
     "Rellena cada bola con un trocito de chorizo y ciérrala bien, dejando la costura hacia abajo.",
     "Coloca los bollos en una bandeja, cúbrelos y déjalos toda la noche en la nevera.",
     {
@@ -79,6 +84,5 @@
     },
     "Al salir del horno, pincela con mantequilla derretida para que la corteza quede muy tierna."
   ],
-  "summary": "Una masa enriquecida con tangzhong que retiene mucha humedad se amasa hasta quedar lisa y elástica, se rellena con trocitos de chorizo semicurado en bolas de 40 gramos y fermenta toda la noche en la nevera para ganar sabor. Al día siguiente se pintan con huevo batido y se hornean a 185°C hasta dorar, terminando con un pincelado de mantequilla derretida que deja la corteza muy tierna.",
-  "tip": "El tamaño de las bolas (40 g) es clave para que salgan como los bollos de bollería industrial. Añade la sal y la mantequilla al final del amasado para que el gluten se desarrolle primero, e incorpora la mantequilla en varias tandas sin añadir la siguiente hasta que la anterior esté totalmente integrada."
+  "summary": "Una masa enriquecida con tangzhong que retiene mucha humedad se amasa hasta quedar lisa y elástica, se rellena con trocitos de chorizo semicurado en bolas de 40 gramos y fermenta toda la noche en la nevera para ganar sabor. Al día siguiente se pintan con huevo batido y se hornean a 185°C hasta dorar, terminando con un pincelado de mantequilla derretida que deja la corteza muy tierna."
 }

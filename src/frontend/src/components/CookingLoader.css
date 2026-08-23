@@ -18,7 +18,7 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: var(--orange-light);
+  background: var(--ember-light);
   animation: steam-rise 1.3s ease-in-out infinite;
 }
 .cooking-loader .steam span:nth-child(2) { animation-delay: 0.2s; }

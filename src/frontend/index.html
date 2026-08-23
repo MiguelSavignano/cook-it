@@ -5,6 +5,17 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Cook-It</title>
+    <script>
+      /* Before first paint, or the page flashes light on every load for
+         anyone who chose dark. Mirrors hooks/useTheme.ts -- keep the key in
+         step with it. Only dark needs the attribute: no attribute is what
+         theme.css already treats as light, the default. */
+      try {
+        if (localStorage.getItem('cookit_theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -53,10 +53,11 @@
     },
     {
       "text": "Apaga el horno y deja la tarta dentro 30 minutos con la puerta abierta, para que termine de cuajar sin bajones bruscos de temperatura.",
-      "timer_seconds": 1800
+      "timer_seconds": 1800,
+      "tip": "Ese cambio de temperatura gradual es lo que evita que se raje la superficie."
     },
     "Saca y enfría del todo a temperatura ambiente antes de refrigerar varias horas o toda la noche."
   ],
   "summary": "Una mezcla cremosa de queso crema, mascarpone y pasta de pistacho se hornea a 180°C hasta cuajar y se deja enfriar dentro del horno apagado con la puerta entreabierta, para que no se agriete y quede con esa textura suave típica de las tartas de queso al horno.",
-  "tip": "Deja la tarta enfriándose dentro del horno apagado con la puerta abierta -ese cambio de temperatura gradual es lo que evita que se raje la superficie. (Esta receta solo tenía ingredientes y horneado apuntados; el orden de mezclado es el método estándar de una tarta de queso, ajústalo si tu técnica real es distinta. Falta por confirmar el tiempo de refrigeración final antes de servir.)"
+  "tip": "Esta receta solo tenía ingredientes y horneado apuntados; el orden de mezclado es el método estándar de una tarta de queso, ajústalo si tu técnica real es distinta. Falta por confirmar el tiempo de refrigeración final antes de servir."
 }
