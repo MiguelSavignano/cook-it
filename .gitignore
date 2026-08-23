@@ -25,11 +25,15 @@ src/voices/
 # frontend/vite.config.ts's outDir), so it needs its own entry here.
 src/static_dist/
 
-# Claude Code's own working area -- agent worktrees and session state. Git
-# records a directory with its own .git as a submodule, so this landed in
-# the index as a gitlink with no .gitmodules: a clone would get an empty
-# folder and a broken `git submodule update`.
-.claude/
+# Claude Code's own working area. Agent worktrees carry their own .git, and
+# git records such a directory as a submodule -- one landed in the index as
+# a gitlink with no .gitmodules, so a clone got an empty folder and a broken
+# `git submodule update`. Machinery is ignored; skills/ is not: those are
+# written for this project and are meant to travel with it.
+# (`.claude/*` rather than `.claude/`, or git wouldn't descend far enough to
+# see the exception.)
+.claude/*
+!.claude/skills/
 
 # OS/editor cruft
 .DS_Store
