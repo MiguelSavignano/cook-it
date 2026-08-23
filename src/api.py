@@ -18,10 +18,11 @@ that should hear the answer, not whichever machine happens to run the API.
 (The CLI scripts are different: there, this same machine IS the device the
 user is standing next to, so they use common.speak() to play locally instead.)
 
-Frontend: a React SPA (src/frontend/, Picker "/" + Cook "/cook", one
-react-router app) built by Vite into src/static_dist/ -- see
-src/frontend/vite.config.ts. This file serves that build (mounts below +
-the catch-all route at the bottom) alongside the /api/* endpoints; it does
+Frontend: a React SPA (src/frontend/, Picker "/" + Cook "/cook" + a shared
+recipe's page "/r/<uuid>", one react-router app) built by Vite into
+src/static_dist/ -- see src/frontend/vite.config.ts. This file serves that
+build (mounts below + the catch-all route at the bottom) alongside the
+/api/* endpoints; it does
 NOT run the frontend's dev server (that's `npm run dev` in src/frontend/,
 which proxies /api/* back to this server -- see vite.config.ts).
 
@@ -40,8 +41,11 @@ from faster_whisper import WhisperModel
 from pydantic import BaseModel
 
 import pantry
+import recipe_store
 from common import load_state, clear_state, synthesize
-from recipe_engine import load_recipes, next_step, previous_step, process_question, request_recipe
+from recipe_engine import (
+    load_recipes, next_step, previous_step, process_question, start_recipe_by_uuid,
+)
 
 BASE_DIR = Path(__file__).parent
 # npm run build's output (src/frontend/vite.config.ts's outDir) -- doesn't
@@ -96,26 +100,43 @@ def reset():
 @app.get("/api/recipes")
 def list_recipes():
     """All local recipes, for the "pick one with a tap" home screen -- no
-    voice/LLM needed to see what's available."""
+    voice/LLM needed to see what's available. Each one carries its uuid: the
+    frontend needs it both to start the recipe and to build its share link
+    (/r/<uuid>, see recipe_store.py)."""
     recipes = load_recipes()
     return [
-        {"name": r["name"], "servings": r.get("servings"), "tip": r.get("tip", "")}
+        {"uuid": r["uuid"], "name": r["name"], "servings": r.get("servings"), "tip": r.get("tip", "")}
         for r in recipes.values()
     ]
 
 
-class SelectRecipeRequest(BaseModel):
-    name: str
+@app.get("/api/recipes/{recipe_uuid}")
+def get_recipe(recipe_uuid: str):
+    """The recipe behind a shared link: everything needed to render it
+    WITHOUT starting to cook it (someone opening a link you sent should see
+    the dish first and decide, not find themselves on step 1).
+
+    Returns 404 for a uuid this install doesn't know -- links are only valid
+    on the machine that minted them, there is no central registry."""
+    recipe = recipe_store.find(recipe_uuid)
+    if recipe is None:
+        return JSONResponse(
+            {"ok": False, "reason": "recipe_not_found",
+             "error": "No conozco esa receta."},
+            status_code=404,
+        )
+    return {"ok": True, "recipe": recipe_store.public_recipe(recipe)}
 
 
-@app.post("/api/recipes/select")
-def select_recipe(body: SelectRecipeRequest):
-    """Tapping a recipe card: starts that recipe directly, same result shape
-    as asking for it by voice, but skips STT entirely. Since local recipes
-    always have their summary/tip cached (see request_recipe), this is just
-    as close to instant as "Next"/"Previous" -- no LLM call either."""
+@app.post("/api/recipes/{recipe_uuid}/start")
+def start_recipe(recipe_uuid: str):
+    """Tapping a recipe card, or "empezar a cocinar" on a shared link:
+    starts that exact recipe, same result shape as asking for it by voice
+    but with no STT and no LLM -- a uuid needs no interpreting, and local
+    recipes always have their summary/tip cached (see request_recipe). As
+    close to instant as "Next"/"Previous"."""
     try:
-        data = request_recipe(body.name)
+        data = start_recipe_by_uuid(recipe_uuid)
     except ValueError as e:
         error_text = "No he encontrado esa receta, prueba con otra."
         audio_b64, _synth_time = _synthesize_b64(error_text)
@@ -260,7 +281,7 @@ async def api_question(audio: UploadFile):
 # (correct the list, tap an idea, tick what you're missing), so synthesizing
 # speech for each round-trip would only add latency to something the user is
 # looking at anyway. Once they confirm, /confirm hands off to the Cook page
-# and speaks -- exactly like /api/recipes/select.
+# and speaks -- exactly like /api/recipes/{uuid}/start.
 
 def _pantry_error(e, status=500):
     reason = str(e)
@@ -367,7 +388,7 @@ def pantry_exclude(body: PantryExcludeRequest):
 @app.post("/api/pantry/confirm")
 def pantry_confirm():
     """Step 6 answered "yes": promotes the draft to the active cooking
-    session and speaks the opening line, same shape as /api/recipes/select
+    session and speaks the opening line, same shape as /api/recipes/{uuid}/start
     so the frontend can hand off to /cook with no special case."""
     try:
         data = pantry.confirm()
@@ -383,9 +404,11 @@ def pantry_confirm():
 # MUST be the last route registered: FastAPI/Starlette matches routes in
 # registration order, so every /api/* route and the two mounts above only
 # take effect at all because they were added first. This one matches
-# anything else -- "/", "/cook", and any client-side route react-router
-# adds later -- and always serves the same built index.html; react-router
-# reads the URL client-side and renders Picker or Cook accordingly.
+# anything else -- "/", "/cook", "/r/<uuid>" (a shared recipe link, which
+# is a real URL people paste into a browser, so it MUST return the app
+# rather than a 404), and any client-side route react-router adds later --
+# and always serves the same built index.html; react-router reads the URL
+# client-side and renders Picker, Cook or Recipe accordingly.
 @app.get("/{full_path:path}")
 def spa_catch_all(full_path: str):
     index_path = STATIC_DIST_DIR / "index.html"

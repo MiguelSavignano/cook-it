@@ -5,19 +5,14 @@ import CookingLoader from '../components/CookingLoader';
 import PantryFlow from '../components/PantryFlow';
 import { useAudioPlayer } from '../hooks/useAudioPlayer';
 import { useMicRecorder } from '../hooks/useMicRecorder';
+import { stashPendingAudio } from '../lib/pendingAudio';
 import {
-  askQuestion, getState, isActiveState, listRecipes, resetPantry, selectRecipe,
+  askQuestion, getState, isActiveState, listRecipes, resetPantry, startRecipe,
   type RecipeListItem,
 } from '../api';
 import './Picker.css';
 
 type StatusVariant = 'idle' | 'listening' | 'thinking';
-
-// A recipe just picked/created here carries a spoken greeting (summary +
-// step 1) that couldn't be played on this page without navigation killing
-// it mid-sentence -- stashed for Cook.tsx to pick up and play once mounted,
-// one beat later.
-const PENDING_AUDIO_KEY = 'cookit_pending_audio';
 
 /**
  * The recipe picker/creator ("/"): mic button (new recipe or, indirectly,
@@ -49,12 +44,9 @@ export default function Picker() {
   // through one.
   const goToCook = useCallback(
     (data: { audio_base64?: string; audio_mime?: string }) => {
-      if (data.audio_base64) {
-        sessionStorage.setItem(
-          PENDING_AUDIO_KEY,
-          JSON.stringify({ audio_base64: data.audio_base64, audio_mime: data.audio_mime }),
-        );
-      }
+      // The greeting (summary + step 1) is played on /cook, one beat
+      // later -- playing it here would be cut off by the navigation.
+      stashPendingAudio(data);
       navigate('/cook');
     },
     [navigate],
@@ -118,15 +110,16 @@ export default function Picker() {
     setPantryOpen(true);
   }
 
-  async function handleSelectRecipe(name: string) {
-    // Tapping a recipe card: starts that recipe directly, same result
-    // shape as asking for it by voice, but skips STT entirely. Local
-    // recipes always have their summary/tip cached, so this is just as
-    // close to instant as "Next"/"Previous" -- no LLM call either.
+  async function handleSelectRecipe(uuid: string) {
+    // Tapping a recipe card: starts that exact recipe (by uuid -- no name
+    // matching, no ambiguity), same result shape as asking for it by voice
+    // but skipping STT entirely. Local recipes always have their
+    // summary/tip cached, so this is just as close to instant as
+    // "Next"/"Previous" -- no LLM call either.
     setStatusVariant('thinking');
     setStatusText('🤔 Pensando…');
     try {
-      const data = await selectRecipe(name);
+      const data = await startRecipe(uuid);
       if (!data.ok) {
         if (data.audio_base64) audio.play(data.audio_base64, data.audio_mime);
         setStatusVariant('idle');

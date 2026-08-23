@@ -95,6 +95,7 @@ MVP: hand-curated recipes in JSON, example schema:
 
 ```json
 {
+  "uuid": "af60ef76-9147-4c74-b46b-8c0b0b97e7ea",
   "id": "tortilla-patatas",
   "name": "Tortilla de patatas",
   "servings": 4,
@@ -112,6 +113,13 @@ MVP: hand-curated recipes in JSON, example schema:
   ]
 }
 ```
+
+`uuid` is the recipe's identity and its shareable address (`/r/<uuid>`, see
+`src/recipe_store.py`): assigned once, written back into the file, and never
+regenerated — a link that changes on restart is not a link. Recipes generated
+by the LLM (no local match) or negotiated through the pantry flow get one too
+and are stored in `src/recipes_shared/`, which is what keeps their links
+resolving after the session that created them is over.
 
 (Note: this is the schema's original design sketch, in English for readability here — the actual recipe files in `src/recipes/` keep their content in Spanish, since that's what gets spoken to the user. See `src/recipe_engine.py` for the real field names.)
 

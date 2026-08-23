@@ -144,21 +144,35 @@ header p {
   font-size: 0.85rem;
   padding: 8px 0;
 }
+/* The card is a container, not the tap target: cooking is .recipe-card-main
+   (the whole name/servings block), and the row underneath holds the two
+   things that DON'T start cooking -- opening the recipe's own page and
+   sharing its link. See RecipeCard.tsx. */
 .recipe-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--cream-2);
+  border: 1px solid rgba(232, 112, 58, 0.18);
+  border-radius: 14px;
+  padding: 6px 8px 8px;
+  transition: background 0.12s ease;
+}
+.recipe-card:hover { background: var(--cream); }
+.recipe-card-main {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
+  width: 100%;
   text-align: left;
-  background: var(--cream-2);
-  border: 1px solid rgba(232, 112, 58, 0.18);
-  border-radius: 14px;
-  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 6px;
   cursor: pointer;
-  transition: transform 0.12s ease, background 0.12s ease;
+  transition: transform 0.12s ease;
 }
-.recipe-card:hover { background: var(--cream); }
-.recipe-card:active { transform: scale(0.97); }
+.recipe-card-main:active { transform: scale(0.97); }
 .recipe-card-name {
   font-weight: 700;
   font-size: 0.9rem;
@@ -169,6 +183,27 @@ header p {
   font-size: 0.75rem;
   color: var(--brown-soft);
 }
+.recipe-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 6px;
+  border-top: 1px solid rgba(232, 112, 58, 0.15);
+}
+.recipe-card-view {
+  border: none;
+  background: transparent;
+  color: var(--brown-soft);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 6px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.recipe-card-view:hover { color: var(--orange-dark); background: white; }
 
 /* Entry point into the "cook with what I have" flow (PantryFlow.tsx).
    Deliberately secondary to the recipe grid above it: picking a known

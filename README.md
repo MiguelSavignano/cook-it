@@ -58,13 +58,46 @@ src/
   api.py            Web API (FastAPI) -- backend for the browser voice interface,
                      serves the built frontend (see below) + /api/*
   recipe_engine.py  Shared logic: request a recipe (LLM+RAG), step navigation, router
+  recipe_store.py   Recipe identity: every recipe's uuid and where it's stored
   common.py         Session state + voice synthesis/playback
   assistant_poc.py  Push-to-talk CLI (no browser)
   next_step.py      CLI "next step" button, no voice or LLM
   frontend/         Browser UI (React + TypeScript, Vite) -- Picker "/" (pick/create a
-                     recipe) + Cook "/cook" (hands-free step-through), one SPA. `npm run
-                     build` writes to src/static_dist/, which api.py serves; run_web.sh
-                     does this for you. `npm run dev` for a fast dev loop instead
-                     (proxies /api/* to api.py -- see frontend/vite.config.ts).
+                     recipe) + Cook "/cook" (hands-free step-through) + Recipe
+                     "/r/<uuid>" (a shared recipe), one SPA. `npm run build` writes to
+                     src/static_dist/, which api.py serves; run_web.sh does this for
+                     you. `npm run dev` for a fast dev loop instead (proxies /api/* to
+                     api.py -- see frontend/vite.config.ts).
   recipes/          Local recipe database (JSON), source of truth for RAG
+  recipes_shared/   Recipes the LLM/pantry flow generated, kept so their links stay
+                     alive (created at runtime, not in git)
 ```
+
+## Sharing a recipe
+
+Every recipe has a UUID, and that UUID is its address:
+
+```
+https://<whatever host you reached Cook-It on>/r/af60ef76-9147-4c74-b46b-8c0b0b97e7ea
+```
+
+Opening it shows the whole recipe — ingredients, steps with their timers, the
+tip — without starting to cook it; "empezar a cocinar" is one tap from there.
+The 🔗 button on any recipe (on its own page, or on a card on the home screen)
+hands the link to your phone's share sheet, or copies it to the clipboard on a
+desktop.
+
+Recipes the LLM generates get a UUID too, so a dish you asked for by voice can
+be sent to someone exactly like a curated one. Two caveats, both of them the
+consequence of Cook-It being local-only:
+
+- **A link only works on the Cook-It that made it.** There is no central
+  registry — the UUID means nothing to anyone else's install, which answers
+  with "no conozco esta receta".
+- **The host has to be reachable** by whoever you send it to. On a home
+  network that means the same Wi-Fi.
+
+Curated recipes keep their UUID in their own JSON file (`src/recipes/*.json`),
+so their links survive restarts and are the same for everyone who clones the
+repo; a hand-written recipe added without one gets it assigned the first time
+it's loaded.

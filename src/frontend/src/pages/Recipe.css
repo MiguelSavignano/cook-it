@@ -1,0 +1,191 @@
+/* A shared recipe's own page (Recipe.tsx, "/r/<uuid>").
+
+   Same cream/orange kitchen palette as the picker (the variables live on
+   :root in Picker.css -- one CSS bundle for the SPA, so they're in scope
+   here), but laid out as a recipe SHEET rather than a picker: this page is
+   read top to bottom, often by someone who has just opened a link from a
+   message and has never seen this app before. */
+
+.recipe-page {
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  /* flex-start, not the default stretch: the "link not found" sheet is only
+     a few lines tall and should read as a card, not as an empty page. */
+  align-items: flex-start;
+  padding: 20px 14px 56px;
+  background: radial-gradient(circle at top, var(--cream) 0%, var(--cream-2) 100%);
+  color: var(--brown);
+  font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.recipe-sheet {
+  width: 100%;
+  max-width: 620px;
+  background: white;
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(232, 112, 58, 0.15);
+  padding: 20px 22px 26px;
+}
+
+.recipe-back {
+  border: none;
+  background: transparent;
+  color: var(--brown-soft);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 4px 0;
+  cursor: pointer;
+}
+.recipe-back:hover { color: var(--orange-dark); }
+
+.recipe-name {
+  margin: 6px 0 8px;
+  font-size: 1.9rem;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  color: var(--orange-dark);
+}
+
+.recipe-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--brown-soft);
+}
+.recipe-meta > span {
+  background: var(--cream-2);
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+.recipe-generated {
+  color: var(--orange-dark);
+  cursor: help;
+}
+
+.recipe-summary {
+  margin: 16px 0 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--brown);
+}
+
+.recipe-section { margin-top: 24px; }
+.recipe-section h2 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--brown-soft);
+}
+
+.recipe-ingredients {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.recipe-ingredients li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+/* Zebra striping instead of rules: the amounts are right-aligned across a
+   gap, and the eye needs something to carry it across the row. */
+.recipe-ingredients li:nth-child(odd) { background: var(--cream); }
+.ingredient-item { text-transform: capitalize; }
+.ingredient-amount {
+  color: var(--brown-soft);
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.recipe-steps {
+  margin: 0;
+  padding-left: 1.3em;
+  display: grid;
+  gap: 12px;
+  line-height: 1.5;
+}
+.recipe-steps li::marker {
+  color: var(--orange);
+  font-weight: 700;
+}
+.step-body { margin-right: 8px; }
+.step-timer-badge {
+  display: inline-block;
+  white-space: nowrap;
+  background: var(--cream-2);
+  color: var(--orange-dark);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.recipe-tip {
+  margin-top: 22px;
+  background: var(--cream);
+  border-left: 4px solid var(--orange-light);
+  border-radius: 0 12px 12px 0;
+  padding: 12px 14px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.recipe-actions {
+  margin-top: 26px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.recipe-start-btn {
+  flex: 1 1 240px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(145deg, var(--orange-light), var(--orange));
+  color: white;
+  font-family: inherit;
+  font-size: 1.02rem;
+  font-weight: 700;
+  padding: 14px 20px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+.recipe-start-btn:hover { filter: brightness(1.05); }
+.recipe-start-btn:active { transform: scale(0.98); }
+.recipe-start-btn:disabled { opacity: 0.6; cursor: default; }
+
+.recipe-error {
+  margin-top: 12px;
+  color: var(--orange-dark);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Link this Cook-It doesn't recognise (see Recipe.tsx) -- a dead end by
+   nature, so the page is just an explanation and a way back. */
+.recipe-missing { text-align: center; }
+.recipe-missing-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--brown);
+  margin-bottom: 6px;
+}
+.recipe-missing p {
+  color: var(--brown-soft);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+.recipe-missing .recipe-start-btn { flex: 0 1 auto; }

@@ -34,7 +34,8 @@ from pathlib import Path
 
 import requests
 
-from common import load_pantry, save_pantry, clear_pantry, save_state
+import recipe_store
+from common import load_pantry, save_pantry, clear_pantry
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
 OLLAMA_CHAT_URL = f"{OLLAMA_BASE_URL}/api/chat"
@@ -596,22 +597,19 @@ def confirm():
     if draft is None:
         raise ValueError("no_draft")
 
-    cooking = {
+    # Stored before it's cooked, not after: a dish negotiated down to what
+    # the user actually had in the fridge is exactly the kind you want to
+    # send someone, and it only has a shareable URL once it has a uuid.
+    recipe = recipe_store.remember_generated({
         "name": draft["name"],
         "servings": draft.get("servings"),
         "summary": draft.get("summary", ""),
         "ingredients": draft.get("ingredients", []),
         "steps": draft["steps"],
         "tip": draft.get("tip", ""),
-        "verified_source": False,
-        "current_step": 0,
-    }
-    save_state(cooking)
-    clear_pantry()
+    })
 
-    from recipe_engine import step_text  # local: avoids an import cycle
-    return {
-        **cooking,
-        "total_steps": len(cooking["steps"]),
-        "step_text": step_text(cooking["steps"][0]),
-    }
+    from recipe_engine import begin_recipe  # local: avoids an import cycle
+    data = begin_recipe(recipe)
+    clear_pantry()
+    return data
