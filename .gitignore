@@ -27,3 +27,7 @@ src/static_dist/
 .DS_Store
 
 images/test/
+
+# Recipes generated at runtime (LLM/pantry) and given a shareable uuid --
+# runtime state, not source (see src/recipe_store.py).
+src/recipes_shared/

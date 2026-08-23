@@ -1,0 +1,66 @@
+/* Share affordance (ShareButton.tsx). Palette comes from Picker.css's
+   :root -- one CSS bundle for the whole SPA, so the cream/orange variables
+   are in scope wherever this renders. */
+
+.share-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(232, 112, 58, 0.35);
+  background: white;
+  color: var(--orange-dark);
+  border-radius: 999px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease, transform 0.12s ease;
+}
+.share-btn:hover { background: var(--cream-2); }
+.share-btn:active { transform: scale(0.96); }
+
+.share-wrap.full .share-btn {
+  padding: 10px 18px;
+  font-size: 0.95rem;
+}
+/* On a recipe card the button is a corner affordance, not a call to
+   action: small, quiet, and out of the way of the card's own tap target. */
+.share-wrap.icon .share-btn {
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  background: transparent;
+  border-color: transparent;
+  opacity: 0.65;
+}
+.share-wrap.icon .share-btn:hover {
+  background: white;
+  border-color: rgba(232, 112, 58, 0.35);
+  opacity: 1;
+}
+
+.share-feedback {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--green-ok);
+  white-space: nowrap;
+}
+
+/* Neither the share sheet nor the clipboard worked -- show the link itself
+   so it can still be selected and copied by hand. */
+.share-fallback {
+  flex: 1 1 220px;
+  min-width: 0;
+  font-family: inherit;
+  font-size: 0.8rem;
+  color: var(--brown-soft);
+  background: var(--cream);
+  border: 1px solid rgba(232, 112, 58, 0.25);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
