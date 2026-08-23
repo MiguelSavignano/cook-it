@@ -4,7 +4,7 @@
   /* "Bimo Chef" robot palette. The whole viewport IS the device's OLED
      panel (see docs/hardware.md -- a 2.42" SSD1309 sits behind the face
      window on the real enclosure) -- so the page background itself is
-     the black "screen", with glowing blue eyes/mouth as the only face
+     the black "screen", with the glowing blue mic button as the only
      chrome. The cream/white body + chef hat from the reference art are
      the physical printed case, not something the display renders. */
   --screen: #0B0C0E;
@@ -125,11 +125,10 @@
 .dot.current { background: var(--screen-blue); box-shadow: 0 0 0 2px var(--screen-glow); }
 .progress-label { font-size: 0.64rem; color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
 
-/* Slot shared by Face and StepTimer (see Cook.tsx) -- whichever one is
-   relevant gets mounted here, filling essentially the entire viewport
-   (topbar/step strip float thinly at the edges). Tapping it starts/stops
-   the same voice-question flow the old mic button drove. */
-.face-wrap {
+/* Slot shared by the mic button and StepTimer (see Cook.tsx) -- whichever
+   one is relevant gets mounted here, filling essentially the entire
+   viewport (topbar/step strip float thinly at the edges). */
+.voice-wrap {
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
@@ -138,18 +137,61 @@
   align-items: center;
   justify-content: center;
   gap: 1.5vh;
-  cursor: pointer;
-  touch-action: manipulation;
   position: relative;
 }
-.face-hint {
+.voice-hint {
   font-size: 0.72rem;
   color: var(--ink-soft);
   text-align: center;
   min-height: 1.1em;
 }
 
-/* Pinned thin strip under the face -- the face keeps most of the
+/* The tap-to-ask target. Same job as the Picker's #micBtn, but sized off
+   vh (this page is landscape-first and the button is the main thing in the
+   slot) and drawn in the screen's blue rather than the site's orange --
+   the rest of this route is the black OLED panel, see the palette above. */
+.cook-mic {
+  width: 22vh;
+  height: 22vh;
+  max-width: 128px;
+  max-height: 128px;
+  min-width: 72px;
+  min-height: 72px;
+  border-radius: 50%;
+  border: 2px solid var(--screen-blue);
+  background: rgba(85, 216, 242, 0.08);
+  box-shadow: 0 0 18px var(--screen-glow);
+  font-size: 3rem;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.cook-mic:active { transform: scale(0.96); }
+.cook-mic.listening {
+  background: rgba(216, 57, 31, 0.18);
+  border-color: #ff7a5c;
+  animation: cook-mic-pulse 1.1s infinite;
+}
+.cook-mic.thinking {
+  background: rgba(224, 169, 92, 0.18);
+  border-color: #e0a95c;
+  animation: cook-mic-glow 1.4s infinite;
+}
+@keyframes cook-mic-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 122, 92, 0.45); }
+  70%  { box-shadow: 0 0 0 18px rgba(255, 122, 92, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 122, 92, 0); }
+}
+@keyframes cook-mic-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(224, 169, 92, 0.35); }
+  50%      { box-shadow: 0 0 26px rgba(224, 169, 92, 0.75); }
+}
+
+/* Pinned thin strip under the mic button -- the button keeps most of the
    screen, this is a caption/status strip, not a competing panel. */
 .step-area {
   width: 100%;
@@ -208,8 +250,8 @@
 }
 
 /* Extra-short landscape viewports (phone lying flat, browser chrome
-   eating into the height): the eyes/mouth already shrink on their own
-   (sized off vh, see Face.css) -- this just reclaims a bit more room for
+   eating into the height): the mic button already shrinks on its own
+   (sized off vh, see .cook-mic) -- this just reclaims a bit more room for
    the step strip and tightens its own padding. */
 @media (orientation: landscape) and (max-height: 380px) {
   .step-area { max-height: 42vh; }

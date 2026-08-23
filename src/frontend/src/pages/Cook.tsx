@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Face from '../components/Face/Face';
 import StepTimer from '../components/StepTimer';
-import { DEFAULT_FACE_HINTS, type FaceState } from '../components/Face/types';
 import { useAudioPlayer } from '../hooks/useAudioPlayer';
 import { useMicRecorder } from '../hooks/useMicRecorder';
 import { useStepTimer } from '../hooks/useStepTimer';
@@ -12,6 +10,24 @@ import {
   type RecipeState, type StepData, type VoiceResponse,
 } from '../api';
 import './Cook.css';
+
+/**
+ * What the voice flow is currently doing: idle (waiting), listening
+ * (recording), thinking (waiting for the LLM), speaking (an answer's audio
+ * is playing), happy (recipe finished), confused (something went wrong).
+ * Drives the mic button's styling and the caption under it, and decides
+ * whether the step timer gets the slot instead (see showTimer below).
+ */
+type VoiceState = 'idle' | 'listening' | 'thinking' | 'speaking' | 'happy' | 'confused';
+
+const DEFAULT_HINTS: Record<VoiceState, string> = {
+  idle: 'Toca el micrófono para preguntar',
+  listening: '🎙️ Escuchando…',
+  thinking: '🤔 Pensando…',
+  speaking: '',
+  happy: 'Toca el micrófono para pedir otra receta',
+  confused: '',
+};
 
 type CookView =
   | { kind: 'loading' }
@@ -24,7 +40,7 @@ type CookView =
 const PENDING_AUDIO_KEY = 'cookit_pending_audio';
 
 /**
- * The hands-free cooking route: animated face + step navigation. Separate
+ * The hands-free cooking route: mic button + step navigation. Separate
  * page from Picker ("/") on purpose -- different layout (landscape-mobile,
  * buttons pinned to the screen edges), different job (step through a
  * recipe hands-free, not pick/create one).
@@ -35,17 +51,17 @@ export default function Cook() {
   const stepTimer = useStepTimer();
 
   const [view, setView] = useState<CookView>({ kind: 'loading' });
-  const [faceState, setFaceStateRaw] = useState<FaceState>('idle');
-  const [faceHint, setFaceHint] = useState<string | undefined>(undefined);
+  const [voiceState, setVoiceStateRaw] = useState<VoiceState>('idle');
+  const [voiceHint, setVoiceHint] = useState<string | undefined>(undefined);
   const [userText, setUserText] = useState('');
   const [answer, setAnswer] = useState<string | null>(null);
   const [navBusy, setNavBusy] = useState(false);
 
   // `hint` overrides the state's default caption (e.g. a specific error
-  // message); omit it to fall back to DEFAULT_FACE_HINTS[state].
-  const setFaceState = useCallback((state: FaceState, hint?: string) => {
-    setFaceStateRaw(state);
-    setFaceHint(hint);
+  // message); omit it to fall back to DEFAULT_HINTS[state].
+  const setVoiceState = useCallback((state: VoiceState, hint?: string) => {
+    setVoiceStateRaw(state);
+    setVoiceHint(hint);
   }, []);
 
   // If there's audio, "speaking" until it ends, then back to idle;
@@ -54,13 +70,13 @@ export default function Cook() {
   const speak = useCallback(
     (audioBase64?: string, audioMime?: string) => {
       if (audioBase64) {
-        setFaceState('speaking');
-        audio.play(audioBase64, audioMime, () => setFaceState('idle'));
+        setVoiceState('speaking');
+        audio.play(audioBase64, audioMime, () => setVoiceState('idle'));
       } else {
-        setFaceState('idle');
+        setVoiceState('idle');
       }
     },
-    [audio, setFaceState],
+    [audio, setVoiceState],
   );
 
   const applyState = useCallback((state: RecipeState) => {
@@ -72,11 +88,11 @@ export default function Cook() {
   const renderFinished = useCallback(
     (d: StepData) => {
       stepTimer.setSeconds(null);
-      setFaceState('happy');
+      setVoiceState('happy');
       setView({ kind: 'finished', name: d.name || '', tip: d.tip });
       // eslint-disable-next-line react-hooks/exhaustive-deps
     },
-    [setFaceState],
+    [setVoiceState],
   );
 
   const refreshState = useCallback(async () => {
@@ -105,46 +121,46 @@ export default function Cook() {
 
   const sendAudio = useCallback(
     async (blob: Blob) => {
-      setFaceState('thinking');
+      setVoiceState('thinking');
       try {
         const data = await askQuestion(blob);
         speak(data.audio_base64, data.audio_mime);
         if (!data.ok) {
-          setFaceState('confused', data.spoken_text || 'No te he entendido, prueba otra vez');
+          setVoiceState('confused', data.spoken_text || 'No te he entendido, prueba otra vez');
           return;
         }
         setUserText(data.user_text ? `"${data.user_text}"` : '');
         handleVoiceResult(data);
       } catch (err) {
-        setFaceState('confused', 'Error hablando con el servidor 😕');
+        setVoiceState('confused', 'Error hablando con el servidor 😕');
         console.error(err);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     },
-    [speak, setFaceState],
+    [speak, setVoiceState],
   );
 
   const mic = useMicRecorder({
     onRecorded: sendAudio,
     onError: (err) => {
-      setFaceState('confused', 'No pude acceder al micrófono 😕');
+      setVoiceState('confused', 'No pude acceder al micrófono 😕');
       console.error(err);
     },
   });
 
   // Recording just started -- clear whatever question/answer was on screen
-  // and switch the face to "listening" (mirrors the old startRecording()).
+  // and switch the mic to "listening" (mirrors the old startRecording()).
   useEffect(() => {
     if (mic.recording) {
       setUserText('');
       setAnswer(null);
-      setFaceState('listening');
+      setVoiceState('listening');
     }
-  }, [mic.recording, setFaceState]);
+  }, [mic.recording, setVoiceState]);
 
   async function buttonAction(action: () => Promise<VoiceResponse<StepData>>) {
     setNavBusy(true);
-    setFaceState('thinking');
+    setVoiceState('thinking');
     setUserText('');
     setAnswer(null);
     try {
@@ -162,7 +178,7 @@ export default function Cook() {
         await refreshState();
       }
     } catch (err) {
-      setFaceState('confused', 'Error hablando con el servidor 😕');
+      setVoiceState('confused', 'Error hablando con el servidor 😕');
       console.error(err);
     } finally {
       setNavBusy(false);
@@ -204,7 +220,7 @@ export default function Cook() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const showTimer = view.kind === 'active' && faceState === 'idle' && stepTimer.seconds !== null;
+  const showTimer = view.kind === 'active' && voiceState === 'idle' && stepTimer.seconds !== null;
   const finished = view.kind === 'finished';
 
   return (
@@ -244,7 +260,7 @@ export default function Cook() {
           </div>
         </div>
 
-        <div className="face-wrap" title="Toca la cara para preguntar" onClick={() => mic.toggle()}>
+        <div className="voice-wrap">
           {showTimer && view.kind === 'active' ? (
             <StepTimer
               seconds={stepTimer.seconds as number}
@@ -256,8 +272,15 @@ export default function Cook() {
             />
           ) : (
             <>
-              <Face state={faceState} />
-              <div className="face-hint">{faceHint ?? DEFAULT_FACE_HINTS[faceState]}</div>
+              <button
+                className={`cook-mic ${voiceState !== 'idle' ? voiceState : ''}`}
+                title="Toca y habla"
+                aria-label="Hacer una pregunta por voz"
+                onClick={() => mic.toggle()}
+              >
+                🎤
+              </button>
+              <div className="voice-hint">{voiceHint ?? DEFAULT_HINTS[voiceState]}</div>
             </>
           )}
         </div>

@@ -8,7 +8,7 @@ export type StepTimerPhase = 'ready' | 'running' | 'finished';
  * Owns the countdown for whichever step is current -- lives in the Cook
  * page (not in the StepTimer component) so the controller/interval keeps
  * running even while StepTimer isn't the thing being rendered (a voice
- * interaction shows Face instead, but a running countdown shouldn't pause
+ * interaction shows the mic instead, but a running countdown shouldn't pause
  * just because you asked a question mid-timer).
  */
 export function useStepTimer() {

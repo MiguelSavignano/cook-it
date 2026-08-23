@@ -13,7 +13,7 @@ interface StepTimerProps {
 }
 
 /**
- * Takes over the exact spot Face occupies (see Cook.tsx) whenever the
+ * Takes over the exact spot the mic button occupies (see Cook.tsx) whenever the
  * current step needs one and there's no voice interaction in progress.
  * Purely presentational -- the actual countdown lives in useStepTimer,
  * owned by Cook.tsx, so it keeps ticking even while this isn't mounted.
