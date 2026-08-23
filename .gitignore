@@ -25,6 +25,12 @@ src/voices/
 # frontend/vite.config.ts's outDir), so it needs its own entry here.
 src/static_dist/
 
+# Claude Code's own working area -- agent worktrees and session state. Git
+# records a directory with its own .git as a submodule, so this landed in
+# the index as a gitlink with no .gitmodules: a clone would get an empty
+# folder and a broken `git submodule update`.
+.claude/
+
 # OS/editor cruft
 .DS_Store
 
