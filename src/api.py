@@ -34,14 +34,16 @@ import tempfile
 import time
 from pathlib import Path
 
-from fastapi import FastAPI, UploadFile
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi import FastAPI, Request, UploadFile
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from faster_whisper import WhisperModel
 from pydantic import BaseModel
 
+import drive
 import pantry
 import recipe_store
+import settings
 from common import load_state, clear_state, synthesize
 from recipe_engine import (
     load_recipes, next_step, previous_step, process_question, start_recipe_by_uuid,
@@ -108,6 +110,31 @@ def list_recipes():
         {"uuid": r["uuid"], "name": r["name"], "servings": r.get("servings"), "tip": r.get("tip", "")}
         for r in recipes.values()
     ]
+
+
+@app.get("/api/recipes/seed")
+def recipe_seed():
+    """The factory recipes that ship with the project, for a browser whose
+    library is empty. Declared before /api/recipes/{uuid} on purpose --
+    FastAPI matches routes in order and would otherwise read "seed" as a
+    uuid."""
+    return [recipe_store.public_recipe(r) for r in recipe_store.load_curated().values()]
+
+
+class LibraryUpload(BaseModel):
+    recipes: list[dict]
+
+
+@app.post("/api/library")
+def save_library(body: LibraryUpload):
+    """The browser mirroring its library here.
+
+    The browser owns the recipes (see recipe_store's docstring); this copy
+    exists so the server can do the two things a browser can't: match free
+    speech against your recipes, and resolve a /r/<uuid> link for someone
+    else's device. It replaces the mirror wholesale, so a recipe you deleted
+    in the browser stops being cookable here too."""
+    return {"ok": True, "stored": recipe_store.save_library(body.recipes)}
 
 
 @app.get("/api/recipes/{recipe_uuid}")
@@ -409,6 +436,118 @@ def pantry_confirm():
 # rather than a 404), and any client-side route react-router adds later --
 # and always serves the same built index.html; react-router reads the URL
 # client-side and renders Picker, Cook or Recipe accordingly.
+# --- Google Drive -------------------------------------------------------
+# Off unless settings.yml says otherwise, and every call says WHY it can't
+# work rather than failing blank -- the setup has a Google Cloud step that
+# no program can do on the user's behalf (see drive.py).
+
+def _drive_guard():
+    """None if Drive is usable, else the response explaining what's missing."""
+    if not settings.get("drive.enabled"):
+        return JSONResponse(
+            {"ok": False, "reason": "disabled",
+             "error": "Google Drive está desactivado (drive.enabled en settings.yml)."},
+            status_code=409,
+        )
+    return None
+
+
+def _drive_redirect_uri(request: Request):
+    """Must match, character for character, a redirect URI registered in the
+    Google Cloud client -- so it's derived from the URL the user actually
+    reached us on, not hardcoded."""
+    return str(request.url_for("drive_callback"))
+
+
+@app.get("/api/drive/status")
+def drive_status(request: Request):
+    """What the settings UI needs to know which button to offer."""
+    return {**drive.status(), "redirect_uri": _drive_redirect_uri(request)}
+
+
+@app.post("/api/drive/connect")
+def drive_connect(request: Request):
+    """Returns the Google consent URL for the browser to visit. The token
+    exchange happens in /api/drive/callback, below."""
+    guard = _drive_guard()
+    if guard:
+        return guard
+    try:
+        return {"ok": True, "auth_url": drive.auth_url(_drive_redirect_uri(request))}
+    except drive.DriveError as e:
+        return JSONResponse({"ok": False, "reason": "not_configured", "error": str(e)}, status_code=400)
+
+
+@app.get("/api/drive/callback", name="drive_callback")
+def drive_callback(request: Request, code: str = "", error: str = ""):
+    """Where Google sends the browser back. Returns a page rather than JSON:
+    a person is looking at this tab."""
+    def page(title, detail):
+        return HTMLResponse(
+            f"<!doctype html><meta charset=utf-8>"
+            f"<title>Cook-It · Google Drive</title>"
+            f"<body style='font-family:system-ui;padding:40px;max-width:32em;margin:auto'>"
+            f"<h1>{title}</h1><p>{detail}</p>"
+            f"<p><a href='/'>Volver a Cook-It</a></p>"
+        )
+
+    if error == "access_denied":
+        # By far the most common failure for a self-hosted app: the consent
+        # screen is in Testing and the account isn't on its test-user list.
+        # Being the project's owner does NOT grant access by itself.
+        return page(
+            "Google bloqueó el acceso",
+            "Tu cuenta no está en la lista de usuarios de prueba de la pantalla "
+            "de consentimiento. Añádela en <b>Google Auth Platform &rarr; Público "
+            "&rarr; Usuarios de prueba</b> y vuelve a intentarlo.<br><br>"
+            "Ojo: en modo <i>Testing</i> el token caduca a los 7 días. Para uso "
+            "diario, publica la app (el scope <code>drive.file</code> no es "
+            "sensible, así que no necesita auditoría).",
+        )
+    if error:
+        return page("No se conectó", f"Google devolvió: {error}")
+    if not code:
+        return page("No se conectó", "Google no devolvió ningún código.")
+    try:
+        drive.exchange_code(code, _drive_redirect_uri(request))
+    except drive.DriveError as e:
+        return page("No se conectó", str(e))
+    return page("Google Drive conectado", "Ya puedes sincronizar tus recetas.")
+
+
+@app.post("/api/drive/disconnect")
+def drive_disconnect():
+    """Forgets the token on this machine. Revoking the access itself is done
+    from the Google account's own permissions page."""
+    drive.disconnect()
+    return {"ok": True}
+
+
+@app.post("/api/drive/push")
+def drive_push():
+    """Local recipes -> Drive, as Markdown."""
+    guard = _drive_guard()
+    if guard:
+        return guard
+    try:
+        return {"ok": True, "result": drive.push()}
+    except drive.DriveError as e:
+        return JSONResponse({"ok": False, "reason": "drive_error", "error": str(e)}, status_code=400)
+
+
+@app.post("/api/drive/pull")
+def drive_pull():
+    """Drive -> local. Curated (git-tracked) recipes are reported, not
+    overwritten -- see drive.pull()."""
+    guard = _drive_guard()
+    if guard:
+        return guard
+    try:
+        return {"ok": True, "result": drive.pull()}
+    except drive.DriveError as e:
+        return JSONResponse({"ok": False, "reason": "drive_error", "error": str(e)}, status_code=400)
+
+
 @app.get("/{full_path:path}")
 def spa_catch_all(full_path: str):
     index_path = STATIC_DIST_DIR / "index.html"

@@ -30,6 +30,21 @@ src/static_dist/
 
 images/test/
 
+# Google Drive credentials. drive_client.json is your OAuth client from
+# Google Cloud; drive_token.json is the token it produced -- that one is a
+# key to your Drive, treat it like a password (see src/drive.py).
+src/drive_client.json
+src/drive_token.json
+client_secret*.json
+
+# YOUR recipe library. It lives in the browser (IndexedDB) and syncs with
+# Google Drive; this is only the mirror the server needs to match speech and
+# resolve shared links. Never source -- see src/recipe_store.py.
+src/recipes_library/
+
 # Recipes generated at runtime (LLM/pantry) and given a shareable uuid --
 # runtime state, not source (see src/recipe_store.py).
 src/recipes_shared/
+
+
+client_secret.json

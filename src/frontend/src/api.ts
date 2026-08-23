@@ -13,7 +13,7 @@
  */
 import type { Step } from './lib/timer';
 
-const apiUrl = (path: string) => `${import.meta.env.BASE_URL}${path}`;
+export const apiUrl = (path: string) => `${import.meta.env.BASE_URL}${path}`;
 
 export interface Ingredient {
   item: string;
@@ -197,6 +197,9 @@ export interface PantryError {
 
 export type PantryResponse = PantryOk | PantryError;
 
+/** The project's factory recipes, to fill an empty browser library. */
+export const getSeedRecipes = () => getJSON<Recipe[]>('api/recipes/seed');
+
 export const getPantryState = () => getJSON<PantryState>('api/pantry/state');
 
 export const resetPantry = () => postJSON<{ ok: boolean }>('api/pantry/reset');
@@ -223,3 +226,48 @@ export const excludePantryItems = (items: string[]) =>
 
 /** Step 6 confirmed: promotes the draft to the active cooking session. */
 export const confirmPantryRecipe = () => postJSON<VoiceResponse>('api/pantry/confirm');
+
+// --- Google Drive -----------------------------------------------------
+// Off unless settings.yml enables it; every call reports why it can't work
+// rather than failing blank, because the setup has a Google Cloud step the
+// app can't do for you (see src/drive.py).
+
+export interface DriveStatus {
+  enabled: boolean;
+  /** drive_client.json is in place (the Google Cloud half is done). */
+  configured: boolean;
+  /** A token has been obtained: syncing will actually work. */
+  connected: boolean;
+  folder: string;
+  local_recipes: number;
+  /** The exact URI to register in the Google Cloud client. */
+  redirect_uri: string;
+}
+
+export interface DriveSyncResult {
+  ok: boolean;
+  error?: string;
+  result?: {
+    folder: string;
+    created?: string[];
+    updated?: (string | { file: string; uuid: string })[];
+    added?: { file: string; uuid: string }[];
+    skipped?: { file: string; reason: string }[];
+    failed?: { file: string; error: string }[];
+    /** The recipes themselves, on a pull, so the browser can store them. */
+    recipes?: Recipe[];
+  };
+}
+
+export const getDriveStatus = () => getJSON<DriveStatus>('api/drive/status');
+
+export const connectDrive = () =>
+  postJSON<{ ok: boolean; auth_url?: string; error?: string }>('api/drive/connect');
+
+export const disconnectDrive = () => postJSON<{ ok: boolean }>('api/drive/disconnect');
+
+/** Local recipes -> Drive, as Markdown. */
+export const pushToDrive = () => postJSON<DriveSyncResult>('api/drive/push');
+
+/** Drive -> local. Curated recipes are reported, never overwritten. */
+export const pullFromDrive = () => postJSON<DriveSyncResult>('api/drive/pull');

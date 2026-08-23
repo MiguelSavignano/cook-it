@@ -44,6 +44,8 @@ ENV_OVERRIDES = {
     "vision.moondream_model": "COOKIT_MOONDREAM_MODEL",
     "vision.claude_model": "COOKIT_CLAUDE_MODEL",
     "vision.keep_alive": "COOKIT_VISION_KEEP_ALIVE",
+    "drive.enabled": "COOKIT_DRIVE_ENABLED",
+    "drive.folder": "COOKIT_DRIVE_FOLDER",
     "cli.mic_device": "COOKIT_MIC_DEVICE",
     "cli.record_seconds": "COOKIT_RECORD_SECONDS",
 }

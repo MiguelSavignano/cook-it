@@ -102,11 +102,17 @@ def step_text(step):
 
 
 def load_recipes():
-    """The curated recipes, keyed by name. Reading them goes through
-    recipe_store so every recipe carries its uuid (its shareable address --
-    see that module) wherever it ends up: the picker, a cooking session, or
-    an LLM prompt."""
-    return recipe_store.load_curated()
+    """Every recipe this install can cook, keyed by name: the browser's
+    library (mirrored server-side) plus the seed that ships with the project.
+    Reading them goes through recipe_store so every recipe carries its uuid
+    (its shareable address -- see that module) wherever it ends up: the
+    picker, a cooking session, or an LLM prompt."""
+    # The browser's library first, the shipped seed behind it: a recipe the
+    # user has edited should win over the factory copy of the same dish.
+    recipes = {r["name"]: recipe_store.library_recipe(r) for r in recipe_store.load_library() if r.get("name")}
+    for name, recipe in recipe_store.load_curated().items():
+        recipes.setdefault(name, recipe)
+    return recipes
 
 
 # Common filler words that shouldn't count when matching a recipe name against

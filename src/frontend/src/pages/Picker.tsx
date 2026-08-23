@@ -2,13 +2,15 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RecipeList from '../components/RecipeList';
 import CookingLoader from '../components/CookingLoader';
+import DriveSync from '../components/DriveSync';
+import { bootstrap, getAll } from '../lib/recipeStore';
 import ThemeToggle from '../components/ThemeToggle';
 import PantryFlow from '../components/PantryFlow';
 import { useAudioPlayer } from '../hooks/useAudioPlayer';
 import { useMicRecorder } from '../hooks/useMicRecorder';
 import { stashPendingAudio } from '../lib/pendingAudio';
 import {
-  askQuestion, getState, isActiveState, listRecipes, resetPantry, startRecipe,
+  askQuestion, getState, isActiveState, resetPantry, startRecipe,
   type RecipeListItem,
 } from '../api';
 import './Picker.css';
@@ -147,7 +149,11 @@ export default function Picker() {
       }
       resetToIdle();
       try {
-        setRecipes(await listRecipes());
+        // The library lives in this browser (lib/recipeStore.ts), so the list
+        // comes from there -- instant, and it works with the server's recipe
+        // side of things unreachable. bootstrap() fills an empty browser from
+        // the project's seed recipes and mirrors the result to the server.
+        setRecipes(await bootstrap());
       } catch (err) {
         console.error(err);
         setRecipes([]);
@@ -191,6 +197,7 @@ export default function Picker() {
             <button className="pantry-open-btn" disabled={busy} onClick={openPantry}>
               📷 …o cocina con lo que tengas
             </button>
+            <DriveSync onLibraryChange={() => void getAll().then(setRecipes)} />
           </div>
         )}
       </div>

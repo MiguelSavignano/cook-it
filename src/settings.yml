@@ -64,6 +64,19 @@ vision:
   #                                                [COOKIT_VISION_KEEP_ALIVE]
   keep_alive: 30m
 
+# Google Drive: your recipes as Markdown files in a folder you own. OFF by
+# default -- it is the only part of Cook-It that talks to the internet, and
+# turning it on takes a one-time setup in Google Cloud (see src/drive.py).
+drive:
+  # Nothing about Drive happens while this is false, not even a check.
+  #                                                    [COOKIT_DRIVE_ENABLED]
+  enabled: true
+
+  # The folder Cook-It creates and syncs into. It only ever sees files it
+  # created itself (OAuth scope drive.file), so this never collides with a
+  # folder of yours that happens to share the name.     [COOKIT_DRIVE_FOLDER]
+  folder: Cook-It
+
 # The push-to-talk CLI scripts only (assistant_poc.py / next_step.py). The web
 # app never reads these -- the browser does its own recording.
 cli:
