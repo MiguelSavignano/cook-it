@@ -1,0 +1,75 @@
+# Cook-It settings -- the one place the app's configuration lives, and it IS
+# committed: what model answers questions or which voice speaks is part of how
+# this project is put together, not a per-machine secret. (There are no
+# secrets here at all: everything Cook-It talks to runs on this machine.)
+#
+# Two ways to change a value without editing this file:
+#   - settings.local.yml, next to this one (gitignored): same shape, only the
+#     keys you want to override. That's the place for machine-specific things
+#     like your mic device or an Ollama running on another box.
+#   - an environment variable, which wins over both -- handy for a one-off
+#     run: OLLAMA_MODEL=llama3 ./run_web.sh
+# The variable that overrides each key is named in the comment above it; see
+# settings.py for the full table.
+
+ollama:
+  # Where Ollama is reachable. Point it at another machine on your network if
+  # it isn't running on the same box as Cook-It.        [OLLAMA_BASE_URL]
+  base_url: http://localhost:11434
+
+  # Two separate models, picked for what each call needs -- see
+  # docs/feasibility.md §11 for the comparison behind these defaults. Both
+  # must already be pulled (`ollama pull <name>`) and fit in your RAM.
+
+  # Generates new recipes -- picked for speed, since that's the longer
+  # response.                                                [OLLAMA_MODEL]
+  model: gemma3
+
+  # Answers follow-up questions while you cook -- picked for output quality,
+  # since answers are short and raw speed matters less.
+  #                                                 [OLLAMA_QUESTION_MODEL]
+  question_model: qwen2.5:3b
+
+voice:
+  # Which Piper voice speaks. Must be a name from
+  # https://huggingface.co/rhasspy/piper-voices (e.g. es_ES-carlfm-x_low) --
+  # setup.sh downloads whichever one this is.                [COOKIT_VOICE]
+  piper: es_ES-davefx-medium
+
+# "Cocina con lo que tienes": reading a photo of your ingredients (pantry.py).
+vision:
+  # Who reads the photo:
+  #   ollama    -> vision.ollama_model below, a multimodal Ollama model.
+  #   moondream -> vision.moondream_model, ~1.2 GB resident: the only local
+  #                option that fits a Pi 5 alongside STT/TTS/the text model.
+  #   claude    -> shells out to the Claude Code CLI. Most accurate by a
+  #                distance, but it NEEDS THE NETWORK -- the one setting in
+  #                this file that breaks the "everything runs here" rule,
+  #                which is why it is not the default.  [COOKIT_VISION_BACKEND]
+  backend: ollama
+
+  # Used when backend is "ollama". gemma3's default tag is the 4b, which is
+  # multimodal but wants ~4 GB resident (docs/feasibility.md §11).
+  #                                                     [COOKIT_VISION_MODEL]
+  ollama_model: gemma3
+
+  # Used when backend is "moondream".                 [COOKIT_MOONDREAM_MODEL]
+  moondream_model: moondream
+
+  # Used when backend is "claude".                       [COOKIT_CLAUDE_MODEL]
+  claude_model: sonnet
+
+  # How long Ollama keeps the vision model resident. Cold start is ~180s on
+  # CPU vs ~0.4s per call once loaded, so keep this generous.
+  #                                                [COOKIT_VISION_KEEP_ALIVE]
+  keep_alive: 30m
+
+# The push-to-talk CLI scripts only (assistant_poc.py / next_step.py). The web
+# app never reads these -- the browser does its own recording.
+cli:
+  # ALSA device for `arecord`, machine-specific. List yours with `arecord -l`.
+  # A good candidate for settings.local.yml.            [COOKIT_MIC_DEVICE]
+  mic_device: plughw:1,0
+
+  # Seconds recorded per push-to-talk turn.         [COOKIT_RECORD_SECONDS]
+  record_seconds: 7

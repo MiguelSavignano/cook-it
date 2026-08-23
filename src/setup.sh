@@ -3,18 +3,20 @@
 # see .gitignore). Doesn't touch Ollama -- that's a separate, system-level
 # install, see the root README's Requirements section.
 #
-# Voice: set COOKIT_VOICE to pick a different Piper voice than the default
-# (must be a name from https://huggingface.co/rhasspy/piper-voices, e.g.
-# "es_MX-claude-high") -- see also the COOKIT_VOICE var read by common.py.
+# Voice: whichever one settings.yml names under voice.piper gets downloaded
+# (override it in settings.local.yml, or with COOKIT_VOICE for one run). Must
+# be a name from https://huggingface.co/rhasspy/piper-voices.
 set -e
 cd "$(dirname "$0")"
 
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -q --upgrade pip
-pip install -q piper-tts faster-whisper requests fastapi "uvicorn[standard]" python-multipart
+pip install -q piper-tts faster-whisper requests fastapi "uvicorn[standard]" python-multipart pyyaml
 
-VOICE="${COOKIT_VOICE:-es_ES-davefx-medium}"
+# Asked of settings.py rather than duplicated here, so the voice this
+# downloads can never drift from the one the app then tries to speak with.
+VOICE="$(python3 -c 'import settings; print(settings.get("voice.piper"))')"
 # Piper voice names are "<locale>-<name>-<quality>", e.g. "es_ES-davefx-medium"
 # -> locale=es_ES, name=davefx, quality=medium, lang=es (locale's prefix).
 # That's also the HF repo's directory layout: <lang>/<locale>/<name>/<quality>/

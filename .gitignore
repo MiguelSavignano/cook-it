@@ -3,8 +3,10 @@ src/.venv/
 **/__pycache__/
 *.pyc
 
-# Local secrets/config
-.env
+# Per-machine settings overrides. The shared config (src/settings.yml) IS
+# committed -- see src/settings.py for the precedence; this is only for what
+# genuinely differs per machine, like your mic device.
+src/settings.local.yml
 
 # TLS cert -- self-signed, regenerated automatically by run_web.sh
 src/certs/

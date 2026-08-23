@@ -36,20 +36,36 @@ For this to work, the machine it runs on needs:
 All three are 100% local — none of this calls a cloud service. See `docs/voice.md` for the
 STT/TTS details and `docs/feasibility.md` for the real measured latency/RAM numbers.
 
-## Environment variables
+## Settings
 
-None are required if everything runs on the same machine with the default setup — they only
-matter for adapting the app to a different machine/mic. See [`.env.example`](.env.example) for
-the full list with defaults:
+All of it lives in [`src/settings.yml`](src/settings.yml), which **is committed** — there are no
+secrets in it (Cook-It talks to nothing but the machine it runs on), and which model answers
+your questions or which voice speaks is part of how the project is put together. Nothing has to
+be set up: every value already has a working default for a single-machine install.
 
-| Variable | What it's for | Default |
+| Setting | What it's for | Default |
 |---|---|---|
-| `OLLAMA_BASE_URL` | Where Ollama is — only needed if it's not on `localhost` | `http://localhost:11434` |
-| `OLLAMA_MODEL` | Model used to generate new recipes (picked for speed) | `gemma3` |
-| `OLLAMA_QUESTION_MODEL` | Model used to answer follow-up questions (picked for quality) | `qwen2.5:3b` |
-| `COOKIT_VOICE` | Which Piper voice to use (a name from [rhasspy/piper-voices](https://huggingface.co/rhasspy/piper-voices)) | `es_ES-davefx-medium` |
-| `COOKIT_MIC_DEVICE` | ALSA mic device (CLI scripts only, not the web app) | `plughw:1,0` |
-| `COOKIT_RECORD_SECONDS` | Seconds recorded per turn (CLI only) | `7` |
+| `ollama.base_url` | Where Ollama is — only needed if it's not on `localhost` | `http://localhost:11434` |
+| `ollama.model` | Model used to generate new recipes (picked for speed) | `gemma3` |
+| `ollama.question_model` | Model used to answer follow-up questions (picked for quality) | `qwen2.5:3b` |
+| `voice.piper` | Which Piper voice to use (a name from [rhasspy/piper-voices](https://huggingface.co/rhasspy/piper-voices)) | `es_ES-davefx-medium` |
+| `vision.backend` | Who reads the pantry photo: `ollama`, `moondream` or `claude` (the last one needs the network) | `ollama` |
+| `vision.ollama_model` / `vision.moondream_model` / `vision.claude_model` | The model each backend uses | `gemma3` / `moondream` / `sonnet` |
+| `vision.keep_alive` | How long Ollama keeps the vision model resident (cold start is ~180s on CPU) | `30m` |
+| `cli.mic_device` | ALSA mic device (CLI scripts only, not the web app) | `plughw:1,0` |
+| `cli.record_seconds` | Seconds recorded per turn (CLI only) | `7` |
+
+To change something without editing the committed file, in order of precedence:
+
+1. **An environment variable**, for a one-off run — `OLLAMA_MODEL=llama3 ./run_web.sh`. The
+   variable for each setting is named in `settings.yml`'s comments and in `src/settings.py`.
+2. **`src/settings.local.yml`** (gitignored, same shape, only the keys you want) for what
+   genuinely differs on your machine — your mic device, an Ollama on another box:
+
+   ```yaml
+   cli:
+     mic_device: plughw:2,0
+   ```
 
 ## Structure
 
@@ -69,6 +85,7 @@ src/
                      you. `npm run dev` for a fast dev loop instead (proxies /api/* to
                      api.py -- see frontend/vite.config.ts).
   recipes/          Local recipe database (JSON), source of truth for RAG
+  settings.yml      All configuration, committed (settings.py reads it)
   recipes_shared/   Recipes the LLM/pantry flow generated, kept so their links stay
                      alive (created at runtime, not in git)
 ```

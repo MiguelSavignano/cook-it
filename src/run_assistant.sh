@@ -10,6 +10,4 @@ if [ ! -d .venv ]; then
 fi
 source .venv/bin/activate
 
-[ -f ../.env ] && set -a && source ../.env && set +a
-
 python3 assistant_poc.py

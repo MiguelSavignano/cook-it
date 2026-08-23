@@ -8,7 +8,6 @@ recipe_engine.py / common.py, shared with the web API (api.py).
 
 Usage: run via poc/run_assistant.sh (which activates the venv).
 """
-import os
 import subprocess
 import sys
 import time
@@ -16,14 +15,15 @@ from pathlib import Path
 
 from faster_whisper import WhisperModel
 
+import settings
 from common import speak
 from recipe_engine import process_command
 
 BASE_DIR = Path(__file__).parent
-RECORD_SECONDS = int(os.environ.get("COOKIT_RECORD_SECONDS", "7"))
+RECORD_SECONDS = settings.get("cli.record_seconds")
 # `arecord -l` lists your devices, e.g. "plughw:1,0" -- machine-specific, so
 # this is NOT meant to work out of the box, override it via env var.
-MIC_DEVICE = os.environ.get("COOKIT_MIC_DEVICE", "plughw:1,0")
+MIC_DEVICE = settings.get("cli.mic_device")
 REC_WAV = BASE_DIR / "assistant_in.wav"
 
 

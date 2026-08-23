@@ -15,8 +15,6 @@ if [ ! -d .venv ]; then
 fi
 source .venv/bin/activate
 
-[ -f ../.env ] && set -a && source ../.env && set +a
-
 # Frontend (src/frontend/ -- Vite+React, see its README/vite.config.ts):
 # build fresh every run so this always serves what's actually on disk, not
 # a stale build from last time. npm install only when node_modules is

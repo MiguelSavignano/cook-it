@@ -1,10 +1,11 @@
 """Shared helpers for Cook-It: session state (memory while cooking) and
 text-to-speech. Used by both the CLI scripts and the web API."""
 import json
-import os
 import subprocess
 import time
 from pathlib import Path
+
+import settings
 
 BASE_DIR = Path(__file__).parent
 
@@ -12,7 +13,7 @@ BASE_DIR = Path(__file__).parent
 # "es_ES-davefx-medium" or "es_MX-claude-high". Must already be downloaded to
 # voices/<name>.onnx (+ .onnx.json) -- see setup.sh, which fetches whichever
 # voice this is set to. Full list: https://huggingface.co/rhasspy/piper-voices
-COOKIT_VOICE = os.environ.get("COOKIT_VOICE", "es_ES-davefx-medium")
+COOKIT_VOICE = settings.get("voice.piper")
 VOICE_PATH = BASE_DIR / "voices" / f"{COOKIT_VOICE}.onnx"
 
 OUT_WAV = BASE_DIR / "assistant_out.wav"

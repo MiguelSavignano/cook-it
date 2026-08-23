@@ -35,14 +35,15 @@ from pathlib import Path
 import requests
 
 import recipe_store
+import settings
 from common import load_pantry, save_pantry, clear_pantry
 
-OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
+OLLAMA_BASE_URL = settings.get("ollama.base_url").rstrip("/")
 OLLAMA_CHAT_URL = f"{OLLAMA_BASE_URL}/api/chat"
 
 # Text model for steps 3-6. Short reasoning over a name list -- the same
 # model recipe_engine.py uses for generation is plenty.
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma3")
+OLLAMA_MODEL = settings.get("ollama.model")
 
 # --- Vision backend ----------------------------------------------------
 # "ollama"    -> OLLAMA_VISION_MODEL (a multimodal Ollama model), prompted
@@ -60,15 +61,15 @@ OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma3")
 #                accuracy by a distance, but needs the network, so it is
 #                not the default: the kitchen keeps working when the router
 #                reboots.
-VISION_BACKEND = os.environ.get("COOKIT_VISION_BACKEND", "ollama")
-OLLAMA_VISION_MODEL = os.environ.get("COOKIT_VISION_MODEL", "gemma3")
-MOONDREAM_MODEL = os.environ.get("COOKIT_MOONDREAM_MODEL", "moondream")
-CLAUDE_VISION_MODEL = os.environ.get("COOKIT_CLAUDE_MODEL", "sonnet")
+VISION_BACKEND = settings.get("vision.backend")
+OLLAMA_VISION_MODEL = settings.get("vision.ollama_model")
+MOONDREAM_MODEL = settings.get("vision.moondream_model")
+CLAUDE_VISION_MODEL = settings.get("vision.claude_model")
 
 # Vision cold-start is brutal on CPU -- measured ~180s to load moondream vs
 # ~0.4s per call once resident. Whatever the flow costs, it should not be
 # paying that on every photo, so the vision model is asked to stay loaded.
-VISION_KEEP_ALIVE = os.environ.get("COOKIT_VISION_KEEP_ALIVE", "30m")
+VISION_KEEP_ALIVE = settings.get("vision.keep_alive")
 
 MAX_SUGGESTIONS = 3
 

@@ -18,12 +18,13 @@ from pathlib import Path
 import requests
 
 import recipe_store
+import settings
 from common import load_state, save_state, clear_state
 
 BASE_DIR = Path(__file__).parent
 CACHE_DIR = BASE_DIR / "cache_llm"
 CACHE_DIR.mkdir(exist_ok=True)
-OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
+OLLAMA_BASE_URL = settings.get("ollama.base_url").rstrip("/")
 OLLAMA_CHAT_URL = f"{OLLAMA_BASE_URL}/api/chat"
 
 # Two models, picked for what each call actually needs -- see docs/feasibility.md
@@ -35,8 +36,8 @@ OLLAMA_CHAT_URL = f"{OLLAMA_BASE_URL}/api/chat"
 #   - Follow-up questions (process_question): qwen2.5:3b -- best output quality
 #     of the small models tested, and answers here are short (1-3 sentences),
 #     so its lower raw tok/s matters less than getting the answer right.
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma3")
-OLLAMA_QUESTION_MODEL = os.environ.get("OLLAMA_QUESTION_MODEL", "qwen2.5:3b")
+OLLAMA_MODEL = settings.get("ollama.model")
+OLLAMA_QUESTION_MODEL = settings.get("ollama.question_model")
 
 # NOTE: the instructions below are written in Spanish on purpose -- they tell
 # the LLM how to write Spanish output for a Spanish-speaking user, and models
