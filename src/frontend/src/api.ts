@@ -1,12 +1,19 @@
 /**
  * Cook-It API client -- thin typed wrappers over src/api.py's endpoints.
- * Every path is relative (no leading slash): resolves correctly whether the
- * SPA's current URL is "/" or "/cook" (both are one directory level deep,
- * same as the old static pages were), and if this ever ends up reverse
- * proxied under a subpath (e.g. Caddy "/cookit/*") it still lands on that
- * subpath's own /api instead of the domain root's.
+ *
+ * Paths are resolved against Vite's BASE_URL rather than against the
+ * current document. They used to be plain document-relative strings
+ * ("api/state"), which worked only because every route was exactly one
+ * level deep ("/" and "/cook"); a shared recipe's URL is "/r/<uuid>", two
+ * levels deep, and would have sent every call to "/r/api/*". BASE_URL
+ * keeps the property that motivated relative paths in the first place --
+ * reverse proxying the whole app under a subpath (e.g. Caddy "/cookit/*")
+ * still hits that subpath's own /api -- by pinning it to the base the app
+ * was built for instead of to the route it happens to be on.
  */
 import type { Step } from './lib/timer';
+
+const apiUrl = (path: string) => `${import.meta.env.BASE_URL}${path}`;
 
 export interface Ingredient {
   item: string;
@@ -17,6 +24,8 @@ export interface Ingredient {
 /** GET /api/state -- {active: false} (or a 404-shaped absence) when nothing's cooking. */
 export interface RecipeState {
   active?: false;
+  /** The recipe being cooked, so it can be shared without a lookup by name. */
+  uuid?: string;
   name: string;
   servings?: string | number | null;
   summary?: string;
@@ -33,10 +42,29 @@ export function isActiveState(state: RecipeState | null | undefined): state is R
 
 /** GET /api/recipes -- the local recipe list for the "tap to pick one" home screen. */
 export interface RecipeListItem {
+  /** Identity AND share link: "/r/<uuid>" (see lib/share.ts). */
+  uuid: string;
   name: string;
   servings?: string | number | null;
   tip?: string;
 }
+
+/** GET /api/recipes/{uuid} -- a full recipe, rendered without cooking it. */
+export interface Recipe {
+  uuid: string;
+  name: string;
+  servings?: string | number | null;
+  summary?: string;
+  ingredients: Ingredient[];
+  steps: Step[];
+  tip?: string;
+  /** True for a curated recipe (src/recipes/*.json), false for a generated one. */
+  verified_source: boolean;
+}
+
+export type RecipeResponse =
+  | { ok: true; recipe: Recipe }
+  | { ok: false; reason?: string; error?: string };
 
 interface AudioFields {
   spoken_text: string;
@@ -74,12 +102,12 @@ export interface StepData {
 }
 
 async function getJSON<T>(path: string): Promise<T> {
-  const res = await fetch(path);
+  const res = await fetch(apiUrl(path));
   return res.json() as Promise<T>;
 }
 
 async function postJSON<T>(path: string, body?: unknown): Promise<T> {
-  const res = await fetch(path, {
+  const res = await fetch(apiUrl(path), {
     method: 'POST',
     ...(body !== undefined
       ? { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
@@ -94,8 +122,12 @@ export const resetSession = () => postJSON<{ ok: boolean }>('api/reset');
 
 export const listRecipes = () => getJSON<RecipeListItem[]>('api/recipes');
 
-export const selectRecipe = (name: string) =>
-  postJSON<VoiceResponse>('api/recipes/select', { name });
+/** The recipe behind a shared link -- does NOT start cooking it. */
+export const getRecipe = (uuid: string) => getJSON<RecipeResponse>(`api/recipes/${uuid}`);
+
+/** Tapping a card, or "empezar a cocinar" on a shared link. No STT, no LLM. */
+export const startRecipe = (uuid: string) =>
+  postJSON<VoiceResponse>(`api/recipes/${uuid}/start`);
 
 export const nextStep = () => postJSON<VoiceResponse<StepData>>('api/next');
 
@@ -106,7 +138,7 @@ export const previousStep = () => postJSON<VoiceResponse<StepData>>('api/previou
 export async function askQuestion(blob: Blob): Promise<VoiceResponse> {
   const form = new FormData();
   form.append('audio', blob, 'clip.webm');
-  const res = await fetch('api/question', { method: 'POST', body: form });
+  const res = await fetch(apiUrl('api/question'), { method: 'POST', body: form });
   return res.json();
 }
 
@@ -114,7 +146,7 @@ export async function askQuestion(blob: Blob): Promise<VoiceResponse> {
 // Photo -> ingredients -> ideas -> a draft negotiated down to what the user
 // actually has, then handed off to /cook. See src/pantry.py for the flow.
 // These endpoints return no audio (the negotiation is tap-driven on screen)
-// except confirmPantry(), which speaks the opening line like selectRecipe.
+// except confirmPantry(), which speaks the opening line like startRecipe.
 
 /** One of the 2-3 ideas proposed from the detected ingredients. */
 export interface PantrySuggestion {
@@ -173,7 +205,7 @@ export const resetPantry = () => postJSON<{ ok: boolean }>('api/pantry/reset');
 export async function uploadPantryPhoto(blob: Blob): Promise<PantryResponse> {
   const form = new FormData();
   form.append('photo', blob, 'pantry.jpg');
-  const res = await fetch('api/pantry/photo', { method: 'POST', body: form });
+  const res = await fetch(apiUrl('api/pantry/photo'), { method: 'POST', body: form });
   return res.json();
 }
 

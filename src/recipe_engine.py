@@ -17,10 +17,10 @@ from pathlib import Path
 
 import requests
 
+import recipe_store
 from common import load_state, save_state, clear_state
 
 BASE_DIR = Path(__file__).parent
-RECIPES_DIR = BASE_DIR / "recipes"
 CACHE_DIR = BASE_DIR / "cache_llm"
 CACHE_DIR.mkdir(exist_ok=True)
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
@@ -87,11 +87,11 @@ def step_text(step):
 
 
 def load_recipes():
-    recipes = {}
-    for f in sorted(RECIPES_DIR.glob("*.json")):
-        r = json.loads(f.read_text())
-        recipes[r["name"]] = r
-    return recipes
+    """The curated recipes, keyed by name. Reading them goes through
+    recipe_store so every recipe carries its uuid (its shareable address --
+    see that module) wherever it ends up: the picker, a cooking session, or
+    an LLM prompt."""
+    return recipe_store.load_curated()
 
 
 # Common filler words that shouldn't count when matching a recipe name against
@@ -154,8 +154,9 @@ def build_messages(user_text, local_recipe):
     ]
 
 
-def _slugify(text):
-    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+# The same slug rule the store uses to key generated recipes by dish --
+# here it keys the "what the user said" cache below instead.
+_slugify = recipe_store.slugify
 
 
 def _read_general_cache(user_text):
@@ -243,27 +244,59 @@ def request_recipe(user_text):
     if local_recipe:
         steps = local_recipe["steps"]
         ingredients = local_recipe["ingredients"]
-        verified_source = True
         name = local_recipe["name"]
         servings = local_recipe.get("servings")
     else:
         steps = generated.get("steps", [])
         ingredients = generated.get("ingredients", [])
-        verified_source = False
         name = user_text
         servings = None
 
     if not steps:
         raise ValueError(f"Could not get steps for: {user_text!r}")
 
+    if local_recipe:
+        # The curated file already carries a uuid; summary/tip may have just
+        # been written by the LLM (that happens when the file has none).
+        recipe = {**local_recipe, "summary": summary, "tip": tip}
+    else:
+        # Nothing curated matched, so this dish has no address yet -- give it
+        # one (or reuse the one it already got) so a recipe the LLM just
+        # wrote is every bit as shareable as a curated one.
+        recipe = recipe_store.remember_generated({
+            "name": name,
+            "servings": servings,
+            "summary": summary,
+            "ingredients": ingredients,
+            "steps": steps,
+            "tip": tip,
+        })
+
+    return {**begin_recipe(recipe), "llm_time": llm_time}
+
+
+def begin_recipe(recipe):
+    """Makes `recipe` (a recipe_store record) the active cooking session,
+    starting at step 1, and returns what the API/CLI speak from.
+
+    The one place a cooking session is created -- by voice, by tapping a
+    card, by opening a shared link, or out of the pantry flow -- so the
+    session always carries the recipe's uuid and can be shared mid-cooking
+    without having to look it back up by name.
+    """
+    steps = recipe.get("steps") or []
+    if not steps:
+        raise ValueError(f"Recipe has no steps: {recipe.get('name')!r}")
+
     state = {
-        "name": name,
-        "servings": servings,
-        "summary": summary,
-        "ingredients": ingredients,
+        "uuid": recipe.get("uuid"),
+        "name": recipe.get("name", ""),
+        "servings": recipe.get("servings"),
+        "summary": recipe.get("summary", ""),
+        "ingredients": recipe.get("ingredients", []),
         "steps": steps,
-        "tip": tip,
-        "verified_source": verified_source,
+        "tip": recipe.get("tip", ""),
+        "verified_source": bool(recipe.get("verified_source")),
         "current_step": 0,  # 0-based; 0 = first step already shown/spoken
     }
     save_state(state)
@@ -272,8 +305,17 @@ def request_recipe(user_text):
         **state,
         "total_steps": len(steps),
         "step_text": step_text(steps[0]),
-        "llm_time": llm_time,
     }
+
+
+def start_recipe_by_uuid(recipe_uuid):
+    """"Empezar a cocinar" on a shared link (/r/<uuid>). No LLM call and no
+    name matching: the uuid resolves to exactly one recipe, curated or
+    generated, or to nothing at all."""
+    recipe = recipe_store.find(recipe_uuid)
+    if recipe is None:
+        raise ValueError(f"Unknown recipe uuid: {recipe_uuid!r}")
+    return begin_recipe(recipe)
 
 
 def next_step():

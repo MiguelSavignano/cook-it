@@ -4,7 +4,7 @@ import type { RecipeListItem } from '../api';
 interface RecipeListProps {
   /** null = still loading. */
   recipes: RecipeListItem[] | null;
-  onSelect: (name: string) => void;
+  onSelect: (uuid: string) => void;
 }
 
 /** The "tap to pick one" home-screen list (Picker.tsx) -- no voice/LLM
@@ -14,7 +14,7 @@ export default function RecipeList({ recipes, onSelect }: RecipeListProps) {
     <div className="recipe-list">
       {recipes === null && <div className="loading-hint">Cargando recetas…</div>}
       {recipes?.length === 0 && <div className="loading-hint">No hay recetas locales todavía.</div>}
-      {recipes?.map((r) => <RecipeCard key={r.name} recipe={r} onSelect={onSelect} />)}
+      {recipes?.map((r) => <RecipeCard key={r.uuid} recipe={r} onSelect={onSelect} />)}
     </div>
   );
 }
