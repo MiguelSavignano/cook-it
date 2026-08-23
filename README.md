@@ -120,7 +120,9 @@ src/
                      src/static_dist/, which api.py serves; run_web.sh does this for
                      you. `npm run dev` for a fast dev loop instead (proxies /api/* to
                      api.py -- see frontend/vite.config.ts).
-  recipes/          Local recipe database (JSON), source of truth for RAG
+  recipes/          Seed recipes: two examples a fresh browser starts with.
+                     YOUR library lives in the browser (IndexedDB) and syncs
+                     to Drive -- see frontend/src/lib/recipeStore.ts
   recipe_markdown.py  Recipe JSON <-> Markdown, lossless both ways
   drive.py          Google Drive sync (optional, off by default)
   setup_drive.sh    Everything scriptable of the Google Cloud setup for it
