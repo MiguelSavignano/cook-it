@@ -197,6 +197,17 @@ export interface PantryError {
 
 export type PantryResponse = PantryOk | PantryError;
 
+/**
+ * Cook the active recipe for a different number of people. Adjusts the
+ * SESSION -- no second recipe is created and the step you're on is kept.
+ * Pass `servings` for an absolute count or `factor` for "el doble".
+ */
+export const scaleRecipe = (body: { servings?: number; factor?: number }) =>
+  postJSON<VoiceResponse<{ servings?: string | number | null; ingredients?: Ingredient[] }>>(
+    'api/recipes/scale',
+    body,
+  );
+
 /** The project's factory recipes, to fill an empty browser library. */
 export const getSeedRecipes = () => getJSON<Recipe[]>('api/recipes/seed');
 

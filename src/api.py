@@ -46,6 +46,7 @@ import recipe_store
 import settings
 from common import load_state, clear_state, synthesize
 from recipe_engine import (
+    scale_active_recipe,
     load_recipes, next_step, previous_step, process_question, start_recipe_by_uuid,
 )
 
@@ -210,6 +211,36 @@ def _no_active_recipe_response(attempted):
             "audio_mime": "audio/wav",
         }
     )
+
+
+class ScaleRequest(BaseModel):
+    """Either an absolute serving count, or a multiplier ("el doble")."""
+    servings: float | None = None
+    factor: float | None = None
+
+
+@app.post("/api/recipes/scale")
+def scale_recipe(body: ScaleRequest):
+    """Cook the active recipe for a different number of people.
+
+    Adjusts the SESSION, not your library: no second recipe is created, no
+    new uuid is minted, and the step you're on is kept (see scaling.py). The
+    same thing happens when you just say "hazlo para seis" -- this endpoint
+    is for the buttons.
+    """
+    if body.servings is not None:
+        request = ("servings", float(body.servings))
+    elif body.factor is not None:
+        request = ("factor", float(body.factor))
+    else:
+        return JSONResponse(
+            {"ok": False, "reason": "bad_request", "error": "Falta servings o factor."},
+            status_code=400,
+        )
+    result = scale_active_recipe(request)
+    if not result["data"]["ok"]:
+        return JSONResponse({**result["data"], "spoken_text": result["spoken_text"]}, status_code=409)
+    return _respond_with_audio(result)
 
 
 @app.post("/api/next")

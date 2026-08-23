@@ -69,6 +69,28 @@ To change something without editing the committed file, in order of precedence:
      mic_device: plughw:2,0
    ```
 
+## Cooking for a different number of people
+
+Say *"hazlo para seis"*, *"el doble"* or *"la mitad"* while a recipe is
+active — or use the −/+ next to the ingredient list — and the amounts are
+recalculated. It adjusts **the session, not your library**: no second recipe
+is created, no new uuid is minted, the link you already shared still points
+at the recipe as written, and the step you're on is kept. Start the recipe
+again and the original amounts are back.
+
+Two things deliberately don't change:
+
+- **Ingredients with no number** (`al gusto`, `1 pizca`). Twice the salt "to
+  taste" isn't a quantity, it's a mistake.
+- **The wording of the steps.** A step saying "añade los 600 g de ternera"
+  keeps saying that; the ingredient list is the one place amounts are
+  authoritative, and it's the place that changes. The spoken confirmation
+  says so.
+
+Things you count are rounded to whole units — 7.5 eggs is not a quantity —
+and a second adjustment measures from the ORIGINAL amounts, so asking for 6
+and then 8 gives exactly what asking for 8 would have.
+
 ## Recipes in Google Drive (optional)
 
 Recipes are JSON because that's what the app reads, but JSON is a poor thing to hand a person.
@@ -124,6 +146,7 @@ src/
                      YOUR library lives in the browser (IndexedDB) and syncs
                      to Drive -- see frontend/src/lib/recipeStore.ts
   recipe_markdown.py  Recipe JSON <-> Markdown, lossless both ways
+  scaling.py        Cooking the same recipe for more or fewer people
   drive.py          Google Drive sync (optional, off by default)
   setup_drive.sh    Everything scriptable of the Google Cloud setup for it
   settings.yml      All configuration, committed (settings.py reads it)

@@ -223,11 +223,17 @@
   margin-bottom: -4px;
 }
 /* The summary is prose, not an instruction: lighter than a step's text so
-   the two never read as the same kind of thing. */
+   the two never read as the same kind of thing. Capped because it's the
+   least load-bearing thing on the card -- the ingredients below it are what
+   you came to read. */
 .step-row.current .intro-name + .step-headline {
   font-weight: 400;
   color: var(--ink-soft);
   line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .user-text { font-size: 0.8rem; font-style: italic; color: var(--ink-faint); }
@@ -274,6 +280,92 @@
   font-weight: 600;
   cursor: pointer;
   touch-action: manipulation;
+}
+
+/* --- Ingredients, on the intro card. This is also the only place the
+   amounts are authoritative: scaling for more people rewrites THIS list and
+   deliberately leaves the step wording alone (see src/scaling.py). --- */
+.ingredients {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--surface);
+}
+.ingredients-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.ingredients-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.servings-control {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.servings-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--ember);
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-family: inherit;
+  line-height: 1;
+  border-radius: 8px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.servings-btn:active:not(:disabled) { background: var(--surface-2); }
+.servings-btn:disabled { opacity: 0.35; cursor: default; }
+.servings-value {
+  min-width: 4.5ch;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.ingredient-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  /* A recipe with 23 ingredients would push step 1 off the screen, so this
+     is the one box on the strip that scrolls. `pan-y` hands vertical drags
+     INSIDE it to the browser; everywhere else the drag is still the swipe
+     that changes step (see useSwipeNav and .strip-wrap's touch-action). */
+  max-height: 26vh;
+  overflow-y: auto;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+.ingredient-list li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+.ingredient-name { color: var(--ink); }
+.ingredient-amount {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
 }
 
 /* The incoming step arrives from the side it came from, so the direction of

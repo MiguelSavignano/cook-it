@@ -18,6 +18,7 @@ from pathlib import Path
 import requests
 
 import recipe_store
+import scaling
 import settings
 from common import load_state, save_state, clear_state
 
@@ -459,6 +460,38 @@ def _no_active_recipe(attempted):
     }
 
 
+def scale_active_recipe(request):
+    """Cooks the active recipe for a different number of people.
+
+    Adjusts THE SESSION, not the library: no new recipe, no new uuid, and
+    the shared link still points at the recipe as written (see scaling.py).
+    The step you're on is kept -- asking for more food shouldn't send you
+    back to step 1.
+    """
+    state = load_state()
+    if state is None:
+        return {
+            "type": "scaled",
+            "data": {"ok": False, "reason": "no_active_recipe"},
+            "spoken_text": "No tengo ninguna receta activa que ajustar.",
+        }
+    try:
+        scaled, spoken = scaling.rescale_from_original(state, request)
+    except ValueError as e:
+        return {"type": "scaled", "data": {"ok": False, "reason": "cannot_scale"},
+                "spoken_text": str(e)}
+    save_state(scaled)
+    return {
+        "type": "scaled",
+        "data": {
+            "ok": True,
+            "servings": scaled.get("servings"),
+            "ingredients": scaled.get("ingredients", []),
+        },
+        "spoken_text": spoken,
+    }
+
+
 def process_question(user_text):
     """For the web app's microphone button: "next"/"previous" are already
     separate buttons (no voice, no LLM), so anything that reaches here is
@@ -474,6 +507,15 @@ def process_question(user_text):
     recipes = load_recipes()
     local_recipe = find_local_recipe(user_text, recipes)
     state = load_state()
+
+    # "hazlo para seis" adjusts the recipe you're already cooking. Checked
+    # before the LLM because a regex settles it (see scaling.py) and the
+    # user is standing there with their hands full -- and only when no
+    # recipe NAME was said, so "una tortilla para 6" still starts a recipe.
+    if state is not None and not local_recipe:
+        request = scaling.parse_scale_request(user_text)
+        if request:
+            return scale_active_recipe(request)
 
     if local_recipe or state is None:
         data = request_recipe(user_text)

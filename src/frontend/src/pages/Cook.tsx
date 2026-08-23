@@ -9,7 +9,7 @@ import { useStepTimer } from '../hooks/useStepTimer';
 import { useSwipeNav } from '../hooks/useSwipeNav';
 import { parseStepTimerSeconds, stepText, stepTip } from '../lib/timer';
 import {
-  askQuestion, getState, isActiveState, nextStep, previousStep, resetSession,
+  askQuestion, getState, isActiveState, nextStep, previousStep, resetSession, scaleRecipe,
   type RecipeState, type StepData, type VoiceResponse,
 } from '../api';
 import './Cook.css';
@@ -227,6 +227,39 @@ export default function Cook() {
   const atFirstStep = view.kind === 'active' && view.state.current_step === 0;
   const finished = view.kind === 'finished';
 
+  /**
+   * Cook this recipe for more or fewer people. Adjusts the session only --
+   * the recipe in your library keeps the amounts it was written with, and no
+   * second recipe is created (see src/scaling.py).
+   */
+  const changeServings = useCallback(
+    async (delta: number) => {
+      if (view.kind !== 'active') return;
+      const current = parseFloat(String(view.state.servings ?? '').replace(',', '.'));
+      const target = Number.isFinite(current) ? Math.max(1, Math.round(current) + delta) : null;
+      setNavBusy(true);
+      try {
+        // No serving count to count from ("una bandeja"): halve or double
+        // instead, which needs no base number.
+        const data = target !== null
+          ? await scaleRecipe({ servings: target })
+          : await scaleRecipe({ factor: delta > 0 ? 2 : 0.5 });
+        speak(data.audio_base64, data.audio_mime);
+        if (!data.ok) {
+          setVoiceState('confused', data.spoken_text || 'No pude ajustar las cantidades');
+          return;
+        }
+        await refreshState();
+      } catch (err) {
+        setVoiceState('confused', 'Error hablando con el servidor');
+        console.error(err);
+      } finally {
+        setNavBusy(false);
+      }
+    },
+    [refreshState, setVoiceState, speak, view],
+  );
+
   const goNext = useCallback(() => {
     setNavDir('up');
     // Leaving the intro just uncovers step 1, which the server is already
@@ -352,6 +385,43 @@ export default function Cook() {
                 <div className="row-body">
                   <div className="intro-name">{view.state.name}</div>
                   <div className="step-headline size-sm">{view.state.summary}</div>
+
+                  {view.state.ingredients && view.state.ingredients.length > 0 && (
+                    <div className="ingredients">
+                      <div className="ingredients-head">
+                        <span className="ingredients-title">Ingredientes</span>
+                        {/* Changing this rewrites the amounts for THIS session
+                            only -- it never creates a second recipe. Saying
+                            "hazlo para seis" does exactly the same thing. */}
+                        <div className="servings-control">
+                          <button
+                            className="servings-btn"
+                            aria-label="Menos raciones"
+                            disabled={navBusy}
+                            onClick={() => void changeServings(-1)}
+                          >−</button>
+                          <span className="servings-value">{String(view.state.servings ?? '—')}</span>
+                          <button
+                            className="servings-btn"
+                            aria-label="Más raciones"
+                            disabled={navBusy}
+                            onClick={() => void changeServings(1)}
+                          >+</button>
+                        </div>
+                      </div>
+                      <ul className="ingredient-list">
+                        {view.state.ingredients.map((ing, i) => (
+                          <li key={`${ing.item}-${i}`}>
+                            <span className="ingredient-name">{ing.item}</span>
+                            <span className="ingredient-amount">
+                              {[ing.amount, ing.unit].filter(Boolean).join(' ')}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
                   {mainTip && (
                     <div className="tip-box">
                       <span className="tip-icon"><Bulb size={16} /></span>
