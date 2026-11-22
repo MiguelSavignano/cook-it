@@ -21,6 +21,23 @@ target user is a Spanish speaker, and its Piper voice/Whisper language are set t
 documentation and code (identifiers, comments) are in English; see `docs/spec.md` if you want to
 adapt it to another language.
 
+## Cook-It for ChatGPT
+
+The [Cook-It skill](skills/cook-it/SKILL.md) brings the cooking workflow to chat. Ask it to guide
+you through a recipe, suggest a dish from pantry ingredients, or adjust servings while cooking.
+It works independently of the offline web app and uses recipes and ingredients you provide in chat.
+
+To prepare a package for the public plugin directory, run this from the repository root:
+
+```sh
+python3 -m zipfile -c cook-it-plugin.zip plugin.json assets skills
+```
+
+Upload the ZIP using the [OpenAI plugin submission portal](https://platform.openai.com/plugins).
+Choose your verified developer identity, confirm the listing category, and submit for review.
+After approval, publish it from the same dashboard. See the
+[submission guide](https://developers.openai.com/plugins/deploy/submission) for details.
+
 ## Requirements
 
 For this to work, the machine it runs on needs:
