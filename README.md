@@ -1,6 +1,8 @@
 # Cook-It for ChatGPT
 
-Cook-It guides you through recipes step by step, adjusts servings, and suggests meals from ingredients you have. With Google Drive connected, you can search your cookbook by ingredient and save recipes as Google Docs when write actions are available.
+Cook-It guides you through recipes step by step and suggests meals from ingredients you have. Export recipes as downloadable Markdown when your chat supports file creation, or copy the Markdown to save anywhere. You can also upload or paste a recipe, organize it with the Cook-It template, and adjust servings.
+
+Google Drive is optional. When Drive is connected and allows writes, Cook-It saves and updates recipes there by default. Otherwise it gives you Markdown to keep wherever you like. You can request a download at any time.
 
 ## Install the skill
 
@@ -21,7 +23,7 @@ https://github.com/MiguelSavignano/cook-it/blob/main/skills/cook-it/SKILL.md
 https://github.com/MiguelSavignano/cook-it/blob/main/skills/cook-it/references/google-docs.md
 https://github.com/MiguelSavignano/cook-it/blob/main/skills/cook-it/references/recipe-template.md
 
-If you can't open a link, ask me to paste that file's contents. If you can't save recipes to Google Docs, give me the recipe in Markdown so I can save it myself.
+If you can't open a link, ask me to paste that file's contents. When I ask to save or update a saved recipe, use my connected Google Drive if write actions are available. Otherwise give me a downloadable Markdown file if you can create one, or give me copyable Markdown. If I ask to download or export, give me Markdown directly.
 ```
 
 Pin the conversation in the sidebar so you can return to it later.
@@ -31,6 +33,7 @@ Pin the conversation in the sidebar so you can return to it later.
 - “Guide me through making tortilla de patatas for four, one step at a time.”
 - “Scale this recipe to six servings and keep me on the same step.”
 - “Find recipes in my cookbook that use mascarpone.”
+- “Organize this recipe I uploaded, scale it to six servings, and give me a Markdown file.”
 - “Save this recipe to Google Docs and tag it as a dessert.”
 
 ## Submit the plugin for public listing

@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "cook-it",
-  "version": "1.0.0",
-  "description": "Cook step by step, scale servings, and organize recipes in Google Docs.",
+  "version": "1.1.0",
+  "description": "Cook step by step, find pantry meals, and save or export recipes. Optionally import, organize, or scale your own recipes.",
   "author": {
     "name": "Miguel Savignano"
   },
@@ -12,13 +12,13 @@
       "interface": {
         "displayName": "Cook-It",
         "shortDescription": "Step-by-step cooking",
-        "longDescription": "Cook from a recipe you provide or find a meal from the ingredients you have. Cook-It guides you one step at a time, answers questions without advancing, and scales servings. With Google Drive connected and recipe write tools available, it can save recipes as Google Docs and find them by category, tags, or ingredients.",
+        "longDescription": "Cook one step at a time, ask questions without losing your place, and find meals from ingredients you have. Save recipes to Google Docs when Drive write access is available, or export them as Markdown. You can also upload or paste your own recipe, organize it with the Cook-It template, and adjust servings.",
         "developerName": "Miguel Savignano",
         "category": "Lifestyle",
         "defaultPrompt": [
           "Guide me through making tortilla de patatas for four, one step at a time.",
           "I have eggs, potatoes and onions. What can I cook?",
-          "Save this recipe to my Google Docs cookbook and tag it for easy searching."
+          "Organize my uploaded recipe, scale it to six servings, and export it as Markdown."
         ],
         "composerIcon": "./assets/cook-it.svg",
         "logo": "./assets/cook-it.svg"

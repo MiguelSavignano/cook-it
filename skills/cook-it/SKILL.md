@@ -1,6 +1,6 @@
 ---
 name: cook-it
-description: Guide a cook through a recipe one step at a time, adapt servings, suggest meals from pantry ingredients, and answer questions without losing the current step. Find, save, and update recipes in a personal Google Docs cookbook with categories, tags, and ingredient search. Use for interactive cooking, pantry-based meal ideas, recipe scaling, or cookbook management.
+description: Guide cooks through recipes one step at a time, answer questions without losing their place, and suggest meals from pantry ingredients. Save recipes to a connected Google Docs cookbook or export them as Markdown. Also import uploaded or pasted recipes, organize them with a recipe template, and scale servings.
 ---
 
 # Cook-It
@@ -31,9 +31,13 @@ When the cook asks for a specific recipe, or chooses a dish from suggestions, us
 - Keep the current step. Use the scaled ingredient list for quantities mentioned in later instructions. If the cook has already added ingredients, explain what can still be adjusted before suggesting changes.
 - Keep oven temperatures and cooking times unless there is a specific reason to change them, such as a different pan size or food thickness. Point out the relevant doneness cue.
 
-## Use the cookbook
+## Import and organize a recipe
 
-- When asked to find, save, or update a recipe, follow [the Google Docs workflow](references/google-docs.md). Use the signed-in cook's Google Drive and Google Docs tools.
-- Use [the recipe template](references/recipe-template.md) as the content template for Google Docs and when sharing a recipe in Markdown.
-- Persist recipes only when the cook asks to save or update them. Session-only adjustments stay in chat unless the cook asks to save them.
-- If the Google Drive connector or its write tools are unavailable, give the recipe in Markdown and say it has not been saved. Ask the cook to connect Google Drive in ChatGPT if they want to save it there.
+If the cook already has a recipe, invite them to upload the file or paste its contents. Read the supplied recipe and preserve its source quantities, units, sections, steps, timing, and notes. Organize it using the [recipe template](references/recipe-template.md) when asked, including category, tags, and key ingredients. Flag missing or unclear details. Keep the original amounts available for future scaling. An exported Markdown recipe can be uploaded again in a new chat.
+
+## Export and save a recipe
+
+- For explicit download or Markdown export requests, or when Google Drive saving is unavailable, use the [recipe template](references/recipe-template.md). Export the current version, including the selected servings, scaled quantities, and any step quantities that depend on them. Include the complete recipe even if the cook is on a single step.
+- When file creation and download links are available, create a UTF-8 `.md` file with a descriptive recipe filename and return its download link. Tell the cook they can save it wherever they prefer. If file creation or delivery fails or is unavailable, return the complete Markdown in one copyable fenced block. Never claim a file was saved or downloaded unless that action succeeded.
+- For requests to save a recipe or update a saved recipe, use the connected Google Docs cookbook by default when the necessary actions are available. Follow the [Google Docs workflow](references/google-docs.md) and return the saved document link. If saving is unavailable or fails, explain what happened and provide the Markdown export. Honor explicit download requests without writing to Drive. For cookbook lookup, use the Google Docs workflow when available.
+- Keep session adjustments in chat until the cook asks to export or save them.
