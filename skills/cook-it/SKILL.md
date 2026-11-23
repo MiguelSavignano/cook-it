@@ -30,6 +30,6 @@ Reply in the cook's language. Keep instructions short enough to follow with hand
 ## Use the cookbook
 
 - When asked to find, save, or update a recipe, follow [the Google Docs workflow](references/google-docs.md). Use the signed-in cook's Google Drive and Google Docs tools.
-- Use [the recipe example](references/recipe-example.md) as the content template for Google Docs and when sharing a recipe in Markdown.
+- Use [the recipe template](references/recipe-template.md) as the content template for Google Docs and when sharing a recipe in Markdown.
 - Persist recipes only when the cook asks to save or update them. Session-only adjustments stay in chat unless the cook asks to save them.
 - If the Google Drive connector or its write tools are unavailable, give the recipe in Markdown and say it has not been saved. Ask the cook to connect Google Drive in ChatGPT if they want to save it there.

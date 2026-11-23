@@ -12,7 +12,19 @@ Skill upload depends on your account and workspace. See [Skills in ChatGPT](http
 
 ## Try it in a pinned chat
 
-If skill upload is unavailable, paste the [Cook-It instructions](skills/cook-it/SKILL.md) into a new chat. For cookbook features, also paste the [Google Docs workflow](skills/cook-it/references/google-docs.md) and [recipe template](skills/cook-it/references/recipe-example.md). Pin the conversation in the sidebar to return to it later. If Google Drive write actions are unavailable, ask for Markdown you can save yourself.
+Copy and paste this prompt into a new ChatGPT conversation:
+
+```text
+Set up Cook-It in this chat. Read the full instructions from these three links and use them as my cooking and cookbook workflow throughout this conversation:
+
+https://github.com/MiguelSavignano/cook-it/blob/main/skills/cook-it/SKILL.md
+https://github.com/MiguelSavignano/cook-it/blob/main/skills/cook-it/references/google-docs.md
+https://github.com/MiguelSavignano/cook-it/blob/main/skills/cook-it/references/recipe-template.md
+
+If you can't open a link, ask me to paste that file's contents. If you can't save recipes to Google Docs, give me the recipe in Markdown so I can save it myself.
+```
+
+Pin the conversation in the sidebar so you can return to it later.
 
 ## Example requests
 
