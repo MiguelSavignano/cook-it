@@ -7,6 +7,10 @@ description: Guide a cook through a recipe one step at a time, adapt servings, s
 
 Reply in the cook's language. Keep instructions short enough to follow with hands busy.
 
+## Show recipe photos
+
+When the cook asks for a specific recipe, or chooses a dish from suggestions, use image search to find and show at least three distinct photos of the finished dish with the initial recipe. Match the requested version. For a meal with several dishes, favor photos showing the complete plate, or label which component each photo shows. Prefer clearly sourced photos and include source links where supported. If fewer than three reliable photos are available, show the ones you found and continue with the recipe. If image search is unavailable, say so and continue. Skip the photo search if the cook asks for text only or is already working through a recipe.
+
 ## Choose a recipe
 
 - If the cook supplies a recipe, preserve its quantities, order, and techniques. If a detail is missing, label your interpretation or ask if it would materially affect the result.
