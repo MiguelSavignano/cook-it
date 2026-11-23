@@ -32,16 +32,17 @@ by ingredient. The [Markdown example](skills/cook-it/references/recipe-example.m
 template for the Google Docs version and for Markdown exports. The offline app's
 existing Google Drive sync format is documented below.
 
-To prepare a package for the public plugin directory, run this from the repository root:
+### Install the skill in ChatGPT
 
-```sh
-python3 -m zipfile -c cook-it-plugin.zip plugin.json assets skills
-```
+1. Download [cook-it-skill.zip](cook-it-skill.zip?raw=1).
+2. In ChatGPT, open **Plugins → Skills → Create → Upload from your computer** and select the ZIP.
+3. After the upload scan completes, start a new chat and ask “Use Cook-It to guide me through making tortilla de patatas.” Connect Google Drive if you want to save or find recipes in your cookbook.
 
-Upload the ZIP using the [OpenAI plugin submission portal](https://platform.openai.com/plugins).
-Choose your verified developer identity, confirm the listing category, and submit for review.
-After approval, publish it from the same dashboard. See the
-[submission guide](https://developers.openai.com/plugins/deploy/submission) for details.
+Skill upload depends on your account and workspace. OpenAI documents it for eligible Business, Enterprise, Healthcare, and Edu users. If the upload option is missing, you can paste the [Cook-It instructions](skills/cook-it/SKILL.md) into a chat for that session. Paste the linked recipe template too if you want to use its format. See [Skills in ChatGPT](https://help.openai.com/en/articles/20001066-skills-in-chatgpt).
+
+### Submit the plugin for public listing
+
+Download [cook-it-plugin.zip](cook-it-plugin.zip?raw=1) and upload it as a skills-only plugin in the [OpenAI plugin submission portal](https://platform.openai.com/plugins). Choose your verified developer identity, confirm the listing category, and submit for review. After approval, publish it from the dashboard. See the [submission guide](https://developers.openai.com/plugins/deploy/submission).
 
 ## Requirements
 
