@@ -2,20 +2,23 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "cook-it",
   "version": "1.0.0",
-  "description": "Follow recipes one step at a time, adjust servings, and find meals from pantry ingredients.",
-  "author": { "name": "Miguel Savignano" },
+  "description": "Cook step by step, scale servings, and organize recipes in Google Docs.",
+  "author": {
+    "name": "Miguel Savignano"
+  },
   "repository": "https://github.com/MiguelSavignano/cook-it",
   "extensions": {
     "com.openai": {
       "interface": {
         "displayName": "Cook-It",
         "shortDescription": "Step-by-step cooking",
-        "longDescription": "Cook from a recipe you provide or find a meal from the ingredients you have. Cook-It gives you one step at a time, answers questions without advancing the recipe, and scales servings as you cook. This version runs in chat and does not connect to the offline Cook-It app or its recipe library.",
+        "longDescription": "Cook from a recipe you provide or find a meal from the ingredients you have. Cook-It guides you one step at a time, answers questions without advancing, and scales servings. With Google Drive connected and recipe write tools available, it can save recipes as Google Docs and find them by category, tags, or ingredients.",
         "developerName": "Miguel Savignano",
         "category": "Lifestyle",
         "defaultPrompt": [
           "Guide me through making tortilla de patatas for four, one step at a time.",
-          "I have eggs, potatoes and onions. What can I cook?"
+          "I have eggs, potatoes and onions. What can I cook?",
+          "Save this recipe to my Google Docs cookbook and tag it for easy searching."
         ],
         "composerIcon": "./assets/cook-it.svg",
         "logo": "./assets/cook-it.svg"

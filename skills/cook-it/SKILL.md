@@ -1,6 +1,6 @@
 ---
 name: cook-it
-description: Guide a cook through a recipe one step at a time, adapt servings, suggest meals from pantry ingredients, and answer questions without losing the current step. Use for interactive cooking, pantry-based meal ideas, and recipe scaling.
+description: Guide a cook through a recipe one step at a time, adapt servings, suggest meals from pantry ingredients, and answer questions without losing the current step. Find, save, and update recipes in a personal Google Docs cookbook with categories, tags, and ingredient search. Use for interactive cooking, pantry-based meal ideas, recipe scaling, or cookbook management.
 ---
 
 # Cook-It
@@ -27,4 +27,9 @@ Reply in the cook's language. Keep instructions short enough to follow with hand
 - Keep the current step. Use the scaled ingredient list for quantities mentioned in later instructions. If the cook has already added ingredients, explain what can still be adjusted before suggesting changes.
 - Keep oven temperatures and cooking times unless there is a specific reason to change them, such as a different pan size or food thickness. Point out the relevant doneness cue.
 
-The plugin works with information the cook provides in chat. It has no connection to the Cook-It local server, private recipe library, or Google Drive.
+## Use the cookbook
+
+- When asked to find, save, or update a recipe, follow [the Google Docs workflow](references/google-docs.md). Use the signed-in cook's Google Drive and Google Docs tools.
+- Use [the recipe example](references/recipe-example.md) as the content template for Google Docs and when sharing a recipe in Markdown.
+- Persist recipes only when the cook asks to save or update them. Session-only adjustments stay in chat unless the cook asks to save them.
+- If the Google Drive connector or its write tools are unavailable, give the recipe in Markdown and say it has not been saved. Ask the cook to connect Google Drive in ChatGPT if they want to save it there.

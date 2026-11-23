@@ -25,7 +25,12 @@ adapt it to another language.
 
 The [Cook-It skill](skills/cook-it/SKILL.md) brings the cooking workflow to chat. Ask it to guide
 you through a recipe, suggest a dish from pantry ingredients, or adjust servings while cooking.
-It works independently of the offline web app and uses recipes and ingredients you provide in chat.
+It works independently of the offline web app. With Google Drive connected in ChatGPT and
+document write tools available, it can create a Google Doc for each recipe and maintain a
+cookbook index with categories, tags, and key ingredients. Ask to save a recipe or find one
+by ingredient. The [Markdown example](skills/cook-it/references/recipe-example.md) is the
+template for the Google Docs version and for Markdown exports. The offline app's
+existing Google Drive sync format is documented below.
 
 To prepare a package for the public plugin directory, run this from the repository root:
 
