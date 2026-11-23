@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "cook-it",
   "version": "1.1.0",
-  "description": "Import recipes, cook step by step, scale servings, and export to Markdown.",
+  "description": "Cook step by step, find pantry meals, and save or export recipes. Optionally import, organize, or scale your own recipes.",
   "author": {
     "name": "Miguel Savignano"
   },
@@ -12,7 +12,7 @@
       "interface": {
         "displayName": "Cook-It",
         "shortDescription": "Step-by-step cooking",
-        "longDescription": "Upload or paste a recipe, organize it with the Cook-It template, adjust servings, and cook one step at a time. Export a Markdown recipe to keep wherever you like. With write access to Google Drive, Cook-It saves recipes there by default. Markdown export is always an option.",
+        "longDescription": "Cook one step at a time, ask questions without losing your place, and find meals from ingredients you have. Save recipes to Google Docs when Drive write access is available, or export them as Markdown. You can also upload or paste your own recipe, organize it with the Cook-It template, and adjust servings.",
         "developerName": "Miguel Savignano",
         "category": "Lifestyle",
         "defaultPrompt": [

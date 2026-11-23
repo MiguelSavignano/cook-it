@@ -1,6 +1,6 @@
 # Cook-It for ChatGPT
 
-Upload or paste a recipe, organize it with the Cook-It template, adjust servings, and cook step by step. Ask to export a recipe to get a downloadable Markdown file when the chat supports file creation, or copy the Markdown directly. You can store it anywhere and upload it again later.
+Cook-It guides you through recipes step by step and suggests meals from ingredients you have. Export recipes as downloadable Markdown when your chat supports file creation, or copy the Markdown to save anywhere. You can also upload or paste a recipe, organize it with the Cook-It template, and adjust servings.
 
 Google Drive is optional. When Drive is connected and allows writes, Cook-It saves and updates recipes there by default. Otherwise it gives you Markdown to keep wherever you like. You can request a download at any time.
 

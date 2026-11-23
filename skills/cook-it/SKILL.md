@@ -1,6 +1,6 @@
 ---
 name: cook-it
-description: Import uploaded or pasted recipes, organize them with a recipe template, scale servings, guide cooking step by step, suggest pantry meals, and export recipes as downloadable Markdown. Optionally find or save recipes in a connected Google Docs cookbook. Use for recipe import, cooking, scaling, formatting, export, or cookbook management.
+description: Guide cooks through recipes one step at a time, answer questions without losing their place, and suggest meals from pantry ingredients. Save recipes to a connected Google Docs cookbook or export them as Markdown. Also import uploaded or pasted recipes, organize them with a recipe template, and scale servings.
 ---
 
 # Cook-It
